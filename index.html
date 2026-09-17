@@ -1909,24 +1909,73 @@ const QUADRANTS = [
        ]},
        {type:'fields',key:'observacoes',label:'Observações',fields:[{key:'texto',label:'Observações'}]},
      ]},
-    {id:'funil',title:'Funil de Conteúdo',desc:'Estrutura de conteúdo por etapa de consciência do paciente.',
-     /* Habilita o botão "Gerar PDF" no modal deste tópico — exporta a tabela preenchida, pronta pra
-        imprimir e produzir conteúdo fora da plataforma (ver exportTopicPDF). */
-     pdfExport:true,
+    {id:'cuidadores',title:'Saúde mental e disponibilidade dos cuidadores',desc:'Aspectos emocionais, psicológicos e contextuais dos principais cuidadores que podem influenciar sua disponibilidade, responsividade e capacidade de co-regulação com a criança.',
      sections:[
-       {type:'table',key:'funil',label:'Funil de Conteúdo (semana)',columns:[
-         {key:'__label',label:'Dia'},
-         {key:'link',label:'Link do Conteúdo',type:'link'},
-         {key:'objetivo',label:'Objetivo (etapa de consciência)'},{key:'descricao',label:'Descrição'},{key:'formato',label:'Formato'},
-         {key:'status',label:'Status',type:'select',options:['Produzindo','Pronto','Publicado']},
-       ],
-       /* Começa com as 7 linhas Segunda–Domingo (seedRows), mas — diferente de fixedRows — dá pra ir
-          adicionando mais linhas depois; cada linha nova já sugere o próximo dia da semana em sequência. */
-       seedRows:['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'],
-       cycleColumn:'__label', cycleValues:['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'],
-       /* Quando o Status vira "Publicado" e há um link preenchido, o link sobe sozinho para a lista de
-          Avaliação de Conteúdo (só o link — o resto continua para preencher manualmente como já era). */
-       autoPublish:{statusKey:'status', publishedValue:'Publicado', linkKey:'link', targetTopicId:'avaliacao', targetKey:'avaliacao', flagKey:'__avaliacaoLinked'}},
+       {type:'fields',key:'identificacaoCuidadores',label:'Identificação dos Cuidadores Principais',fields:[
+         {key:'quemForamOsPrincipaisCuidadoresNosPrimeirosAnos',label:'Quem foram os principais cuidadores nos primeiros anos?'},
+         {key:'quemExerceAtualmenteAMaiorParteDosCuidados',label:'Quem exerce atualmente a maior parte dos cuidados?'},
+         {key:'existeMaisDeUmCuidadorPrincipal',label:'Existe mais de um cuidador principal?'},
+         {key:'quantoTempoCadaCuidadorPassaComACrianca',label:'Quanto tempo cada cuidador passa com a criança?'},
+         {key:'houveMudancasImportantesDeCuidadorAoLongoDoDesenvolvimento',label:'Houve mudanças importantes de cuidador ao longo do desenvolvimento?'},
+       ]},
+       {type:'checklist',key:'saudeMentalGestacaoPosParto',label:'Saúde Mental Durante a Gestação e Pós-Parto — Registrar Quando Pertinente',seedItems:[
+         'Sofrimento emocional importante durante a gestação','Ansiedade significativa','Sintomas depressivos','Depressão pós-parto','Ansiedade pós-parto','Episódios de intenso estresse','Luto','Hospitalização psiquiátrica','Dificuldades importantes de adaptação à parentalidade','Outros acontecimentos que tenham reduzido a disponibilidade emocional do cuidador',
+       ]},
+       {type:'fields',key:'disponibilidadePosNascimento',label:'Disponibilidade do Cuidador Após o Nascimento',fields:[
+         {key:'houvePeriodoAposONascimentoEmQueOCuidadorPrincipalEsteveEmocionalmenteOuFisicamentePoucoDisponivel',label:'Houve período após o nascimento em que o cuidador principal esteve emocionalmente ou fisicamente pouco disponível?',type:'select',options:['Não','Sim','Não sabemos']},
+       ]},
+       {type:'fields',key:'saudeMentalAtual',label:'Saúde Mental Atual dos Cuidadores',fields:[
+         {key:'haAlgumaCondicaoEmocionalPsicologicaOuNeuropsiquiatricaDoCuidadorQueEleConsidereRelevanteParaCompreenderADinamicaFamiliar',label:'Há alguma condição emocional, psicológica ou neuropsiquiátrica do cuidador que ele considere relevante para compreender a dinâmica familiar?'},
+       ]},
+       {type:'checklist',key:'estadoRegulatorioDiante',label:'Estado Regulatório do Cuidador — Diante da Desregulação da Criança, o Cuidador Costuma',seedItems:[
+         'Manter-se relativamente regulado','Ficar ansioso','Ficar irritado','Elevar o tom de voz','Afastar-se','Tentar interromper rapidamente a emoção','Ceder para finalizar a situação','Entrar em conflito com a criança','Conseguir permanecer próximo e ajudá-la a se reorganizar','Variar bastante conforme o próprio estado emocional',
+       ]},
+       {type:'checklist',key:'recuperacaoAposConflito',label:'Recuperação do Próprio Cuidador Após um Conflito',seedItems:[
+         'Consegue reorganizar-se rapidamente','Permanece irritado por muito tempo','Consegue retomar contato com a criança','Consegue conversar sobre o que aconteceu','Consegue reparar a interação',
+       ]},
+       {type:'fields',key:'disponibilidadeEmocional',label:'Disponibilidade Emocional — Investigar',fields:[
+         {key:'oCuidadorPercebeQuandoACriancaEstaEmocionalmenteAlterada',label:'O cuidador percebe quando a criança está emocionalmente alterada?'},
+         {key:'consegueInterromperOutraAtividadeParaResponderQuandoNecessario',label:'Consegue interromper outra atividade para responder quando necessário?'},
+         {key:'aCriancaConsegueObterAtencaoSemPrecisarAumentarMuitoAIntensidadeDoComportamento',label:'A criança consegue obter atenção sem precisar aumentar muito a intensidade do comportamento?'},
+         {key:'oAdultoDemonstraInteressePelasExperienciasDaCrianca',label:'O adulto demonstra interesse pelas experiências da criança?'},
+         {key:'haMomentosRegularesDeInteracaoPositiva',label:'Há momentos regulares de interação positiva?'},
+         {key:'oCuidadorConsegueBrincarOuConversarSemDirecionarConstantementeAInteracao',label:'O cuidador consegue brincar ou conversar sem direcionar constantemente a interação?'},
+         {key:'aCriancaSenteseAVontadeParaProcurarEsseAdultoQuandoEstaVulneravel',label:'A criança sente-se à vontade para procurar esse adulto quando está vulnerável?'},
+         {key:'disponibilidadePercebida',label:'Disponibilidade percebida',type:'select',options:['Consistente','Geralmente disponível','Variável','Frequentemente indisponível']},
+       ]},
+       {type:'fields',key:'estresseParental',label:'Estresse Parental — Investigar',fields:[
+         {key:'sensacaoDeCompetenciaParental',label:'Sensação de competência parental'},
+         {key:'percepcaoDeQueAsDemandasExcedemOsRecursosDisponiveis',label:'Percepção de que as demandas excedem os recursos disponíveis'},
+         {key:'conflitosFrequentesRelacionadosAEducacao',label:'Conflitos frequentes relacionados à educação'},
+         {key:'preocupacaoConstanteComACrianca',label:'Preocupação constante com a criança'},
+         {key:'dificuldadeParaEstabelecerLimites',label:'Dificuldade para estabelecer limites'},
+         {key:'culpaParental',label:'Culpa parental'},
+         {key:'sensacaoDeImpotencia',label:'Sensação de impotência'},
+         {key:'divergenciasEntreCuidadores',label:'Divergências entre cuidadores'},
+         {key:'poucoTempoDeDescanso',label:'Pouco tempo de descanso'},
+         {key:'ausenciaDeApoio',label:'Ausência de apoio'},
+         {key:'principaisFontesAtuaisDeSobrecarga',label:'Principais fontes atuais de sobrecarga',type:'select',options:['Criança','Trabalho','Financeiro','Conjugal','Saúde','Outros filhos','Falta de apoio','Outro']},
+       ]},
+       {type:'fields',key:'historiaDoProprioCuidador',label:'História do Próprio Cuidador — Experiências de Cuidado Recebidas',fields:[
+         {key:'comoDescreveSuaPropriaInfancia',label:'Como descreve sua própria infância?'},
+         {key:'sentiaseProtegido',label:'Sentia-se protegido?'},
+         {key:'comoOsAdultosReagiamQuandoChorava',label:'Como os adultos reagiam quando chorava?'},
+         {key:'comoConflitosEramResolvidos',label:'Como conflitos eram resolvidos?'},
+         {key:'haviaPunicaoFisica',label:'Havia punição física?'},
+         {key:'haviaDisponibilidadeEmocional',label:'Havia disponibilidade emocional?'},
+         {key:'teveFigurasImportantesDeSeguranca',label:'Teve figuras importantes de segurança?'},
+         {key:'existemAspectosDaPropriaInfanciaQuePercebeRepetirOuTentarFazerDiferenteComOFilho',label:'Existem aspectos da própria infância que percebe repetir ou tentar fazer diferente com o filho?'},
+         {key:'haPadroesDaSuaPropriaHistoriaQueVocePercebeAparecendoNaRelacaoComACrianca',label:'Há padrões da sua própria história que você percebe aparecendo na relação com a criança?'},
+       ]},
+       {type:'fields',key:'relacaoEntreCuidadores',label:'Relação Entre os Cuidadores (Quando Houver Mais de Um)',fields:[
+         {key:'concordanciaSobreRegras',label:'Concordância sobre regras'},
+         {key:'consistenciaDasRespostas',label:'Consistência das respostas'},
+         {key:'divergenciasFrequentes',label:'Divergências frequentes'},
+         {key:'umCuidadorDesfazOLimiteEstabelecidoPeloOutro',label:'Um cuidador desfaz o limite estabelecido pelo outro?'},
+         {key:'existeApoioEntreEles',label:'Existe apoio entre eles?'},
+         {key:'conflitosAcontecemNaPresencaDaCrianca',label:'Conflitos acontecem na presença da criança?'},
+         {key:'aCriancaPrecisaAdaptarseAEstilosMuitoDiferentes',label:'A criança precisa adaptar-se a estilos muito diferentes?'},
+       ]},
        {type:'fields',key:'observacoes',label:'Observações',fields:[{key:'texto',label:'Observações'}]},
      ]},
     {id:'avaliacao',title:'Avaliação de Conteúdo',desc:'Indicadores de performance dos conteúdos publicados.',

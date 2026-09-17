@@ -1687,14 +1687,49 @@ const QUADRANTS = [
        ]},
        {type:'fields',key:'observacoes',label:'Observações',fields:[{key:'texto',label:'Observações'}]},
      ]},
-    {id:'identidade',title:'Identidade de Marca',desc:'Arquétipo, paleta de cores, tipografia e manual de marca.',
+    {id:'identidade',title:'Estresse, Adversidades e Segurança',desc:'Mapeamento das experiências de estresse ao longo do desenvolvimento, considerando tipo, intensidade, duração, previsibilidade e suporte relacional.',
      sections:[
-       {type:'fields',key:'marca',label:'Identidade de Marca',fields:[
-         {key:'arquetipo',label:'Arquétipos de Marca'},{key:'fontePrincipal',label:'Fonte Principal'},{key:'fonteSecundaria',label:'Fonte Secundária'},{key:'fonteTerciaria',label:'Fonte Terciária'},
-         {key:'marketingSonoro',label:'Marketing Sonoro'},{key:'marketingOlfativo',label:'Marketing Olfativo'},{key:'fotos',label:'Fotos (link)'},
-         {key:'manualMarca',label:'Manual de Marca (link)'},{key:'arquivosMarca',label:'Arquivos da Marca (link)'},{key:'papelaria',label:'Papelaria (link)'},
+       /* Linha do tempo + características de cada evento/adversidade (partes 1 e 3 do mapeamento):
+          uma linha por evento ou contexto de exposição ao estresse. Frequência e Duração aparecem só
+          aqui (com as opções padronizadas da parte 3), sem repetir como texto livre da parte 1. */
+       {type:'table',key:'linhaTempo',label:'Linha do Tempo e Características da Exposição',columns:[
+         {key:'evento',label:'Evento / Contexto'},
+         {key:'categoria',label:'Categoria',type:'select',options:['Ameaça','Privação','Imprevisibilidade','Perda e Separação','Estresse Social','Sobrecarga Familiar']},
+         {key:'idadeInicio',label:'Idade de início'},
+         {key:'idadeTermino',label:'Idade de término, se terminou'},
+         {key:'unicoRecorrente',label:'Único ou recorrente',type:'select',options:['Único','Recorrente']},
+         {key:'exposicaoAtualPassada',label:'Exposição atual ou passada',type:'select',options:['Atual','Passada']},
+         {key:'periodosSemExposicao',label:'Houve períodos sem exposição?',type:'select',options:['Sim','Não']},
+         {key:'agravamentoReducao',label:'Agravamento ou redução ao longo do tempo',type:'select',options:['Agravamento','Redução','Sem mudança significativa']},
+         {key:'coincidiuTransicao',label:'Coincidiu com transição do desenvolvimento?'},
+         {key:'intensidade',label:'Intensidade percebida',type:'select',options:['0 — Mínima','1 — Leve','2 — Moderada','3 — Elevada']},
+         {key:'frequencia',label:'Frequência',type:'select',options:['Episódio único','Ocasional','Frequente','Praticamente diária']},
+         {key:'duracao',label:'Duração',type:'select',options:['Horas/dias','Semanas','Meses','Anos']},
+         {key:'previsibilidade',label:'Previsibilidade',type:'select',options:['Previsível','Parcialmente previsível','Imprevisível']},
+         {key:'controlabilidade',label:'Controlabilidade percebida',type:'select',options:['Alguma possibilidade de ação','Pouca possibilidade','Nenhuma possibilidade percebida']},
+         {key:'natureza',label:'Natureza',type:'select',options:['Interpessoal','Não interpessoal']},
+         {key:'formaExposicao',label:'Forma de exposição',type:'select',options:['Vivenciou diretamente','Testemunhou','Soube posteriormente','Exposição indireta recorrente']},
        ]},
-       {type:'swatches',key:'paleta',label:'Paleta de Cores',count:5},
+       /* Natureza da adversidade (parte 2): marque o que se aplica, por dimensão — cada uma já vem com
+          os subtipos prontos pra marcar, mas dá pra editar o texto ou adicionar mais itens. */
+       {type:'checklist',key:'ameaca',label:'Natureza da Adversidade — Ameaça',seedItems:[
+         'Violência','Agressões','Intimidação','Conflitos intensos','Exposição a situações percebidas como perigosas','Experiências médicas dolorosas ou ameaçadoras',
+       ]},
+       {type:'checklist',key:'privacao',label:'Natureza da Adversidade — Privação',seedItems:[
+         'Ausência de estimulação adequada','Negligência emocional','Negligência física','Baixa disponibilidade de interação','Pouca oportunidade de linguagem, brincadeira ou exploração',
+       ]},
+       {type:'checklist',key:'imprevisibilidade',label:'Natureza da Adversidade — Imprevisibilidade',seedItems:[
+         'Cuidadores inconsistentes','Mudanças frequentes de rotina','Entradas e saídas de pessoas da casa','Mudanças residenciais','Regras altamente variáveis','Conflitos imprevisíveis',
+       ]},
+       {type:'checklist',key:'perdaSeparacao',label:'Natureza da Adversidade — Perda e Separação',seedItems:[
+         'Falecimento','Separação parental','Afastamento prolongado','Hospitalização','Institucionalização','Mudança de cuidador principal',
+       ]},
+       {type:'checklist',key:'estresseSocial',label:'Natureza da Adversidade — Estresse Social',seedItems:[
+         'Rejeição','Exclusão','Bullying','Conflitos com pares','Experiências de humilhação','Isolamento social',
+       ]},
+       {type:'checklist',key:'sobrecargaFamiliar',label:'Natureza da Adversidade — Sobrecarga Familiar',seedItems:[
+         'Doença de cuidador','Desemprego','Instabilidade financeira','Múltiplas demandas familiares','Conflitos conjugais','Cuidado de familiares adoecidos',
+       ]},
        {type:'fields',key:'observacoes',label:'Observações',fields:[{key:'texto',label:'Observações'}]},
      ]},
     {id:'paginas',title:'Páginas e Mídias',desc:'Instagram, Google Meu Negócio, YouTube, Facebook e árvore de links.',
@@ -5289,7 +5324,10 @@ function sectionFilled(section, data){
   const val = sectionValue(data, section);
   if(section.type==='fields') return section.fields.every(f=>f.computed || (val[f.key]||'').trim()!=='');
   if(section.type==='list') return val.some(v=>(v||'').trim()!=='');
-  if(section.type==='checklist') return val.length>0 && val.every(it=>(it.text||'').trim()!=='');
+  /* Checklist com itens pré-prontos (seedItems): já nasce com texto preenchido, então "preenchida" só
+     quando pelo menos um item foi de fato marcado — senão contaria como concluída sem ninguém ter
+     revisado nada. Checklist normal (sem seedItems): continua exigindo que todo item tenha texto. */
+  if(section.type==='checklist') return section.seedItems? val.some(it=>it.done) : (val.length>0 && val.every(it=>(it.text||'').trim()!==''));
   if(section.type==='swatches') return val.every(v=>/^#([0-9a-f]{3}){1,2}$/i.test(v||''));
   /* "Totalmente completo": TODAS as linhas precisam ter TODAS as colunas reais preenchidas — não
      basta preencher uma célula em uma linha (ex.: só marcar o Status de um dia no Funil de
@@ -5592,7 +5630,14 @@ function sectionValue(data, section){
     return data[section.key];
   }
   if(section.type==='swatches'){ if(!data[section.key]) data[section.key] = new Array(section.count).fill(''); return data[section.key]; }
-  if(section.type==='checklist'){ if(!data[section.key]) data[section.key] = []; return data[section.key]; }
+  if(section.type==='checklist'){
+    /* section.seedItems (opcional): lista de textos que já vêm prontos e marcáveis na primeira vez que
+       a seção é aberta — usado quando os itens são um checklist fixo de referência (ex.: subtipos de
+       adversidade) em vez de uma lista que a pessoa cria do zero. Só aplica na primeira vez (se já
+       existir data salva, respeita o que a pessoa já tiver editado/removido). */
+    if(!data[section.key]) data[section.key] = (section.seedItems||[]).map(t=>({text:t, done:false}));
+    return data[section.key];
+  }
   if(section.type==='cashflow'){
     if(!data[section.key]) data[section.key] = { view:{year:new Date().getFullYear(), month:new Date().getMonth()}, months:{}, contasFixas:[], moeda:'BRL' };
     if(!data[section.key].contasFixas) data[section.key].contasFixas = []; // compatibilidade com painéis salvos antes desse campo existir

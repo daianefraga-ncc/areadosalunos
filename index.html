@@ -719,6 +719,17 @@
   .topic-note{font-size:13px;color:var(--text-dim);background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;line-height:1.6;}
   .topic-note strong{color:var(--text);}
   .topic-note-msg{background:var(--bg-elev);border-left:3px solid var(--accent);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px 14px;margin-top:8px;font-style:italic;color:var(--text-dim);line-height:1.6;}
+  /* Tela de "ciência e responsabilidade profissional" que bloqueia um quadrante (ex.: Área da Criança)
+     até a pessoa marcar a caixinha final e clicar em Continuar — ver q.consentNote e renderPainel(). */
+  .consent-gate{max-width:640px;}
+  .consent-list{list-style:none;margin:14px 0 20px;padding:0;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);}
+  .consent-list li{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text-dim);line-height:1.5;}
+  .consent-list li:last-child{border-bottom:none;}
+  .consent-list .icon{width:15px;height:15px;flex-shrink:0;margin-top:2px;stroke:var(--accent);}
+  .consent-confirm-row{display:flex;gap:10px;align-items:flex-start;margin-top:4px;}
+  .consent-confirm-row label{font-size:13.5px;color:var(--text);line-height:1.5;cursor:pointer;}
+  .consent-gate .btn-accent{margin-top:18px;}
+  .consent-gate .btn-accent:disabled{opacity:.45;cursor:not-allowed;}
   .ps-section{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border);}
   .ps-section:last-of-type{border-bottom:none;margin-bottom:6px;padding-bottom:0;}
   .ps-h{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--shared);margin-bottom:10px;}
@@ -1651,6 +1662,24 @@ const QUADRANTS = [
    ]},
   {id:'marketing',title:'Área da Criança',icon:'child',moduleId:'ser',
    meta:'Informações essenciais sobre o desenvolvimento da criança.',
+   /* Tela de ciência e responsabilidade profissional exibida uma única vez antes do primeiro acesso
+      aos tópicos deste quadrante — ver o bloqueio em renderPainel() (getTopicData(s.id,'_consent_'+q.id)). */
+   consentNote:{
+     title:'Ciência e Responsabilidade Profissional',
+     intro:'Antes de utilizar esta ferramenta, confirme que está ciente de que:',
+     items:[
+       'Esta ferramenta tem finalidade de apoio à organização, observação e acompanhamento profissional.',
+       'Não possui finalidade diagnóstica e não substitui avaliações clínicas, médicas, neuropsicológicas, terapêuticas, educacionais ou outras avaliações especializadas.',
+       'As informações registradas devem ser interpretadas dentro do contexto da criança e nunca utilizadas isoladamente para conclusões diagnósticas.',
+       'Devo atuar exclusivamente dentro das competências, atribuições e limites estabelecidos pela minha formação profissional.',
+       'Sou responsável por cumprir o código de ética, as normas técnicas e a legislação aplicáveis à minha profissão.',
+       'Comprometo-me a preservar o sigilo, a privacidade e a proteção dos dados da criança e de sua família.',
+       'Quando identificar necessidades que ultrapassem meu campo de atuação, devo realizar o encaminhamento adequado para profissional habilitado.',
+       'Estou ciente de que esta ferramenta não substitui julgamento profissional, supervisão, avaliação especializada ou tomada de decisão baseada no conjunto de evidências disponíveis.',
+     ],
+     confirmLabel:'Declaro que li, compreendi e estou ciente das condições de uso da Área da Criança.',
+     buttonLabel:'Continuar',
+   },
    topics:[
     {id:'persona',title:'Identificação essencial',desc:'Informações básicas sobre a criança.',
      sections:[
@@ -6019,6 +6048,48 @@ function renderPainel(){
     }));
   } else {
     const q = QUADRANTS.find(x=>x.id===panelQuadrantId);
+    /* Quadrantes com q.consentNote (ex.: Área da Criança) mostram uma tela de ciência e
+       responsabilidade profissional antes do primeiro acesso aos tópicos — só uma vez: a confirmação
+       fica salva em getTopicData(s.id,'_consent_'+q.id) e não é pedida de novo depois disso. */
+    if(q.consentNote){
+      const gateKey = '_consent_'+q.id;
+      const gateData = getTopicData(s.id, gateKey);
+      if(!gateData.accepted){
+        const cn = q.consentNote;
+        el.innerHTML = `
+          <div class="back-row"><button class="back-btn" id="panel-back">${icon('back')} Voltar ao Painel Profissional</button></div>
+          <div class="consent-gate">
+            <h2 class="section-title">${icon('lock')} ${cn.title}</h2>
+            <p class="section-sub">${cn.intro}</p>
+            <ul class="consent-list">
+              ${cn.items.map(it=>`<li>${icon('tick')}<span>${it}</span></li>`).join('')}
+            </ul>
+            <div class="consent-confirm-row">
+              <button class="goal-check" id="consent-check" style="width:20px;height:20px;flex-shrink:0">${icon('check')}</button>
+              <label id="consent-check-label">${cn.confirmLabel}</label>
+            </div>
+            <button class="btn-accent" id="consent-continue" disabled>${cn.buttonLabel||'Continuar'}</button>
+          </div>`;
+        document.getElementById('panel-back').addEventListener('click',()=>{panelQuadrantId=null; renderPainel();});
+        const checkBtn = document.getElementById('consent-check');
+        const continueBtn = document.getElementById('consent-continue');
+        const toggleCheck = ()=>{
+          const checked = !checkBtn.classList.contains('checked');
+          checkBtn.classList.toggle('checked', checked);
+          continueBtn.disabled = !checked;
+        };
+        checkBtn.addEventListener('click', toggleCheck);
+        document.getElementById('consent-check-label').addEventListener('click', toggleCheck);
+        continueBtn.addEventListener('click',()=>{
+          if(continueBtn.disabled) return;
+          gateData.accepted = true;
+          gateData.acceptedAt = new Date().toISOString();
+          syncPanelDataNow(s.id, gateKey, gateData);
+          renderPainel();
+        });
+        return;
+      }
+    }
     const filled = quadrantFilledCount(q,s);
     el.innerHTML = `
       <div class="back-row"><button class="back-btn" id="panel-back">${icon('back')} Voltar ao Painel Profissional</button></div>

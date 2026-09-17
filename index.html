@@ -1730,6 +1730,19 @@ const QUADRANTS = [
        {type:'checklist',key:'sobrecargaFamiliar',label:'Natureza da Adversidade — Sobrecarga Familiar',seedItems:[
          'Doença de cuidador','Desemprego','Instabilidade financeira','Múltiplas demandas familiares','Conflitos conjugais','Cuidado de familiares adoecidos',
        ]},
+       {type:'fields',key:'seguranca',label:'Segurança Disponível Durante a Adversidade',fields:[
+         {key:'adultoDisponivel',label:'Havia um adulto disponível durante ou após a experiência?'},
+         {key:'criancaProcurava',label:'A criança conseguia procurar esse adulto?'},
+         {key:'adultoRespondia',label:'Esse adulto respondia quando procurado?'},
+         {key:'respostaPrevisivel',label:'A resposta era previsível?'},
+         {key:'ajudaReorganizar',label:'O adulto conseguia ajudar a criança a se reorganizar?'},
+         {key:'localSeguro',label:'Existia um local percebido como seguro?'},
+         {key:'sozinhaNaAmeaca',label:'A criança permanecia sozinha durante situações de ameaça?'},
+         {key:'reparacaoConflitos',label:'Houve reparação após conflitos?'},
+         {key:'cuidadorExplicava',label:'O cuidador explicava o que estava acontecendo?'},
+         {key:'informacaoAdequadaIdade',label:'A criança recebia informações adequadas à idade?'},
+         {key:'bufferingRelacional',label:'Capacidade de Buffering Relacional',type:'select',options:['Ausente','Baixa','Parcial','Consistente']},
+       ]},
        {type:'fields',key:'observacoes',label:'Observações',fields:[{key:'texto',label:'Observações'}]},
      ]},
     {id:'paginas',title:'Páginas e Mídias',desc:'Instagram, Google Meu Negócio, YouTube, Facebook e árvore de links.',
@@ -5706,6 +5719,15 @@ function renderSectionHTML(section, data){
         if(f.type==='date'){
           return `<label class="ps-label">${f.label}</label>
         <input type="date" class="ps-input pr-recalc" data-fkind="fields" data-skey="${section.key}" data-fkey="${f.key}" value="${escapeAttr(val[f.key]||'')}">`;
+        }
+        if(f.type==='select'){
+          const current = val[f.key]||'';
+          const opts = (!current || f.options.includes(current))? f.options : [current, ...f.options];
+          return `<label class="ps-label">${f.label}</label>
+        <select class="ps-input" data-fkind="fields" data-skey="${section.key}" data-fkey="${f.key}">
+          <option value="">—</option>
+          ${opts.map(o=>`<option value="${escapeAttr(o)}" ${current===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}
+        </select>`;
         }
         return `
         <label class="ps-label">${f.label}</label>

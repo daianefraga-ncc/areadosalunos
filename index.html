@@ -2221,12 +2221,186 @@ const QUADRANTS = [
        ]},
        {type:'fields',key:'observacoes',label:'Observações',fields:[{key:'texto',label:'Observações'}]},
      ]},
-    {id:'parceiros',title:'10 Parceiros',desc:'Mapeamento de parcerias estratégicas para indicações.',
+    {id:'sensorial',title:'Perfil Sensorial, Motor e Interoceptivo',desc:'Rastreamento de como a criança percebe e responde aos estímulos do ambiente, organiza o corpo para agir e reconhece sinais internos relevantes para regulação, autonomia e participação.',
      sections:[
-       {type:'table',key:'parceiros',label:'Parceiros',columns:[
-         {key:'parceiro',label:'Parceiro'},{key:'nicho',label:'Nicho'},
-         {key:'indicado',label:'Indicado',type:'select',options:['Fez contraindicação','Não fez contraindicação']},
-       ],maxRows:10},
+       {type:'checklist',key:'visaoGeralDoPerfilSensorial',label:'Visão Geral do Perfil Sensorial — De Modo Geral, a Criança',seedItems:[
+         'Tolera bem diferentes ambientes','Parece perceber estímulos antes das outras crianças','Reage intensamente a estímulos cotidianos','Parece perceber pouco alguns estímulos','Busca estímulos constantemente','Evita determinados estímulos','Alterna entre busca e evitação','Fica desorganizada em ambientes com muitos estímulos','Precisa de tempo para se adaptar a ambientes novos','Não há dificuldades perceptíveis',
+       ]},
+       {type:'checklist',key:'processamentoAuditivo',label:'Processamento Auditivo — A Criança',seedItems:[
+         'Cobre os ouvidos diante de alguns sons','Assusta-se facilmente com sons inesperados','Reclama de sons que outras pessoas toleram','Evita ambientes barulhentos','Fica irritada em locais com muitas vozes','Tem dificuldade para acompanhar fala em ambiente ruidoso','Parece não perceber quando é chamada','Precisa que instruções sejam repetidas','Aumenta muito o volume da voz','Produz sons repetidamente','Busca músicas ou sons intensos','Parece gostar de sons repetitivos',
+       ]},
+       {type:'fields',key:'respostaAuditivaPredominante',label:'Processamento Auditivo — Resposta Predominante',fields:[
+         {key:'respostaPredominante',label:'Resposta predominante',type:'select',options:['Sensibilidade aumentada','Baixa responsividade aparente','Busca auditiva','Mista','Sem alteração evidente']},
+         {key:'seHouverSonsEspecificosProblematicosOpcional',label:'Se houver sons específicos problemáticos (opcional)'},
+       ]},
+       {type:'checklist',key:'processamentoVisual',label:'Processamento Visual — A Criança',seedItems:[
+         'Demonstra desconforto com luz intensa','Prefere ambientes pouco iluminados','Distrai-se facilmente com movimento visual','Fixa-se em detalhes visuais','Aproxima objetos dos olhos','Observa objetos por ângulos incomuns','Busca luzes, brilhos ou movimentos repetitivos','Tem dificuldade em localizar objetos em ambientes visualmente carregados','Parece cansar rapidamente em tarefas visualmente exigentes','Perde-se em páginas muito cheias','É muito atraída por telas ou estímulos visuais rápidos',
+       ]},
+       {type:'fields',key:'respostaVisualPredominante',label:'Processamento Visual — Resposta Predominante',fields:[
+         {key:'respostaPredominante',label:'Resposta predominante',type:'select',options:['Sensibilidade','Busca visual','Dificuldade de seleção/organização','Mista','Sem alteração evidente']},
+       ]},
+       {type:'checklist',key:'desconfortoTatil',label:'Processamento Tátil — A Criança Demonstra Desconforto Com',seedItems:[
+         'Toque inesperado','Abraços','Cabelo sendo penteado','Corte de cabelo','Corte de unhas','Escovar dentes','Etiquetas de roupas','Costuras','Determinados tecidos','Sujeira nas mãos','Areia','Grama','Tinta/massa','Água no rosto',
+       ]},
+       {type:'checklist',key:'tambemPodeTatil',label:'Processamento Tátil — Também Pode',seedItems:[
+         'Buscar contato físico intenso','Tocar pessoas ou objetos constantemente','Não perceber sujeira no corpo','Parecer pouco responsiva a pequenos machucados','Buscar texturas específicas',
+       ]},
+       {type:'fields',key:'respostaTatilPredominante',label:'Processamento Tátil — Resposta Predominante',fields:[
+         {key:'respostaPredominante',label:'Resposta predominante',type:'select',options:['Evitação tátil','Busca tátil','Baixa percepção aparente','Mista','Sem alteração evidente']},
+       ]},
+       {type:'checklist',key:'alimentacaoTextura',label:'Oral, Gustativo e Olfativo — Alimentação/Textura',seedItems:[
+         'Restrição importante de texturas','Prefere alimentos crocantes','Prefere alimentos macios','Rejeita alimentos misturados','Reage à temperatura da comida','Engasga ou demonstra ânsia diante de determinadas texturas','Explora alimentos excessivamente antes de comer','Aceita variedade adequada',
+       ]},
+       {type:'checklist',key:'buscaOral',label:'Oral, Gustativo e Olfativo — Busca Oral',seedItems:[
+         'Morde objetos','Mastiga roupas','Coloca objetos na boca','Busca alimentos muito crocantes/intensos','Busca sabores fortes',
+       ]},
+       {type:'checklist',key:'olfato',label:'Oral, Gustativo e Olfativo — Olfato',seedItems:[
+         'Percebe cheiros rapidamente','Rejeita pessoas/ambientes por cheiro','Cheira objetos frequentemente','Busca cheiros específicos','Parece pouco responsiva a odores fortes',
+       ]},
+       {type:'checklist',key:'sistemaVestibular',label:'Sistema Vestibular — Movimento e Equilíbrio — A Criança',seedItems:[
+         'Evita balanços','Evita escorregadores','Evita ficar com os pés fora do chão','Demonstra medo de altura ou movimento','Fica enjoada facilmente','Busca girar','Busca pular constantemente','Corre de forma quase contínua','Gosta de movimentos intensos','Parece não ficar tonta facilmente','Inclina-se ou balança o corpo repetidamente','Tem dificuldade para permanecer sentada','Parece precisar de movimento para se organizar',
+       ]},
+       {type:'fields',key:'respostaVestibularPredominante',label:'Sistema Vestibular — Resposta Predominante',fields:[
+         {key:'respostaPredominante',label:'Resposta predominante',type:'select',options:['Evitação de movimento','Busca de movimento','Responsividade baixa aparente','Mista','Sem alteração evidente']},
+       ]},
+       {type:'checklist',key:'propriocepcao',label:'Propriocepção — A Criança',seedItems:[
+         'Busca empurrar','Busca puxar','Gosta de carregar peso','Busca pressão corporal','Aperta objetos com força excessiva','Abraça com muita força','Bate portas ou objetos com força','Esbarra frequentemente em pessoas/móveis','Usa força excessiva ao escrever','Quebra materiais sem intenção aparente','Parece precisar "sentir o corpo" por meio de força/movimento','Gosta de ficar apertada entre almofadas/objetos',
+       ]},
+       {type:'fields',key:'percepcaoDeForca',label:'Propriocepção — Percepção de Força',fields:[
+         {key:'percepcaoDeForca',label:'Percepção de força',type:'select',options:['Adequada','Frequentemente excessiva','Frequentemente insuficiente','Muito variável','Não observado']},
+       ]},
+       {type:'checklist',key:'gatilhosDeSobrecarga',label:'Sobrecarga Sensorial — A Criança Tende a se Desorganizar Quando Há',seedItems:[
+         'Muito barulho','Muitas pessoas','Luz intensa','Muitos estímulos visuais','Toque inesperado','Ambientes novos','Cheiros intensos','Muito movimento','Longos períodos de atividade','Fome','Cansaço','Calor','Vários estímulos simultaneamente',
+       ]},
+       {type:'checklist',key:'respostaASobrecarga',label:'Sobrecarga Sensorial — Quando Sobrecarregada, Apresenta',seedItems:[
+         'Irritabilidade','Choro','Agressividade','Fuga','Isolamento','Agitação','Comportamentos repetitivos','Rigidez','Diminuição da fala','Dificuldade de responder','Busca intensa por adulto','Paralisação',
+       ]},
+       {type:'checklist',key:'estrategiasSensoriaisEspontaneas',label:'Estratégias Sensoriais Espontâneas — Para se Organizar, a Criança Espontaneamente',seedItems:[
+         'Movimenta-se','Balança o corpo','Pula','Aperta objetos','Busca abraço/pressão','Procura silêncio','Afasta-se das pessoas','Usa fones','Busca objetos específicos','Repete movimentos','Mastiga objetos','Deita-se','Escurece o ambiente','Busca música','Procura adulto',
+       ]},
+       {type:'fields',key:'estrategiasQueMaisAjudam',label:'Estratégias Sensoriais Espontâneas — O Que Mais Ajuda',fields:[
+         {key:'estrategiasQueMaisAjudam',label:'Estratégias que mais ajudam'},
+       ]},
+       {type:'checklist',key:'controlePostural',label:'Controle Postural — Observa-se',seedItems:[
+         'Boa estabilidade corporal','Apoia-se muito em móveis/pessoas','Escorrega na cadeira','Deita sobre a mesa','Troca constantemente de posição','Cansa rapidamente sentado','Dificuldade para sustentar postura','Posturas corporais incomuns frequentes','Necessidade intensa de movimento durante tarefas',
+       ]},
+       {type:'fields',key:'sustentacaoPostural',label:'Controle Postural — Sustentação Postural',fields:[
+         {key:'sustentacaoPostural',label:'Sustentação postural',type:'select',options:['Adequada','Levemente dificultada','Moderadamente dificultada','Bastante dificultada','Não observado']},
+       ]},
+       {type:'checklist',key:'participacaoMotoraGlobal',label:'Motricidade Global — A Criança Consegue Participar Adequadamente de',seedItems:[
+         'Corrida','Salto','Pular com dois pés','Pular em um pé','Subir/descer escadas','Chutar bola','Arremessar','Receber bola','Pedalar','Brincadeiras de parque','Atividades esportivas compatíveis com a idade',
+       ]},
+       {type:'checklist',key:'observacoesMotricidadeGlobal',label:'Motricidade Global — Observa-se',seedItems:[
+         'Movimentos fluidos','Movimentos rígidos','Aparente desajeitamento','Quedas frequentes','Esbarra frequentemente','Evita atividades motoras','Cansa antes dos pares',
+       ]},
+       {type:'checklist',key:'dificuldadeDeEquilibrio',label:'Equilíbrio — Apresenta Dificuldade Em',seedItems:[
+         'Ficar em um pé','Caminhar em linha','Subir/descer superfícies irregulares','Mudanças rápidas de direção','Brincadeiras que exigem equilíbrio','Andar de bicicleta/patinete','Recuperar equilíbrio após tropeço',
+       ]},
+       {type:'fields',key:'equilibrioFuncional',label:'Equilíbrio — Equilíbrio Funcional',fields:[
+         {key:'equilibrioFuncional',label:'Equilíbrio funcional',type:'select',options:['Adequado','Leve dificuldade','Moderada dificuldade','Importante dificuldade','Não observado']},
+       ]},
+       {type:'checklist',key:'coordenacaoBilateral',label:'Coordenação Bilateral — A Criança Consegue',seedItems:[
+         'Utilizar as duas mãos de forma coordenada','Segurar papel e recortar','Abrir recipientes','Vestir-se','Pegar/lançar bola','Realizar movimentos alternados','Pedalar','Executar brincadeiras que exigem ambos os lados do corpo',
+       ]},
+       {type:'fields',key:'observacaoCoordenacaoBilateral',label:'Coordenação Bilateral — Observa-se',fields:[
+         {key:'observase',label:'Observa-se',type:'select',options:['Coordenação adequada','Algumas dificuldades','Dificuldade frequente','Não observado']},
+       ]},
+       {type:'checklist',key:'facilidadeDificuldadeMotricidadeFina',label:'Motricidade Fina — Apresenta Facilidade/Dificuldade Em',seedItems:[
+         'Lápis','Tesoura','Talheres','Botões','Zíper','Construções pequenas','Encaixes','Desenho','Escrita','Manipulação de objetos pequenos',
+       ]},
+       {type:'checklist',key:'duranteTarefasFinas',label:'Motricidade Fina — Durante Tarefas Finas',seedItems:[
+         'Usa força adequada','Pressiona excessivamente','Segura muito frouxo','Cansa rapidamente','Reclama de dor/desconforto','Evita tarefas manuais','Demonstra lentidão importante',
+       ]},
+       {type:'checklist',key:'planejamentoMotorAtividadeNova',label:'Planejamento Motor / Praxia — Diante de Uma Atividade Motora Nova, a Criança',seedItems:[
+         'Entende rapidamente o que fazer','Precisa observar outra pessoa primeiro','Precisa de demonstrações repetidas','Tem dificuldade para organizar a sequência dos movimentos','Parece saber o objetivo, mas não consegue organizar o corpo','Executa melhor depois de várias tentativas','Evita atividades novas','Fica frustrada diante de desafios motores',
+       ]},
+       {type:'checklist',key:'maiorDificuldadePraxia',label:'Planejamento Motor / Praxia — Dificuldade Maior Em',seedItems:[
+         'Imitar movimentos','Sequenciar movimentos','Planejar brincadeiras motoras','Adaptar movimentos a situações novas','Organizar o corpo no espaço',
+       ]},
+       {type:'checklist',key:'conscienciaCorporalEEspacial',label:'Consciência Corporal e Espacial — A Criança',seedItems:[
+         'Demonstra boa percepção corporal','Esbarra frequentemente em objetos','Calcula mal espaço/distância','Aproxima-se excessivamente das pessoas','Tem dificuldade em posicionar partes do corpo sob comando','Confunde direita/esquerda além do esperado para idade','Apresenta dificuldade em imitar posições corporais','Parece pouco consciente da posição do próprio corpo',
+       ]},
+       {type:'fields',key:'resistenciaDuranteAtividadesFisicas',label:'Resistência e Fadiga — Durante Atividades Físicas',fields:[
+         {key:'duranteAtividadesFisicas',label:'Durante atividades físicas',type:'select',options:['Mantém energia compatível com os pares','Cansa um pouco antes','Cansa significativamente antes','Evita esforço','Parece nunca cansar','Não observado']},
+       ]},
+       {type:'checklist',key:'aposEsforco',label:'Resistência e Fadiga — Após Esforço',seedItems:[
+         'Recupera-se rapidamente','Precisa de pausa longa','Fica irritada','Fica muito agitada','Demonstra dor','Torna-se sonolenta',
+       ]},
+       {type:'fields',key:'fomeESaciedade',label:'Fome e Saciedade',fields:[
+         {key:'aCriancaPercebeQuandoEstaComFome',label:'A criança percebe quando está com fome?',type:'select',options:['Frequentemente','Algumas vezes','Raramente','Parece perceber apenas quando a fome está intensa']},
+         {key:'reconheceSaciedade',label:'Reconhece saciedade?',type:'select',options:['Sim','Parcialmente','Parece comer além da saciedade','Interrompe alimentação muito cedo','Não sabemos']},
+       ]},
+       {type:'checklist',key:'consegueComunicarFome',label:'Fome e Saciedade — Consegue Comunicar',seedItems:[
+         '"Estou com fome"','"Estou satisfeito"','"Estou enjoado"','"Meu estômago dói"',
+       ]},
+       {type:'fields',key:'sede',label:'Sede',fields:[
+         {key:'percebeSedeEspontaneamente',label:'Percebe sede espontaneamente?',type:'select',options:['Frequentemente','Às vezes','Raramente','Precisa ser lembrada']},
+         {key:'bebeAguaSemOrientacaoDoAdulto',label:'Bebe água sem orientação do adulto?',type:'select',options:['Sim','Às vezes','Raramente']},
+       ]},
+       {type:'checklist',key:'percebeNecessidadeDe',label:'Bexiga e Intestino — Percebe Necessidade De',seedItems:[
+         'Urinar','Evacuar',
+       ]},
+       {type:'fields',key:'geralmentePercebeBexiga',label:'Bexiga e Intestino — Antecedência da Percepção',fields:[
+         {key:'geralmentePercebe',label:'Geralmente percebe',type:'select',options:['Com antecedência','Próximo do limite','Apenas quando está muito urgente','Frequentemente não percebe']},
+       ]},
+       {type:'checklist',key:'observacoesBexigaEIntestino',label:'Bexiga e Intestino — Observa-se',seedItems:[
+         'Adia banheiro excessivamente','Acidentes urinários','Acidentes fecais','Constipação conhecida','Medo de evacuar','Retenção voluntária','Nenhuma dificuldade observada',
+       ]},
+       {type:'fields',key:'respostaADor',label:'Dor — Resposta à Dor',fields:[
+         {key:'respostaADorParece',label:'Resposta à dor parece',type:'select',options:['Compatível com a situação','Muito intensa','Pouco intensa','Muito variável','Difícil de interpretar']},
+       ]},
+       {type:'checklist',key:'aCriancaConsegueDor',label:'Dor — A Criança Consegue',seedItems:[
+         'Perceber que algo dói','Localizar a dor','Descrever intensidade','Comunicar antes de ficar muito alterada','Diferenciar dor de desconforto emocional',
+       ]},
+       {type:'checklist',key:'percebeAdequadamenteTemperatura',label:'Temperatura — Percebe Adequadamente',seedItems:[
+         'Calor','Frio',
+       ]},
+       {type:'checklist',key:'observacoesTemperatura',label:'Temperatura — Observa-se',seedItems:[
+         'Usa roupas inadequadas à temperatura','Parece pouco afetada por frio/calor','Demonstra sensibilidade excessiva','Comunica desconforto adequadamente',
+       ]},
+       {type:'checklist',key:'reconheceQuandoEstaCansacoSono',label:'Cansaço e Sono — A Criança Reconhece Quando Está',seedItems:[
+         'Cansada','Com sono','Precisando de pausa',
+       ]},
+       {type:'checklist',key:'quandoCansadaCostuma',label:'Cansaço e Sono — Quando Cansada, Costuma',seedItems:[
+         'Pedir descanso','Diminuir espontaneamente a atividade','Ficar irritada','Ficar mais agitada','Aumentar impulsividade','Continuar até se desregular',
+       ]},
+       {type:'checklist',key:'percepcaoAtivacaoCorporal',label:'Percepção da Ativação Corporal — Consegue Perceber',seedItems:[
+         'Coração acelerado','Respiração acelerada','Tensão muscular','Tremor','"Frio na barriga"','Calor no corpo','Mãos suadas','Corpo inquieto','Corpo muito cansado/pesado',
+       ]},
+       {type:'fields',key:'reconhecimentoDessesSinais',label:'Percepção da Ativação Corporal — Reconhecimento',fields:[
+         {key:'reconhecimentoDessesSinais',label:'Reconhecimento desses sinais',type:'select',options:['Bom','Parcial','Baixo','Ainda não observado']},
+       ]},
+       {type:'checklist',key:'relacionaSensacoesAEmocoes',label:'Corpo e Emoções — A Criança Consegue Relacionar Sensações Corporais a',seedItems:[
+         'Medo','Ansiedade','Raiva','Tristeza','Alegria','Empolgação','Frustração',
+       ]},
+       {type:'fields',key:'nivelObservadoCorpoEEmocoes',label:'Corpo e Emoções — Nível Observado',fields:[
+         {key:'nivelObservado',label:'Nível observado',type:'select',options:['Identifica espontaneamente','Identifica com ajuda','Tem muita dificuldade','Ainda não é esperado/observado']},
+       ]},
+       {type:'fields',key:'percebeSinaisAntesDeDesregular',label:'Percepção Antes da Desregulação',fields:[
+         {key:'aCriancaPercebeSinaisDeQueEstaComecandoASeDesregular',label:'A criança percebe sinais de que está começando a se desregular?',type:'select',options:['Frequentemente','Algumas vezes','Raramente','Apenas quando já está muito desregulada','Não sabemos']},
+       ]},
+       {type:'checklist',key:'antesDaCriseConsegue',label:'Percepção Antes da Desregulação — Antes da Crise Consegue',seedItems:[
+         'Dizer que está incomodada','Pedir pausa','Procurar adulto','Sair do ambiente','Utilizar estratégia conhecida','Identificar o que está incomodando','Ainda não consegue',
+       ]},
+       {type:'checklist',key:'perfilInterfereEm',label:'Impacto Funcional — O Perfil Sensorial/Motor/Interoceptivo Interfere Em',seedItems:[
+         'Aprendizagem','Atenção','Regulação emocional','Alimentação','Sono','Higiene','Vestir-se','Uso do banheiro','Brincadeira','Atividade física','Relação com pares','Participação escolar','Participação familiar','Autonomia','Não há impacto funcional evidente',
+       ]},
+       {type:'fields',key:'grauDeInterferencia',label:'Impacto Funcional — Grau de Interferência',fields:[
+         {key:'grauDeInterferencia',label:'Grau de interferência',type:'select',options:['Leve','Moderado','Importante','Muito importante']},
+       ]},
+       {type:'checklist',key:'contextosEmQueAparece',label:'Contextos em Que as Dificuldades Aparecem Principalmente',seedItems:[
+         'Casa','Escola','Consultório','Ambientes públicos','Festa/eventos','Alimentação','Banho/higiene','Sono','Atividade física','Todos os ambientes','Apenas contextos específicos',
+       ]},
+       {type:'checklist',key:'oQueAjudaACriancaASeOrganizar',label:'O Que Ajuda a Criança a se Organizar',seedItems:[
+         'Movimento','Pressão profunda','Abraço','Redução de barulho','Redução de luz','Ambiente organizado','Pausa','Atividade física','Mastigação','Objeto tátil','Música','Silêncio','Antecipação','Presença do cuidador','Tempo sozinha','Respiração','Outro',
+       ]},
+       {type:'fields',key:'sinteseDoProfissional',label:'Síntese do Profissional',fields:[
+         {key:'estimulosQueMaisDesorganizamACrianca',label:'Estímulos que mais desorganizam a criança'},
+         {key:'estimulosestrategiasQueMaisAjudamNaOrganizacao',label:'Estímulos/estratégias que mais ajudam na organização'},
+         {key:'principaisDificuldadesMotorasObservadas',label:'Principais dificuldades motoras observadas'},
+         {key:'principaisSinaisInteroceptivosQueACriancaTemDificuldadeDePerceber',label:'Principais sinais interoceptivos que a criança tem dificuldade de perceber'},
+         {key:'consideracoesDoProfissionalCampoOpcional',label:'Considerações do profissional (campo opcional)'},
+       ]},
        {type:'fields',key:'observacoes',label:'Observações',fields:[{key:'texto',label:'Observações'}]},
      ]},
    ]},

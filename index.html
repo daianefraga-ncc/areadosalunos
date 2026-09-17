@@ -1978,11 +1978,109 @@ const QUADRANTS = [
        ]},
        {type:'fields',key:'observacoes',label:'Observações',fields:[{key:'texto',label:'Observações'}]},
      ]},
-    {id:'avaliacao',title:'Avaliação de Conteúdo',desc:'Indicadores de performance dos conteúdos publicados.',
+    {id:'apego',title:'Formação da Figura de Apego e Segurança Relacional',desc:'Como as relações de cuidado contribuíram para a construção de segurança, previsibilidade, co-regulação, exploração e autonomia da criança.',
      sections:[
-       {type:'table',key:'avaliacao',label:'Avaliação de Conteúdo',columns:[
-         {key:'link',label:'Link',type:'link'},{key:'views',label:'Views'},{key:'shared',label:'Shared'},{key:'saved',label:'Saved'},{key:'likes',label:'Likes'},
-         {key:'viewsSeg',label:'Views Seguidores'},{key:'viewsNaoSeg',label:'Views Não Seguidores'},{key:'insights',label:'Insights'},
+       {type:'checklist',key:'figurasPrincipaisDeCuidado',label:'Figuras Principais de Cuidado — Quem Foram/São',seedItems:[
+         'Mãe','Pai','Avó/avô','Outro familiar','Cuidador profissional','Família acolhedora','Instituição','Outro',
+       ]},
+       {type:'fields',key:'continuidadeDaFiguraPrincipal',label:'Figuras Principais de Cuidado — Continuidade',fields:[
+         {key:'houveUmaFiguraPrincipalDeReferencia',label:'Houve uma figura principal de referência?',type:'select',options:['Sim','Não','Variou ao longo do desenvolvimento','Não há informação']},
+         {key:'continuidadeDessaFigura',label:'Continuidade dessa figura',type:'select',options:['Muito estável','Relativamente estável','Mudanças importantes','Muitas mudanças','Não sabemos']},
+         {key:'qualMudancaOcorreuEEmQueIdadePreencherApenasSeHouveMudanca',label:'Qual mudança ocorreu e em que idade? (preencher apenas se houve mudança)'},
+       ]},
+       {type:'fields',key:'disponibilidadeDoCuidador',label:'Disponibilidade do Cuidador',fields:[
+         {key:'quandoACriancaPrecisavaDoCuidadorEleCostumavaEstarDisponivel',label:'Quando a criança precisava do cuidador, ele costumava estar disponível?',type:'select',options:['Consistentemente','Na maior parte das vezes','De forma variável','Pouco disponível','Não sabemos']},
+       ]},
+       {type:'checklist',key:'disponibilidadePredominante',label:'Disponibilidade Predominante',seedItems:[
+         'Física','Emocional','Ambas','Variável',
+       ]},
+       {type:'fields',key:'intensificacaoDoComportamento',label:'Disponibilidade do Cuidador — Intensificação do Comportamento',fields:[
+         {key:'aCriancaPrecisavaIntensificarMuitoOComportamentoParaReceberAtencao',label:'A criança precisava intensificar muito o comportamento para receber atenção?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca','Não sabemos']},
+       ]},
+       {type:'checklist',key:'leituraDosSinaisDaCrianca',label:'O Cuidador Costumava Perceber Quando a Criança Estava',seedItems:[
+         'Com fome','Cansada','Com medo','Sobrecarregada','Com dor/desconforto','Precisando de proximidade','Precisando de espaço','Frustrada','Superestimulada',
+       ]},
+       {type:'fields',key:'interpretacaoDosSinais',label:'Leitura dos Sinais — Interpretação Geral',fields:[
+         {key:'deModoGeralAInterpretacaoDosSinaisEra',label:'De modo geral, a interpretação dos sinais era',type:'select',options:['Adequada na maior parte das vezes','Parcial','Muito variável','Frequentemente inadequada','Não sabemos']},
+       ]},
+       {type:'checklist',key:'respostaAosSinais',label:'Quando a Criança Demonstrava Desconforto, o Cuidador Geralmente',seedItems:[
+         'Aproximava-se','Pegava no colo/oferecia contato','Conversava com voz tranquila','Tentava compreender o que estava acontecendo','Ajudava a criança a se acalmar','Distraía imediatamente','Tentava interromper o choro rapidamente','Ignorava','Irritava-se','Gritava','Afastava-se','Respondia de forma imprevisível',
+       ]},
+       {type:'fields',key:'eficaciaDaResposta',label:'Resposta aos Sinais — Eficácia',fields:[
+         {key:'aRespostaNormalmenteAjudavaACriancaASeOrganizar',label:'A resposta normalmente ajudava a criança a se organizar?',type:'select',options:['Sim, frequentemente','Algumas vezes','Pouco','Parecia aumentar a desregulação','Não sabemos']},
+       ]},
+       {type:'checklist',key:'sinaisDeSeguranca',label:'O Que Normalmente Ajudava a Criança a se Regular',seedItems:[
+         'Presença do cuidador','Colo','Toque','Voz','Movimento/balanço','Contato visual','Proximidade sem toque','Conversar sobre o que aconteceu','Antecipação do que acontecerá','Ambiente silencioso','Objeto de conforto','Ficar sozinha por algum tempo','Outro',
+       ]},
+       {type:'fields',key:'outroSinalDeSeguranca',label:'Sinais de Segurança — Outro',fields:[
+         {key:'outroEspecifique',label:'Outro (especifique)'},
+       ]},
+       {type:'checklist',key:'cuidadorDianteDoMedo',label:'Quando a Criança Sentia Medo, Ela',seedItems:[
+         'Procurava o cuidador','Chamava pelo cuidador','Aproximava-se fisicamente','Observava a expressão do adulto','Aceitava conforto','Rejeitava conforto','Congelava','Tentava resolver sozinha','Escondia o medo','Tornava-se agressiva/agitada',
+       ]},
+       {type:'fields',key:'presencaDoCuidadorDianteDoMedo',label:'Cuidador Diante do Medo — Efeito da Presença',fields:[
+         {key:'aPresencaDoCuidadorTendiaA',label:'A presença do cuidador tendia a',type:'select',options:['Reduzir bastante a reação','Reduzir parcialmente','Não modificar muito','Aumentar a reação','Variar bastante','Não sabemos']},
+       ]},
+       {type:'fields',key:'previsibilidadeRelacional',label:'Previsibilidade Relacional',fields:[
+         {key:'aCriancaConseguiaPreverComoOCuidadorReagiriaAsSuasNecessidades',label:'A criança conseguia prever como o cuidador reagiria às suas necessidades?',type:'select',options:['Geralmente sim','Parcialmente','Pouco','Muito imprevisível','Não sabemos']},
+         {key:'asRespostasDoCuidadorEramDiferentesDependendoDoProprioEstadoEmocional',label:'As respostas do cuidador eram diferentes dependendo do próprio estado emocional?',type:'select',options:['Muito','Moderadamente','Pouco','Não','Não sabemos']},
+         {key:'entreOsCuidadoresHaviaConsistencia',label:'Entre os cuidadores havia consistência?',type:'select',options:['Alta','Moderada','Baixa','Respostas muito diferentes','Apenas um cuidador principal']},
+         {key:'principaisDiferencasEntreOsCuidadoresPreencherApenasSeBaixaConsistencia',label:'Principais diferenças entre os cuidadores (preencher apenas se baixa consistência)'},
+       ]},
+       {type:'checklist',key:'baseSeguraEExploracao',label:'Quando Uma Figura de Segurança Está Disponível, a Criança Consegue',seedItems:[
+         'Explorar o ambiente','Brincar de forma independente','Experimentar coisas novas','Afastar-se do adulto e retornar quando necessário','Pedir ajuda','Aceitar ajuda','Retomar uma atividade após receber apoio','Tentar novamente depois de errar','Interagir com outras pessoas',
+       ]},
+       {type:'fields',key:'exploracaoNaPresencaDaSeguranca',label:'Base Segura e Exploração — Qualidade da Exploração',fields:[
+         {key:'exploracaoNaPresencaDaFiguraDeSeguranca',label:'Exploração na presença da figura de segurança',type:'select',options:['Fácil','Geralmente adequada','Necessita de muita proximidade','Evita explorar','Explora, mas raramente procura o adulto','Muito variável']},
+       ]},
+       {type:'checklist',key:'reacaoASeparacao',label:'Diante de Separação do Cuidador Principal, a Criança Geralmente',seedItems:[
+         'Tolera adequadamente para a idade','Protesta inicialmente e se reorganiza','Demonstra sofrimento intenso','Permanece desregulada por longo período','Demonstra pouca reação aparente','Evita a separação antecipadamente','Apresenta sintomas físicos','Não se aplica',
+       ]},
+       {type:'fields',key:'separacoesImportantes',label:'Separação — Separações Importantes',fields:[
+         {key:'separacoesImportantesOcorreram',label:'Separações importantes ocorreram?',type:'select',options:['Não','Sim','Não sabemos']},
+         {key:'idadeAproximadaSeHouveSeparacaoImportante',label:'Idade aproximada (se houve separação importante)'},
+         {key:'duracao',label:'Duração',type:'select',options:['Horas/dias','Semanas','Meses','Longo período']},
+         {key:'contextoSeHouveSeparacaoImportante',label:'Contexto (se houve separação importante)'},
+       ]},
+       {type:'checklist',key:'reencontro',label:'No Reencontro com a Figura de Cuidado, a Criança Costuma',seedItems:[
+         'Buscar proximidade','Aceitar conforto','Demonstrar alegria','Demonstrar raiva','Evitar contato','Permanecer muito ativada','Recuperar-se e voltar à exploração','Não há padrão consistente',
+       ]},
+       {type:'checklist',key:'rupturaEReparacao',label:'Depois de Conflitos, Normalmente Ocorre',seedItems:[
+         'Reaproximação','Conversa sobre o ocorrido','Reconhecimento das emoções','Pedido de desculpas quando pertinente','Contato afetivo','Retomada natural da interação','Longo afastamento','Silêncio punitivo','Conflito permanece sem resolução',
+       ]},
+       {type:'fields',key:'recuperacaoAposConflitos',label:'Ruptura e Reparação — Recuperação',fields:[
+         {key:'aRelacaoCostumaRecuperarseAposConflitos',label:'A relação costuma recuperar-se após conflitos?',type:'select',options:['Rapidamente','Com algum tempo','Com bastante dificuldade','Frequentemente não ocorre reparação','Não sabemos']},
+       ]},
+       {type:'checklist',key:'coRegulacao',label:'Quando a Criança Está Intensamente Desregulada, o Cuidador Consegue',seedItems:[
+         'Manter-se relativamente calmo','Aproximar-se sem aumentar a intensidade','Ajustar sua fala','Reduzir demandas temporariamente','Identificar o que a criança precisa','Ajudá-la a reconhecer emoções','Esperar a redução da ativação','Retomar a situação posteriormente',
+       ]},
+       {type:'fields',key:'desregulacaoDoCuidador',label:'Co-Regulação — Desregulação do Próprio Cuidador',fields:[
+         {key:'oCuidadorTendeTambemASeDesregular',label:'O cuidador tende também a se desregular?',type:'select',options:['Raramente','Às vezes','Frequentemente','Quase sempre']},
+       ]},
+       {type:'checklist',key:'referenciamentoSocial',label:'Diante de Algo Novo ou Incerto, a Criança',seedItems:[
+         'Olha para o cuidador','Busca sua expressão facial','Pergunta se é seguro','Aproxima-se fisicamente','Utiliza a orientação do adulto','Consegue explorar após receber segurança','Continua insegura mesmo após receber segurança','Não costuma buscar referência no adulto',
+       ]},
+       {type:'checklist',key:'daCoRegulacaoParaAAutorregulacao',label:'O Que a Criança Já Consegue Fazer Atualmente',seedItems:[
+         'Procurar um adulto quando precisa','Nomear o que sente','Comunicar desconforto','Pedir uma pausa','Utilizar estratégias aprendidas','Esperar por curto período','Recuperar-se com pouco suporte','Recuperar-se sem suporte em situações leves','Retomar uma atividade após frustração','Antecipar que uma emoção irá passar','Utilizar linguagem para controlar o próprio comportamento','Procurar ajuda antes de chegar à crise',
+       ]},
+       {type:'checklist',key:'autonomiaSustentadaPeloCuidador',label:'O Cuidador Costuma',seedItems:[
+         'Permitir que a criança tente sozinha','Dar pistas antes de fazer pela criança','Permitir erros','Incentivar resolução de problemas','Oferecer escolhas adequadas à idade','Respeitar iniciativas','Intervir rapidamente','Fazer pela criança com frequência','Evitar desafios para impedir frustração',
+       ]},
+       {type:'fields',key:'nivelDeSuporteAAutonomia',label:'Autonomia Sustentada pelo Cuidador — Nível de Suporte',fields:[
+         {key:'nivelDeSuporteAAutonomia',label:'Nível de suporte à autonomia',type:'select',options:['Adequado à idade','Elevado suporte','Superproteção percebida','Pouco suporte','Muito variável']},
+       ]},
+       {type:'checklist',key:'segurancaRelacionalAtual',label:'Atualmente a Criança Possui Pelo Menos Uma Figura Que',seedItems:[
+         'Procura espontaneamente','Aceita como fonte de conforto','Ajuda a reduzir medo','Ajuda durante crises','É relativamente previsível','Está emocionalmente disponível','Incentiva exploração','Incentiva autonomia','Realiza reparação após conflitos',
+       ]},
+       {type:'fields',key:'segurancaPercebidaAtual',label:'Segurança Relacional Atual — Síntese',fields:[
+         {key:'segurancaPercebidaNaRelacaoAtual',label:'Segurança percebida na relação atual',type:'select',options:['Alta','Moderada','Baixa','Muito variável','Não foi possível determinar']},
+       ]},
+       {type:'fields',key:'sinteseDoProfissional',label:'Síntese do Profissional',fields:[
+         {key:'figurasDeMaiorSegurancaAtualmente',label:'Figura(s) de maior segurança atualmente'},
+         {key:'oQueMaisAjudaEstaCriancaARetornarARegulacao',label:'O que mais ajuda esta criança a retornar à regulação?'},
+         {key:'situacoesEmQueACriancaDemonstraMaiorInsegurancaRelacional',label:'Situações em que a criança demonstra maior insegurança relacional'},
+         {key:'rupturasOuMudancasRelacionaisImportantesNaHistoria',label:'Rupturas ou mudanças relacionais importantes na história'},
+         {key:'consideracoesRelevantesDoProfissionalCampoLivreOpcional',label:'Considerações relevantes do profissional (campo livre opcional)'},
        ]},
        {type:'fields',key:'observacoes',label:'Observações',fields:[{key:'texto',label:'Observações'}]},
      ]},

@@ -1380,6 +1380,7 @@ const ICONS = {
   family:'<circle cx="7.8" cy="5.2" r="2.7"/><path d="M4.2 20.5v-2.3c0-3.3 1.6-5.6 3.6-5.6s3.6 2.3 3.6 5.6v2.3"/><circle cx="16.5" cy="10.8" r="1.9"/><path d="M12.8 20.5v-1.6c0-2.6 1.6-4.4 3.7-4.4s3.7 1.8 3.7 4.4v1.6"/><path d="M11.4 15L14 12.9"/>',
   child:'<circle cx="12" cy="7.3" r="3.6"/><path d="M5 20.5c0-4.1 3.1-6.8 7-6.8s7 2.7 7 6.8"/>',
   familia:'<circle cx="5" cy="4.6" r="2.3"/><path d="M5 7.3v3.2M2.6 12.5c0-1.8 1-3 2.4-3s2.4 1.2 2.4 3"/><path d="M2.6 12.5v7.3M7.4 12.5v7.3"/><circle cx="19" cy="4.6" r="2.3"/><path d="M19 7.3v3.2M16.6 12.5c0-1.8 1-3 2.4-3s2.4 1.2 2.4 3"/><path d="M16.6 12.5v7.3M21.4 12.5v7.3"/><circle cx="12" cy="10.3" r="1.7"/><path d="M12 12.4v4.8M10.3 15v5.5M13.7 15v5.5"/><path d="M7.4 13.5L10.6 12.9M16.6 13.5L13.4 12.9"/>',
+  escola:'<circle cx="12" cy="4.6" r="2.3"/><path d="M7.8 9.6c1.3-1.7 2.9-2.6 4.2-2.6s2.9.9 4.2 2.6"/><path d="M9.3 10.6c.9-.5 1.8-.7 2.7-.7s1.8.2 2.7.7"/><path d="M12 11.3v7.6"/><path d="M5 11c2.5-1.1 5-.8 7 .3v7.5c-2-1.1-4.5-1.4-7-.3z"/><path d="M19 11c-2.5-1.1-5-.8-7 .3v7.5c2-1.1 4.5-1.4 7-.3z"/><circle cx="4.6" cy="14.3" r="0.9"/><circle cx="19.4" cy="14.3" r="0.9"/>',
 };
 function icon(name,cls){return `<svg class="icon ${cls||''}" viewBox="0 0 24 24">${ICONS[name]}</svg>`;}
 function fillIcon(name,cls){return `<svg class="icon ${cls||''}" viewBox="0 0 24 24" fill="currentColor" stroke="none">${ICONS[name]}</svg>`;}
@@ -3482,6 +3483,150 @@ const QUADRANTS = [
      sections:[
        {type:'list',key:'segunda',label:'Segunda'},{type:'list',key:'terca',label:'Terça'},{type:'list',key:'quarta',label:'Quarta'},
        {type:'list',key:'quinta',label:'Quinta'},{type:'list',key:'sexta',label:'Sexta'},{type:'list',key:'sabado',label:'Sábado'},{type:'list',key:'domingo',label:'Domingo'},
+     ]},
+   ]},
+  {id:'escola',title:'Área da Escola',icon:'escola',moduleId:'transformar',
+   meta:'Investiga como a criança aprende no ambiente escolar, considerando atenção, sistemas de aprendizagem, memória, funções executivas, motivação e características do contexto educacional.',
+   topics:[
+    {id:'sistemasAprendizagem',title:'Sistemas de Aprendizagem',desc:'Avalia como a criança identifica regras e padrões, aprende com experiência, consequências e observação, organiza sequências e aplica o que aprendeu em novas situações.',
+     sections:[
+       {type:'checklist',key:'condutaAprendizagemExplicita',label:'1. Aprendizagem Explícita e por Regras — Quando uma Regra ou Estratégia é Ensinada Diretamente, a Criança',seedItems:[
+         'Compreende explicações verbais',
+         'Aprende melhor com exemplos',
+         'Consegue explicar a regra com suas palavras',
+         'Aplica a regra após demonstração',
+         'Precisa de várias repetições',
+         'Conhece a regra, mas nem sempre consegue aplicá-la',
+       ]},
+       {type:'fields',key:'funcionamentoAprendizagemExplicita',label:'Aprendizagem Explícita e por Regras — Funcionamento Predominante',fields:[
+         {key:'funcionamentoPredominante',label:'Funcionamento predominante',type:'select',options:['Consistente','Parcial','Dificuldade frequente']},
+       ]},
+       {type:'checklist',key:'capacidadesAprendizagemImplicita',label:'2. Aprendizagem Implícita e de Regularidades — A Criança Consegue',seedItems:[
+         'Perceber padrões após repetidas exposições',
+         'Antecipar o que costuma acontecer em uma rotina',
+         'Aprender regularidades sem precisar que sejam explicadas',
+         'Perceber padrões em sons, palavras, imagens ou sequências',
+         'Adaptar-se progressivamente à estrutura de uma atividade',
+       ]},
+       {type:'fields',key:'necessidadeDeEnsinoExplicitoParaPadroes',label:'Aprendizagem Implícita e de Regularidades — Necessidade de Ensino Explícito',fields:[
+         {key:'precisaQuePadroesNormalmenteAprendidosPelaExperienciaSejamExplicitamenteEnsinados',label:'Precisa que padrões normalmente aprendidos pela experiência sejam explicitamente ensinados?',type:'select',options:['Frequentemente','Às vezes','Raramente']},
+       ]},
+       {type:'checklist',key:'percepcaoDeRelacoes',label:'3. Aprendizagem por Associação, Causa e Consequência — A Criança Consegue Perceber Relações Entre',seedItems:[
+         'Um evento e outro',
+         'Uma ação e sua consequência',
+         'Uma escolha e seu resultado',
+         'Um sinal e aquilo que geralmente acontece depois',
+         'Uma causa e um efeito',
+       ]},
+       {type:'fields',key:'ajusteDiantConsequencias',label:'Aprendizagem por Associação, Causa e Consequência — Ajuste Diante das Consequências',fields:[
+         {key:'diantDasConsequenciasDeSuasAcoes',label:'Diante das consequências de suas ações',type:'select',options:['Ajusta rapidamente o comportamento','Precisa de várias experiências','Ajusta apenas em alguns contextos','Parece ter dificuldade em usar a consequência para modificar a ação']},
+       ]},
+       {type:'checklist',key:'condutaAoReceberFeedback',label:'4. Aprendizagem por Reforço e Feedback — Quando Recebe Feedback, a Criança',seedItems:[
+         'Repete estratégias que funcionaram',
+         'Reduz estratégias que não funcionaram',
+         'Aprende com acertos',
+         'Aprende com erros',
+         'Utiliza feedback na tentativa seguinte',
+         'Precisa de feedback imediato',
+         'Consegue aprender mesmo quando o resultado ocorre depois',
+       ]},
+       {type:'fields',key:'efeitosDoFeedback',label:'Aprendizagem por Reforço e Feedback — Efeitos do Feedback',fields:[
+         {key:'oComportamentoMelhoraQuandoAsConsequenciasSaoClarasEPrevisiveis',label:'O comportamento melhora quando as consequências são claras e previsíveis?',type:'select',options:['Muito','Moderadamente','Pouco','Não observado']},
+         {key:'tendeARepetirUmaEstrategiaMesmoQuandoElaNaoProduzMaisResultado',label:'Tende a repetir uma estratégia mesmo quando ela não produz mais resultado?',type:'select',options:['Frequentemente','Às vezes','Raramente']},
+       ]},
+       {type:'checklist',key:'aprendizagemSequencial',label:'5. Aprendizagem de Sequências, Habilidades Perceptivas e Motoras — Sequencial: A Criança Consegue Aprender',seedItems:[
+         'Ordem de etapas',
+         'Rotinas',
+         'Sequências de movimentos',
+         'Sequências verbais',
+         'Procedimentos com várias etapas',
+       ]},
+       {type:'checklist',key:'aprendizagemPerceptiva',label:'Sequências, Perceptiva e Motora — Perceptiva: Com a Experiência, Melhora em',seedItems:[
+         'Discriminar sons',
+         'Identificar padrões visuais',
+         'Reconhecer formas/letras/palavras',
+         'Diferenciar informações semelhantes',
+         'Identificar detalhes relevantes',
+       ]},
+       {type:'checklist',key:'aprendizagemMotora',label:'Sequências, Perceptiva e Motora — Motora: Com Repetição, Consegue',seedItems:[
+         'Tornar movimentos mais precisos',
+         'Automatizar habilidades',
+         'Aprender por demonstração e prática',
+         'Manter uma sequência motora aprendida',
+       ]},
+       {type:'fields',key:'funcionamentoSequencialPerceptivoMotor',label:'Sequências, Perceptiva e Motora — Funcionamento neste Bloco',fields:[
+         {key:'aprendizagemNesseBloco',label:'Aprendizagem nesse bloco',type:'select',options:['Consistente','Parcial','Dificuldade frequente']},
+       ]},
+       {type:'checklist',key:'capacidadesDeCategorizacao',label:'6. Categorias, Conceitos e Relações — A Criança Consegue',seedItems:[
+         'Agrupar elementos por características comuns',
+         'Identificar semelhanças e diferenças',
+         'Formar categorias',
+         'Compreender conceitos abstratos progressivamente',
+         'Perceber que exemplos diferentes pertencem ao mesmo conceito',
+         'Explicar por que elementos pertencem a uma categoria',
+       ]},
+       {type:'checklist',key:'melhorFormaDeAprenderConceitos',label:'Categorias, Conceitos e Relações — Aprende Conceitos Melhor Por',seedItems:[
+         'Definição verbal',
+         'Exemplos variados',
+         'Comparação entre exemplos',
+         'Manipulação/experiência prática',
+         'Imagens',
+         'Combinação dessas estratégias',
+       ]},
+       {type:'checklist',key:'aprendizagemPorObservacao',label:'7. Aprendizagem Social e Observacional — A Criança Aprende Observando Outras Pessoas?',seedItems:[
+         'Imita ações demonstradas',
+         'Aprende observando colegas',
+         'Aprende após observar o professor resolver um problema',
+         'Percebe consequências recebidas por outras pessoas',
+         'Utiliza estratégias observadas posteriormente',
+         'Procura modelos quando não sabe como agir',
+       ]},
+       {type:'fields',key:'necessidadeDeDemonstracao',label:'Aprendizagem Social e Observacional — Necessidade de Demonstração',fields:[
+         {key:'nivelDeNecessidadeDeDemonstracao',label:'Necessidade de demonstração',type:'select',options:['Baixa','Moderada','Alta']},
+       ]},
+       {type:'checklist',key:'usoDoConhecimentoEmNovosContextos',label:'8. Generalização e Transferência — Depois de Aprender Algo, a Criança Consegue Utilizar o Conhecimento',seedItems:[
+         'Em exercício diferente',
+         'Com materiais diferentes',
+         'Com outra pessoa/professor',
+         'Em outro ambiente',
+         'Em outra disciplina',
+         'Em uma situação cotidiana',
+         'Para resolver um problema novo',
+       ]},
+       {type:'fields',key:'aprendizagemRestritaAoFormato',label:'Generalização e Transferência — Restrição ao Formato',fields:[
+         {key:'tendeAAprenderApenasOFormatoEspecificoEmQueFoiEnsinada',label:'Tende a aprender apenas o formato específico em que foi ensinada?',type:'select',options:['Frequentemente','Às vezes','Raramente']},
+       ]},
+       {type:'fields',key:'tipoDeTransferencia',label:'Generalização e Transferência — Tipo de Transferência',fields:[
+         {key:'transferenciaDoAprendizado',label:'Transferência do aprendizado',type:'select',options:['Espontânea','Ocorre com pistas','Exige ensino explícito','Muito limitada']},
+       ]},
+       {type:'checklist',key:'condutaQuandoRegraMuda',label:'9. Reversão de Aprendizagem e Atualização — Quando uma Regra Muda, a Criança',seedItems:[
+         'Percebe a mudança rapidamente',
+         'Interrompe a resposta anteriormente aprendida',
+         'Aprende a nova regra',
+         'Alterna adequadamente entre regras',
+         'Precisa de aviso explícito',
+         'Continua utilizando a regra antiga',
+         'Fica presa à estratégia anteriormente reforçada',
+       ]},
+       {type:'fields',key:'mudancaAposEstrategiaObsoleta',label:'Reversão de Aprendizagem e Atualização — Mudança de Estratégia',fields:[
+         {key:'depoisDePerceberQueUmaEstrategiaNaoFuncionaMais',label:'Depois de perceber que uma estratégia não funciona mais',type:'select',options:['Muda espontaneamente','Muda com pista','Precisa de explicação direta','Persiste repetidamente na estratégia anterior']},
+       ]},
+       {type:'fields',key:'sinteseSistemasDeAprendizagem',label:'Síntese Rápida — Perfil por Sistema de Aprendizagem',fields:[
+         {key:'explicitoPorRegras',label:'Explícito e por regras',type:'select',options:['Consistente','Parcial','Dificuldade frequente']},
+         {key:'implicitoRegularidades',label:'Implícito e regularidades',type:'select',options:['Consistente','Parcial','Dificuldade frequente']},
+         {key:'associacaoCausalidade',label:'Associação/causalidade',type:'select',options:['Consistente','Parcial','Dificuldade frequente']},
+         {key:'reforcoEFeedback',label:'Reforço e feedback',type:'select',options:['Consistente','Parcial','Dificuldade frequente']},
+         {key:'sequencialPerceptivoMotor',label:'Sequencial/perceptivo/motor',type:'select',options:['Consistente','Parcial','Dificuldade frequente']},
+         {key:'categoriasEConceitos',label:'Categorias e conceitos',type:'select',options:['Consistente','Parcial','Dificuldade frequente']},
+         {key:'socialObservacional',label:'Social/observacional',type:'select',options:['Consistente','Parcial','Dificuldade frequente']},
+         {key:'generalizacaoTransferencia',label:'Generalização/transferência',type:'select',options:['Consistente','Parcial','Dificuldade frequente']},
+         {key:'reversaoAtualizacao',label:'Reversão/atualização',type:'select',options:['Consistente','Parcial','Dificuldade frequente']},
+       ]},
+       {type:'fields',key:'sinteseFinal',label:'Síntese',fields:[
+         {key:'viaPelaQualACriancaPareceAprenderComMaiorFacilidade',label:'Via pela qual a criança parece aprender com maior facilidade'},
+         {key:'situacaoEmQueApresentaMaiorDificuldadeParaAprenderOuAtualizarUmaAprendizagem',label:'Situação em que apresenta maior dificuldade para aprender ou atualizar uma aprendizagem'},
+         {key:'estrategiasQueMaisFavorecemSuaAprendizagem',label:'Estratégias que mais favorecem sua aprendizagem'},
+       ]},
      ]},
    ]},
 ];

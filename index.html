@@ -2084,11 +2084,140 @@ const QUADRANTS = [
        ]},
        {type:'fields',key:'observacoes',label:'Observações',fields:[{key:'texto',label:'Observações'}]},
      ]},
-    {id:'projetos',title:'3 Projetos',desc:'Iniciativas prioritárias de marca em andamento, mês a mês.',
+    {id:'sono',title:'Sono, Ritmos Biológicos e Autorregulação Fisiológica',desc:'Como a criança organiza seus ciclos de sono-vigília, responde às demandas fisiológicas e recupera o equilíbrio corporal após estados de ativação.',
      sections:[
-       {type:'table',key:'projetos',label:'Projetos',columns:[
-         {key:'mes',label:'Mês'},{key:'parceiro',label:'Parceiro'},{key:'descricao',label:'Descrição do Projeto'},{key:'data',label:'Data'},{key:'detalhes',label:'Detalhes'},
-         {key:'clientes',label:'Clientes'},{key:'avaliacaoGeral',label:'Avaliação Geral'},{key:'custos',label:'Custos'},{key:'retorno',label:'Retorno'},
+       {type:'fields',key:'organizacaoGeralDoSono',label:'Organização Geral do Sono',fields:[
+         {key:'horarioHabitualDeDormir',label:'Horário habitual de dormir',type:'time'},
+         {key:'horarioHabitualDeAcordar',label:'Horário habitual de acordar',type:'time'},
+         {key:'duracaoAproximadaDoSono',label:'Duração aproximada do sono',computed:'sleepDuration',from:'horarioHabitualDeDormir',to:'horarioHabitualDeAcordar'},
+         {key:'oHorarioDeSonoE',label:'O horário de sono é',type:'select',options:['Muito regular','Relativamente regular','Variável','Muito irregular','Não sabemos']},
+         {key:'nosFinsDeSemanaOHorarioMuda',label:'Nos fins de semana o horário muda',type:'select',options:['Menos de 1 hora','1–2 horas','Mais de 2 horas','Não muda significativamente']},
+         {key:'aCriancaDormeDuranteODia',label:'A criança dorme durante o dia?',type:'select',options:['Não','Sim, regularmente','Às vezes']},
+         {key:'duracaoMediaDaSonecaSeDormeDuranteODia',label:'Duração média da soneca (se dorme durante o dia)',type:'select',options:['<30 min','30–60 min','1–2 h','>2 h']},
+       ]},
+       {type:'fields',key:'inicioDoSono',label:'Início do Sono',fields:[
+         {key:'quantoTempoCostumaLevarParaAdormecer',label:'Quanto tempo costuma levar para adormecer?',type:'select',options:['<15 min','15–30 min','30–60 min','>60 min','Muito variável']},
+       ]},
+       {type:'checklist',key:'naHoraDeDormirApresenta',label:'Na Hora de Dormir, Costuma Apresentar',seedItems:[
+         'Adormece com facilidade','Resistência para ir para cama','Solicitações repetidas','Levanta várias vezes','Medo de dormir','Medo de ficar sozinho','Necessidade de presença do cuidador','Necessidade de contato físico','Necessidade de televisão/tela','Necessidade de objeto específico','Agitação corporal','Pensamentos/preocupações','Choro','Irritabilidade',
+       ]},
+       {type:'checklist',key:'condicoesParaAdormecer',label:'A Criança Costuma Adormecer',seedItems:[
+         'Sozinha','Com cuidador no quarto','Com cuidador na cama','Sendo embalada','Com toque/contato físico','Com música/ruído','Com televisão/tela','Com objeto de conforto','Mamando/alimentando-se','De diferentes formas',
+       ]},
+       {type:'fields',key:'reentradaNoSono',label:'Condições Necessárias Para Adormecer — Reentrada no Sono',fields:[
+         {key:'consegueAdormecerNovamenteSemAjudaQuandoDesperta',label:'Consegue adormecer novamente sem ajuda quando desperta?',type:'select',options:['Frequentemente','Algumas vezes','Raramente','Não','Não sabemos']},
+       ]},
+       {type:'fields',key:'continuidadeDoSono',label:'Continuidade do Sono',fields:[
+         {key:'despertaDuranteANoite',label:'Desperta durante a noite?',type:'select',options:['Raramente/nunca','1 vez','2 vezes','3 ou mais vezes','Muito variável']},
+       ]},
+       {type:'checklist',key:'duranteODespertar',label:'Durante o Despertar, a Criança (Se Houver Despertares)',seedItems:[
+         'Volta a dormir sozinha','Chama o cuidador','Vai até o quarto do cuidador','Precisa de presença','Precisa de contato físico','Chora','Demonstra medo','Permanece acordada por longo período','Solicita alimentação/bebida','Usa dispositivo eletrônico',
+       ]},
+       {type:'fields',key:'tempoParaVoltarADormir',label:'Continuidade do Sono — Tempo Para Voltar a Dormir',fields:[
+         {key:'tempoHabitualParaVoltarADormir',label:'Tempo habitual para voltar a dormir',type:'select',options:['<10 min','10–30 min','30–60 min','>60 min']},
+       ]},
+       {type:'checklist',key:'qualidadeObservavelDoSono',label:'Durante o Sono Apresenta',seedItems:[
+         'Sono aparentemente tranquilo','Movimenta-se muito','Fala dormindo','Range os dentes','Sua excessivamente','Ronca','Respira pela boca','Parece ter dificuldade para respirar','Pausas respiratórias percebidas','Acorda tossindo/engasgando','Chuta ou movimenta muito as pernas','Pesadelos','Terrores noturnos relatados','Sonambulismo','Enurese noturna','Desperta confusa','Outro',
+       ]},
+       {type:'fields',key:'despertarPelaManha',label:'Despertar Pela Manhã',fields:[
+         {key:'comoCostumaAcordar',label:'Como costuma acordar?',type:'select',options:['Espontaneamente e disposto','Precisa ser acordado, mas acorda bem','Difícil de acordar','Muito sonolento','Irritado/desregulado','Muito variável']},
+       ]},
+       {type:'checklist',key:'aoAcordarApresenta',label:'Ao Acordar Apresenta',seedItems:[
+         'Boa disposição','Sonolência','Lentificação','Irritabilidade','Dor de cabeça','Queixa de cansaço','Dificuldade para iniciar a rotina','Fome intensa','Pouco apetite',
+       ]},
+       {type:'fields',key:'funcionamentoDuranteODia',label:'Funcionamento Durante o Dia',fields:[
+         {key:'sonolenciaDuranteODia',label:'Sonolência durante o dia',type:'select',options:['Ausente','Leve','Moderada','Importante']},
+       ]},
+       {type:'checklist',key:'aoLongoDoDiaApresenta',label:'Ao Longo do Dia Apresenta',seedItems:[
+         'Energia estável','Queda importante de energia pela manhã','Queda após o almoço','Queda no final da tarde','Agitação quando está cansada','Irritabilidade quando está cansada','Dificuldade de atenção associada ao cansaço','Cochilos involuntários','Dificuldade para permanecer acordada','Aumento de impulsividade quando cansada',
+       ]},
+       {type:'checklist',key:'funcionaMelhorQuando',label:'Quando a Criança Costuma Funcionar Melhor',seedItems:[
+         'Início da manhã','Final da manhã','Início da tarde','Final da tarde','Noite','Não há padrão claro',
+       ]},
+       {type:'checklist',key:'maiorDificuldadeQuando',label:'Quando Demonstra Maior Dificuldade',seedItems:[
+         'Início da manhã','Final da manhã','Após almoço','Final da tarde','Noite','Não há padrão claro',
+       ]},
+       {type:'fields',key:'padraoPredominante',label:'Ritmo Diário de Energia e Alerta — Padrão Predominante',fields:[
+         {key:'padraoPredominante',label:'Padrão predominante',type:'select',options:['Mais matutino','Intermediário','Mais vespertino','Não foi possível observar']},
+       ]},
+       {type:'checklist',key:'rotinaHabitualInclui',label:'Rotina Habitual Inclui',seedItems:[
+         'Horário relativamente fixo para acordar','Exposição à luz natural pela manhã','Atividade física durante o dia','Horários relativamente regulares de refeições','Rotina de desaceleração à noite','Ambiente escuro para dormir','Ambiente silencioso/adequado','Horário consistente para dormir',
+       ]},
+       {type:'checklist',key:'fatoresQuePodemDesorganizar',label:'Fatores Que Podem Desorganizar o Ritmo',seedItems:[
+         'Horários muito variáveis','Dormir muito tarde','Uso de telas à noite','Luz intensa antes de dormir','Atividade estimulante próxima ao sono','Cochilos tardios','Mudanças frequentes de rotina','Viagens/deslocamentos frequentes','Rotinas diferentes entre casas/cuidadores',
+       ]},
+       {type:'fields',key:'telasEPeriodoNoturno',label:'Telas e Período Noturno',fields:[
+         {key:'haUsoDeTelasNaUltimaHoraAntesDeDormir',label:'Há uso de telas na última hora antes de dormir?',type:'select',options:['Não','Alguns dias','Na maioria dos dias','Todos os dias']},
+         {key:'dispositivoPermaneceNoQuarto',label:'Dispositivo permanece no quarto?',type:'select',options:['Não','Sim','Às vezes']},
+       ]},
+       {type:'checklist',key:'usoNoturnoPredominantemente',label:'Uso Noturno Predominantemente',seedItems:[
+         'TV','Celular','Tablet','Videogame','Computador',
+       ]},
+       {type:'fields',key:'retiradaDaTela',label:'Telas e Período Noturno — Retirada da Tela',fields:[
+         {key:'aRetiradaDaTelaCostumaGerarDesregulacao',label:'A retirada da tela costuma gerar desregulação?',type:'select',options:['Não','Leve','Moderada','Intensa']},
+       ]},
+       {type:'checklist',key:'respostaFisiologicaAoEstresse',label:'Quando Está Estressada, a Criança Costuma Apresentar',seedItems:[
+         'Respiração acelerada','Respiração superficial','Coração acelerado percebido','Sudorese','Rubor','Palidez','Tremor','Tensão muscular','Mandíbula contraída','Mãos fechadas','Agitação motora','Paralisação/congelamento','Dor abdominal','Náusea','Vontade de evacuar/urinar','Dor de cabeça','Sensação de calor','Sensação de frio','Cansaço súbito','Sono','Não apresenta sinais facilmente identificáveis',
+       ]},
+       {type:'fields',key:'estadoBasalDeAtivacao',label:'Estado Basal de Ativação',fields:[
+         {key:'noCotidianoForaDeSituacoesClaramenteEstressantesACriancaParece',label:'No cotidiano, fora de situações claramente estressantes, a criança parece',type:'select',options:['Geralmente regulada','Frequentemente muito ativada','Frequentemente pouco ativada/sonolenta','Alterna entre hiper e hipoativação','Muito variável','Não sabemos']},
+       ]},
+       {type:'checklist',key:'caracteristicasFrequentesAtivacao',label:'Características Frequentes',seedItems:[
+         'Relaxa com facilidade','Parece constantemente "em alerta"','Precisa estar em movimento','Assusta-se facilmente','Monitora muito o ambiente','Demonstra tensão corporal','Parece cansada grande parte do tempo','Demora para "engrenar"','Tem dificuldade para ficar em repouso',
+       ]},
+       {type:'fields',key:'tempoDeRecuperacaoFisiologica',label:'Recuperação Fisiológica — Tempo de Recuperação',fields:[
+         {key:'aposUmaSituacaoDeAltaAtivacaoQuantoTempoGeralmenteLevaParaRetornarAoFuncionamentoHabitual',label:'Após uma situação de alta ativação, quanto tempo geralmente leva para retornar ao funcionamento habitual?',type:'select',options:['<5 min','5–15 min','15–30 min','30–60 min','>1 h','Pode permanecer alterada por várias horas']},
+       ]},
+       {type:'checklist',key:'precisaDeParaSeReorganizar',label:'Para se Reorganizar, Geralmente Precisa de',seedItems:[
+         'Nada específico','Tempo','Presença de adulto','Contato físico','Movimento','Redução de estímulos','Silêncio','Respiração orientada','Conversa','Atividade repetitiva','Objeto de conforto','Espaço sozinho','Atividade física',
+       ]},
+       {type:'fields',key:'recuperacaoPredominante',label:'Recuperação Fisiológica — Recuperação Predominante',fields:[
+         {key:'recuperacaoPredominante',label:'Recuperação predominante',type:'select',options:['Autônoma','Com pouco suporte','Com bastante co-regulação','Muito difícil mesmo com suporte']},
+       ]},
+       {type:'checklist',key:'dificuldadeDeTransicaoEntre',label:'A Criança Apresenta Dificuldade Para Passar de',seedItems:[
+         'Sono → vigília','Repouso → atividade','Atividade intensa → repouso','Brincadeira → tarefa estruturada','Ambiente estimulante → ambiente tranquilo','Estado emocional intenso → atividade habitual','Não apresenta dificuldades relevantes',
+       ]},
+       {type:'fields',key:'qualidadeDasTransicoes',label:'Transições Entre Estados — Qualidade das Transições',fields:[
+         {key:'transicoesFisiologicascomportamentaisSao',label:'Transições fisiológicas/comportamentais são',type:'select',options:['Fáceis','Moderadamente difíceis','Difíceis','Muito difíceis']},
+       ]},
+       {type:'fields',key:'sinaisCorporaisDeNecessidade',label:'A Criança Percebe Quando Está',fields:[
+         {key:'cansada',label:'Cansada',type:'select',options:['Sim','Às vezes','Raramente']},
+         {key:'comSono',label:'Com sono',type:'select',options:['Sim','Às vezes','Raramente']},
+         {key:'comFome',label:'Com fome',type:'select',options:['Sim','Às vezes','Raramente']},
+         {key:'comSede',label:'Com sede',type:'select',options:['Sim','Às vezes','Raramente']},
+         {key:'precisandoIrAoBanheiro',label:'Precisando ir ao banheiro',type:'select',options:['Sim','Às vezes','Raramente']},
+         {key:'tensa',label:'Tensa',type:'select',options:['Sim','Às vezes','Raramente']},
+         {key:'muitoAgitada',label:'Muito agitada',type:'select',options:['Sim','Às vezes','Raramente']},
+         {key:'precisandoDescansar',label:'Precisando descansar',type:'select',options:['Sim','Às vezes','Raramente']},
+         {key:'consegueComunicarEssasNecessidadesAntesDeSeDesregular',label:'Consegue comunicar essas necessidades antes de se desregular?',type:'select',options:['Frequentemente','Algumas vezes','Raramente','Ainda não']},
+       ]},
+       {type:'checklist',key:'relacaoSonoEComportamento',label:'Após Uma Noite Ruim, Costuma Haver Aumento de',seedItems:[
+         'Irritabilidade','Choro','Impulsividade','Hiperatividade/agitação','Agressividade','Rigidez','Ansiedade','Sensibilidade sensorial','Dificuldade para esperar','Dificuldade para lidar com erros','Desatenção','Esquecimentos','Lentificação','Sonolência','Não percebe diferença',
+       ]},
+       {type:'checklist',key:'relacaoSonoEAprendizagem',label:'Quando Dorme Mal, Observa-se',seedItems:[
+         'Menor sustentação da atenção','Maior distraibilidade','Dificuldade para seguir instruções','Pior memória de trabalho','Menor persistência','Maior dificuldade para aprender conteúdos novos','Maior necessidade de repetição','Maior quantidade de erros','Menor motivação','Não há diferença percebida',
+       ]},
+       {type:'fields',key:'mudancasRecentesNoSono',label:'Mudanças Recentes no Sono',fields:[
+         {key:'oSonoMudouRecentemente',label:'O sono mudou recentemente?',type:'select',options:['Não','Sim','Não sabemos']},
+       ]},
+       {type:'checklist',key:'mudancaPredominante',label:'Mudança Predominante (Se Sim)',seedItems:[
+         'Dorme menos','Dorme mais','Demora mais para dormir','Acorda mais vezes','Pesadelos','Maior resistência','Medo de dormir','Sonolência diurna','Outra',
+       ]},
+       {type:'checklist',key:'mudancaCoincidiuCom',label:'A Mudança Coincidiu Com',seedItems:[
+         'Mudança familiar','Mudança escolar','Estresse/adversidade','Doença','Introdução/alteração de medicação','Mudança de rotina','Mudança de casa','Não foi possível identificar','Outro',
+       ]},
+       {type:'checklist',key:'fatoresClinicosRelevantes',label:'Fatores Clínicos Relevantes',seedItems:[
+         'Condição respiratória conhecida','Respiração oral','Alergias importantes','Dor recorrente','Refluxo/sintomas gastrointestinais','Condição neurológica','Medicação que pode interferir no sono','Histórico de distúrbio do sono','Nenhum conhecido',
+       ]},
+       {type:'fields',key:'acompanhamentoEspecificoParaSono',label:'Fatores Clínicos — Acompanhamento Específico',fields:[
+         {key:'possuiAcompanhamentoEspecificoParaSono',label:'Possui acompanhamento específico para sono?',type:'select',options:['Não','Pediatria','Neurologia','Pneumologia','Otorrinolaringologia','Medicina do sono','Outro']},
+       ]},
+       {type:'fields',key:'sinteseDoProfissional',label:'Síntese do Profissional',fields:[
+         {key:'principalDificuldadeRelacionadaAoSono',label:'Principal dificuldade relacionada ao sono'},
+         {key:'oQueMaisAjudaACriancaADesacelerarEDormir',label:'O que mais ajuda a criança a desacelerar e dormir'},
+         {key:'principaisSinaisCorporaisDeDesregulacaoObservados',label:'Principais sinais corporais de desregulação observados'},
+         {key:'oQueMaisAjudaACriancaARetornarAoEquilibrio',label:'O que mais ajuda a criança a retornar ao equilíbrio'},
+         {key:'consideracoesDoProfissionalCampoOpcional',label:'Considerações do profissional (campo opcional)'},
        ]},
        {type:'fields',key:'observacoes',label:'Observações',fields:[{key:'texto',label:'Observações'}]},
      ]},
@@ -6008,6 +6137,20 @@ function computeAgeLabel(dateStr){
   const mesesTxt = months===1? '1 mês' : `${months} meses`;
   return `${anosTxt} e ${mesesTxt}`;
 }
+/* Calcula a duração do sono (horas e minutos) a partir de dois campos "HH:MM" (horário de dormir e
+   de acordar). Se o horário de acordar for "menor" que o de dormir, entende que passou da meia-noite
+   (ex.: dormiu 22:00, acordou 07:00 → 9h). Usado pelo campo "Duração aproximada do sono" de
+   Sono, Ritmos Biológicos e Autorregulação Fisiológica — nunca é digitado, só calculado. */
+function computeSleepDuration(bed, wake){
+  if(!bed || !wake) return '';
+  const bm = bed.split(':').map(Number), wm = wake.split(':').map(Number);
+  if(bm.length<2 || wm.length<2 || bm.some(isNaN) || wm.some(isNaN)) return '';
+  const bedMin = bm[0]*60+bm[1], wakeMin = wm[0]*60+wm[1];
+  let diff = wakeMin - bedMin;
+  if(diff <= 0) diff += 24*60;
+  const h = Math.floor(diff/60), m = diff%60;
+  return m>0? `${h}h ${m}min` : `${h}h`;
+}
 function renderSectionHTML(section, data){
   const val = sectionValue(data, section);
   if(section.type==='fields'){
@@ -6020,9 +6163,19 @@ function renderSectionHTML(section, data){
           return `<label class="ps-label">${f.label}</label>
         <div class="ps-input ps-readonly">${computeAgeLabel(val[f.from]) || '—'}</div>`;
         }
+        if(f.computed==='sleepDuration'){
+          /* Campo somente-leitura: calcula a duração do sono a partir dos campos de horário indicados
+             por f.from (horário de dormir) e f.to (horário de acordar). */
+          return `<label class="ps-label">${f.label}</label>
+        <div class="ps-input ps-readonly">${computeSleepDuration(val[f.from], val[f.to]) || '—'}</div>`;
+        }
         if(f.type==='date'){
           return `<label class="ps-label">${f.label}</label>
         <input type="date" class="ps-input pr-recalc" data-fkind="fields" data-skey="${section.key}" data-fkey="${f.key}" value="${escapeAttr(val[f.key]||'')}">`;
+        }
+        if(f.type==='time'){
+          return `<label class="ps-label">${f.label}</label>
+        <input type="time" class="ps-input pr-recalc" data-fkind="fields" data-skey="${section.key}" data-fkey="${f.key}" value="${escapeAttr(val[f.key]||'')}">`;
         }
         if(f.type==='select'){
           const current = val[f.key]||'';

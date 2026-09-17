@@ -3446,45 +3446,6 @@ const QUADRANTS = [
        ]},
      ]},
    ]},
-  {id:'gestao',title:'Gestão de Negócio',icon:'folder',moduleId:'gerenciar',
-   meta:'Documentação, jurídico, financeiro e rotina do consultório.',
-   topics:[
-    {id:'contratos',title:'Contratos',desc:'Modelos de contrato usados no consultório.',
-     sections:[{type:'table',key:'documentos',label:'Documentos',columns:[
-       {key:'documento',label:'Documento'},{key:'link',label:'Link',type:'link'},
-     ]}]},
-    {id:'politicas',title:'Políticas Internas',desc:'Políticas internas do consultório.',
-     sections:[{type:'table',key:'documentos',label:'Documentos',columns:[
-       {key:'documento',label:'Documento'},{key:'link',label:'Link',type:'link'},
-     ]}]},
-    {id:'pops',title:'POPs',desc:'Procedimentos Operacionais Padrão do consultório.',
-     sections:[{type:'table',key:'documentos',label:'Documentos',columns:[
-       {key:'documento',label:'Documento'},{key:'link',label:'Link',type:'link'},
-     ]}]},
-    {id:'prescricoes',title:'Prescrições e Solicitação de Exames',desc:'Modelos de prescrição e solicitação de exames.',
-     sections:[{type:'table',key:'documentos',label:'Documentos',columns:[
-       {key:'documento',label:'Documento'},{key:'link',label:'Link',type:'link'},
-     ]}]},
-    {id:'laudos',title:'Laudos, Atestados e Declarações',desc:'Modelos de laudos, atestados e declarações.',
-     sections:[{type:'table',key:'documentos',label:'Documentos',columns:[
-       {key:'documento',label:'Documento'},{key:'link',label:'Link',type:'link'},
-     ]}]},
-    {id:'financeiro',title:'Fluxo Financeiro',desc:'Fluxo de caixa mensal do consultório.',
-     sections:[
-       {type:'cashflow',key:'fluxoCaixa',label:'Fluxo de Caixa'},
-     ]},
-    {id:'precificacao',title:'Precificação de Protocolos e Consultas',desc:'Cálculo do preço do protocolo a partir dos custos fixos, das horas trabalhadas e dos percentuais variáveis — mesma lógica da planilha de precificação.',
-     sections:[
-       {type:'pricing',key:'precificacao',label:'Precificação'},
-     ]},
-    {id:'faturamento',title:'Faturamento',desc:'Faturamento mensal por tipo de entrada — calculado automaticamente a partir dos lançamentos do Fluxo Financeiro.',
-     sections:[{type:'billing',key:'faturamento',label:'Faturamento Mensal'}]},
-    {id:'rotina',title:'Rotina',desc:'Planejamento da rotina semanal, dia a dia.',pdfExport:true,
-     sections:[
-       {type:'list',key:'segunda',label:'Segunda'},{type:'list',key:'terca',label:'Terça'},{type:'list',key:'quarta',label:'Quarta'},
-       {type:'list',key:'quinta',label:'Quinta'},{type:'list',key:'sexta',label:'Sexta'},{type:'list',key:'sabado',label:'Sábado'},{type:'list',key:'domingo',label:'Domingo'},
-     ]},
-   ]},
   {id:'escola',title:'Área da Escola',icon:'escola',moduleId:'transformar',
    meta:'Investiga como a criança aprende no ambiente escolar, considerando atenção, sistemas de aprendizagem, memória, funções executivas, motivação e características do contexto educacional.',
    topics:[
@@ -3627,6 +3588,45 @@ const QUADRANTS = [
          {key:'situacaoEmQueApresentaMaiorDificuldadeParaAprenderOuAtualizarUmaAprendizagem',label:'Situação em que apresenta maior dificuldade para aprender ou atualizar uma aprendizagem'},
          {key:'estrategiasQueMaisFavorecemSuaAprendizagem',label:'Estratégias que mais favorecem sua aprendizagem'},
        ]},
+     ]},
+   ]},
+  {id:'gestao',title:'Gestão de Negócio',icon:'folder',moduleId:'gerenciar',
+   meta:'Documentação, jurídico, financeiro e rotina do consultório.',
+   topics:[
+    {id:'contratos',title:'Contratos',desc:'Modelos de contrato usados no consultório.',
+     sections:[{type:'table',key:'documentos',label:'Documentos',columns:[
+       {key:'documento',label:'Documento'},{key:'link',label:'Link',type:'link'},
+     ]}]},
+    {id:'politicas',title:'Políticas Internas',desc:'Políticas internas do consultório.',
+     sections:[{type:'table',key:'documentos',label:'Documentos',columns:[
+       {key:'documento',label:'Documento'},{key:'link',label:'Link',type:'link'},
+     ]}]},
+    {id:'pops',title:'POPs',desc:'Procedimentos Operacionais Padrão do consultório.',
+     sections:[{type:'table',key:'documentos',label:'Documentos',columns:[
+       {key:'documento',label:'Documento'},{key:'link',label:'Link',type:'link'},
+     ]}]},
+    {id:'prescricoes',title:'Prescrições e Solicitação de Exames',desc:'Modelos de prescrição e solicitação de exames.',
+     sections:[{type:'table',key:'documentos',label:'Documentos',columns:[
+       {key:'documento',label:'Documento'},{key:'link',label:'Link',type:'link'},
+     ]}]},
+    {id:'laudos',title:'Laudos, Atestados e Declarações',desc:'Modelos de laudos, atestados e declarações.',
+     sections:[{type:'table',key:'documentos',label:'Documentos',columns:[
+       {key:'documento',label:'Documento'},{key:'link',label:'Link',type:'link'},
+     ]}]},
+    {id:'financeiro',title:'Fluxo Financeiro',desc:'Fluxo de caixa mensal do consultório.',
+     sections:[
+       {type:'cashflow',key:'fluxoCaixa',label:'Fluxo de Caixa'},
+     ]},
+    {id:'precificacao',title:'Precificação de Protocolos e Consultas',desc:'Cálculo do preço do protocolo a partir dos custos fixos, das horas trabalhadas e dos percentuais variáveis — mesma lógica da planilha de precificação.',
+     sections:[
+       {type:'pricing',key:'precificacao',label:'Precificação'},
+     ]},
+    {id:'faturamento',title:'Faturamento',desc:'Faturamento mensal por tipo de entrada — calculado automaticamente a partir dos lançamentos do Fluxo Financeiro.',
+     sections:[{type:'billing',key:'faturamento',label:'Faturamento Mensal'}]},
+    {id:'rotina',title:'Rotina',desc:'Planejamento da rotina semanal, dia a dia.',pdfExport:true,
+     sections:[
+       {type:'list',key:'segunda',label:'Segunda'},{type:'list',key:'terca',label:'Terça'},{type:'list',key:'quarta',label:'Quarta'},
+       {type:'list',key:'quinta',label:'Quinta'},{type:'list',key:'sexta',label:'Sexta'},{type:'list',key:'sabado',label:'Sábado'},{type:'list',key:'domingo',label:'Domingo'},
      ]},
    ]},
 ];

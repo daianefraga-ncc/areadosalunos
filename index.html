@@ -2438,55 +2438,1012 @@ const QUADRANTS = [
      ]},
    ]},
   {id:'jornada',title:'Área da Família',icon:'familia',moduleId:'transformar',
-   meta:'Análise das práticas educativas e das experiências familiares que participam da construção da autonomia, autorregulação, tomada de decisão e comportamento da criança ao longo do desenvolvimento.',
+   meta:'Analisa práticas parentais e a organização familiar que influenciam no comportamento da criança.',
    topics:[
-    {id:'agendamento',title:'Agendamento',desc:'Dias e horários disponíveis, e estratégia de oferta de horário ao paciente.',
-     intro:[
-       'Estratégia: Sempre questionar qual período é melhor para o paciente. Após isso oferecer um dia da semana seguinte e um horário específico (exemplo: tenho horário na próxima terça-feira às 10:30h, caso o período escolhido seja matutino). Se o paciente não puder no dia, ofereça o dia seguinte com horário alternativo (exemplo: tenho horário amanhã às 09h).',
-       'Confirmar agendamento com o pagamento na próxima etapa.',
-     ],
-     sections:[{type:'list',key:'acoes',label:'Ações e Estratégia',placeholder:'Ex.: Terça-feira — 09h, 14h, 17h'}]},
-    {id:'registro',title:'Registro de Paciente Novo',desc:'Como registrar os dados de um paciente novo.',
+    {id:'estruturaFamiliar',title:'Estrutura Familiar',desc:'Avalia a clareza, previsibilidade e consistência das regras e consequências utilizadas pela família.',
      sections:[
-       {type:'list',key:'acoes',label:'Ações',placeholder:'Ex.: Compartilhar o link do Wispform'},
-       {type:'fields',key:'material',label:'Material para o Paciente',fields:[
-         {key:'link',label:'Link do material a encaminhar ao paciente'},
+       {type:'fields',key:'clarezaDasRegras',label:'A. Clareza das Regras',fields:[
+         {key:'asRegrasFamiliaresSaoClarasParaACrianca',label:'As regras familiares são claras para a criança?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'asRegrasSaoCompativeisComAIdadeECapacidadeDaCrianca',label:'As regras são compatíveis com a idade e capacidade da criança?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'haPoucasRegrasPrioritariasEmVezDeMuitasProibicoesSimultaneas',label:'Há poucas regras prioritárias, em vez de muitas proibições simultâneas?',type:'select',options:['Sim','Parcialmente','Não']},
+         {key:'aCriancaConsegueDizerOQueSeEsperaDelaNasPrincipaisSituacoesDoCotidiano',label:'A criança consegue dizer o que se espera dela nas principais situações do cotidiano?',type:'select',options:['Sim','Em parte','Não','Não sabemos']},
+         {key:'asRegrasSaoExplicadasAntesDosProblemasAcontecerem',label:'As regras são explicadas antes dos problemas acontecerem?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'previsibilidade',label:'B. Previsibilidade',fields:[
+         {key:'aCriancaSabePreviamenteOQueAconteceQuandoUmaRegraNaoECumprida',label:'A criança sabe previamente o que acontece quando uma regra não é cumprida?',type:'select',options:['Sim, geralmente','Às vezes','Raramente','Não']},
+         {key:'asConsequenciasCostumamSerPrevisiveis',label:'As consequências costumam ser previsíveis?',type:'select',options:['Muito','Moderadamente','Pouco','Nada']},
+         {key:'asRegrasMudamDeAcordoComOHumorOuCansacoDoAdulto',label:'As regras mudam de acordo com o humor ou cansaço do adulto?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'oMesmoComportamentoCostumaReceberRespostasMuitoDiferentesEmDiasDiferentes',label:'O mesmo comportamento costuma receber respostas muito diferentes em dias diferentes?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'consistenciaDoLimite',label:'C. Consistência do Limite',fields:[
+         {key:'quandoOAdultoEstabeleceUmLimiteCostumaMantelo',label:'Quando o adulto estabelece um limite, costuma mantê-lo?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'oAdultoCostumaMudarADecisaoAposInsistenciaChoroOuBirra',label:'O adulto costuma mudar a decisão após insistência, choro ou birra?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'fazAmeacasDeConsequenciasQueDepoisNaoAplica',label:'Faz ameaças de consequências que depois não aplica?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'repeteMuitasVezesAMesmaSolicitacaoAntesDeAgir',label:'Repete muitas vezes a mesma solicitação antes de agir?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'consegueSustentarOLimiteMesmoQuandoACriancaDemonstraFrustracao',label:'Consegue sustentar o limite mesmo quando a criança demonstra frustração?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'qualidadeDasConsequencias',label:'D. Qualidade das Consequências',fields:[
+         {key:'asConsequenciasSaoProporcionaisAoComportamento',label:'As consequências são proporcionais ao comportamento?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'existeRelacaoLogicaEntreComportamentoEConsequenciaExNaoGuardouDeterminadoMaterialParticipaDaOrganizacaoDele',label:'Existe relação lógica entre comportamento e consequência? (ex.: não guardou determinado material → participa da organização dele)',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'asConsequenciasCostumamSerImediatasOuProximasDoComportamento',label:'As consequências costumam ser imediatas ou próximas do comportamento?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'saoUtilizadasPunicoesMuitoLongas',label:'São utilizadas punições muito longas?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'oAdultoAcrescentaNovasPunicoesDuranteADiscussao',label:'O adulto acrescenta novas punições durante a discussão?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aConsequenciaAumentaConformeOAdultoFicaMaisIrritado',label:'A consequência aumenta conforme o adulto fica mais irritado?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'manejoDuranteADesregulacao',label:'E. Manejo Durante a Desregulação — Quando a Criança Está Muito Ativada Emocionalmente, o Adulto Costuma',seedItems:[
+         'Reduzir a quantidade de fala','Repetir o limite de forma breve','Esperar a redução da ativação para conversar','Fazer longas explicações','Tentar convencer a criança naquele momento','Negociar repetidamente','Elevar o tom de voz','Acrescentar ameaças','Retirar o limite para encerrar a crise','Não há padrão definido',
+       ]},
+       {type:'fields',key:'diferenciaLimiteDeReflexao',label:'Manejo Durante a Desregulação — Momento do Limite vs. Momento de Refletir',fields:[
+         {key:'oAdultoDiferenciaOMomentoDeEstabelecerOLimiteDoMomentoDeEnsinarrefletirSobreOComportamento',label:'O adulto diferencia o momento de estabelecer o limite do momento de ensinar/refletir sobre o comportamento?',type:'select',options:['Sim','Parcialmente','Não']},
+       ]},
+       {type:'fields',key:'coerenciaEntreCuidadores',label:'F. Coerência Entre Cuidadores',fields:[
+         {key:'osPrincipaisCuidadoresUtilizamRegrasSemelhantes',label:'Os principais cuidadores utilizam regras semelhantes?',type:'select',options:['Sim','Parcialmente','Não','Apenas um cuidador principal']},
+         {key:'umCuidadorCostumaDesfazerOLimiteColocadoPeloOutro',label:'Um cuidador costuma desfazer o limite colocado pelo outro?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aCriancaProcuraOutroAdultoQuandoRecebeUmaRespostaNegativa',label:'A criança procura outro adulto quando recebe uma resposta negativa?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'oOutroCuidadorCostumaPreencherApenasSeMarcouFrequentementeasVezesNaPerguntaAnterior',label:'O outro cuidador costuma (preencher apenas se marcou Frequentemente/Às vezes na pergunta anterior)',type:'select',options:['Manter a decisão','Rever junto com o primeiro cuidador','Mudar a decisão','Varia muito']},
+       ]},
+       {type:'fields',key:'sinteseFinal',label:'Síntese',fields:[
+         {key:'principalAspectoRelacionadoALimitesEDisciplinaQueMereceOrientacao',label:'Principal aspecto relacionado a limites e disciplina que merece orientação'},
        ]},
      ]},
-    {id:'pagamento',title:'Pagamento',desc:'Formas de pagamento e condições oferecidas.',
-     sections:[{type:'list',key:'acoes',label:'Ações',placeholder:'Ex.: Pix ou cartão de crédito, em até 12x'}]},
-    {id:'orientacoes',title:'Orientações',desc:'Materiais e avisos enviados antes da sessão.',
+    {id:'apoioAutonomia',title:'Apoio à Autonomia e Controle Psicológico',desc:'Avalia quanto os cuidadores favorecem escolhas, iniciativa e resolução de problemas, ou utilizam formas de controle que limitam a autonomia emocional e comportamental da criança.',
      sections:[
-       {type:'list',key:'acoes',label:'Ações',placeholder:'Ex.: Compartilhar manual do paciente'},
-       {type:'fields',key:'material',label:'Material para o Paciente',fields:[
-         {key:'link',label:'Link do material a encaminhar ao paciente'},
+       {type:'fields',key:'oportunidadeDeEscolha',label:'A. Oportunidade de Escolha',fields:[
+         {key:'aCriancaRecebeEscolhasCompativeisComSuaIdade',label:'A criança recebe escolhas compatíveis com sua idade?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'podeEscolherEntreAlternativasPreviamenteDefinidasPeloAdulto',label:'Pode escolher entre alternativas previamente definidas pelo adulto?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'participaDeDecisoesQueDizemRespeitoDiretamenteASuaRotina',label:'Participa de decisões que dizem respeito diretamente à sua rotina?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'asEscolhasOferecidasSaoReaisENaoApenasAparentes',label:'As escolhas oferecidas são reais, e não apenas aparentes?',type:'select',options:['Sim','Parcialmente','Não']},
        ]},
-     ],
-     footnote:['Afirmar que será enviado um <strong>LEMBRETE DA CONSULTA NO DIA ANTERIOR</strong>.']},
-    {id:'confirmacao',title:'Confirmação',desc:'Confirmação do atendimento e envio de termos.',
-     intro:[
-       'Verificar agenda e confirmar atendimento no dia anterior.',
-       'Se confirmado, enviar o <strong>CONTRATO</strong> para assinatura por meio da plataforma escolhida.',
-       'Se a consulta for online, criar um link do atendimento e compartilhar com o paciente.',
-     ],
-     sections:[{type:'list',key:'acoes',label:'Ações',placeholder:'Ex.: Enviar termo de ciência via Autentique'}]},
-    {id:'pos-atendimento',title:'Pós-Atendimento',desc:'Retorno, contrato de protocolo e lembretes.',
-     intro:[
-       'Enviar documentos e orientações pós-consulta.',
-       '<strong>SE APÓS PRIMEIRA CONSULTA</strong> (e caso não tenha feito isso em consulta):<br>• Agendar o retorno.<br>• Afirmar que será enviado um lembrete um dia antes da consulta.',
-       '<strong>SE APÓS O RETORNO E FECHOU O PROTOCOLO</strong> (e caso não tenha feito isso em consulta):<br>• Agendar todas as consultas.<br>• Realizar o pagamento.<br>• Afirmar que será enviado um lembrete um dia antes de cada consulta.',
-       '<strong>SE APÓS A CONSULTA DENTRO DE PROTOCOLO:</strong><br>• Enviar documentos e orientações pós-consulta.',
-       '<strong>SE APÓS O TÉRMINO DO PROTOCOLO:</strong><br>• Enviar documentos e orientações pós-consulta.<br>• Deixar a seguinte mensagem:',
-       '<div class="topic-note-msg">Oi, [nome]! Estou te enviando suas prescrições e orientações finais. Agora começa uma etapa importante: manter o que conquistamos e observar como seu organismo responde nos próximos meses.<br><br>Mesmo com o encerramento deste protocolo, o acompanhamento continua sendo importante para avaliarmos sua evolução, identificarmos possíveis ajustes e evitarmos que pequenas alterações passem despercebidas e se tornem problemas maiores lá na frente.<br><br>Te encontro daqui 3 meses (ou período acordado) para fazermos essa revisão com calma. Enviaremos um lembrete um dia antes da consulta. Cuidar da saúde também é acompanhar, ajustar e prevenir, não apenas agir quando algo não está bem.<br><br>Qualquer necessidade, sigo a sua disposição. Não hesite em me chamar.<br><br>Até lá.</div>',
-     ],
-     sections:[{type:'list',key:'acoes',label:'Ações',placeholder:'Ex.: Agendar retorno (sessão de até 30 minutos)'}]},
-    {id:'avaliacao-jornada',title:'Avaliação',desc:'Coleta de avaliação do atendimento pelo paciente.',
-     sections:[{type:'table',key:'acoes',label:'Ações',columns:[
-       {key:'link',label:'Link',type:'link'},
-     ],fixedRows:[
-       'Enviar avaliação do protocolo/atendimento (NPS).',
-       'Se avaliação positiva, encaminhe o link do Google Meu Negócio para o paciente avaliar.',
-     ]}]},
+       {type:'fields',key:'iniciativaEIndependencia',label:'B. Iniciativa e Independência',fields:[
+         {key:'oCuidadorPermiteQueACriancaTenteFazerSozinhaAntesDeAjudar',label:'O cuidador permite que a criança tente fazer sozinha antes de ajudar?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aCriancaPodeIniciarAtividadesOuProporManeirasDiferentesDeRealizalas',label:'A criança pode iniciar atividades ou propor maneiras diferentes de realizá-las?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'condutaDianteDaDificuldade',label:'Iniciativa e Independência — Quando a Criança Encontra Dificuldade, o Adulto Costuma',seedItems:[
+         'Esperar alguns instantes antes de intervir','Fazer perguntas ou dar pistas','Demonstrar uma etapa','Realizar parte da tarefa','Fazer a tarefa pela criança','Intervir imediatamente','Depende muito da situação',
+       ]},
+       {type:'fields',key:'toleranciaAoErroGeral',label:'C. Tolerância ao Erro',fields:[
+         {key:'oAdultoPermiteQueACriancaErreEmSituacoesSeguras',label:'O adulto permite que a criança erre em situações seguras?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'condutaDianteDoErro',label:'Tolerância ao Erro — Quando a Criança Erra, o Cuidador Tende a',seedItems:[
+         'Incentivar nova tentativa','Perguntar o que poderia ser feito diferente','Ajudar a identificar o erro','Corrigir imediatamente','Dar a resposta correta','Assumir a tarefa','Demonstrar irritação','Evitar que a criança tente novamente',
+       ]},
+       {type:'fields',key:'toleranciaAFrustracao',label:'Tolerância ao Erro — Tolerância à Frustração',fields:[
+         {key:'aFamiliaToleraFrustracoesCompativeisComAIdade',label:'A família tolera frustrações compatíveis com a idade?',type:'select',options:['Bem','Parcialmente','Pouco','Muito pouco']},
+       ]},
+       {type:'fields',key:'resolucaoDeProblemas',label:'D. Resolução de Problemas',fields:[
+         {key:'antesDeOferecerASolucaoOAdultoCostumaPerguntarOQueACriancaPensaQuePoderiaFazer',label:'Antes de oferecer a solução, o adulto costuma perguntar o que a criança pensa que poderia fazer?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aCriancaEIncentivadaAConsiderarMaisDeUmaSolucao',label:'A criança é incentivada a considerar mais de uma solução?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'eEstimuladaAPensarNasConsequenciasDasPropriasEscolhas',label:'É estimulada a pensar nas consequências das próprias escolhas?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aposUmaEstrategiaNaoFuncionarOAdultoAjudaACriancaATentarOutra',label:'Após uma estratégia não funcionar, o adulto ajuda a criança a tentar outra?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'reducaoDaAjudaComACompetencia',label:'E. Transferência Gradual de Responsabilidade',fields:[
+         {key:'aMedidaQueACriancaDemonstraCompetenciaOAdultoReduzAAjuda',label:'À medida que a criança demonstra competência, o adulto reduz a ajuda?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aCriancaPossuiResponsabilidadesCompativeisComAIdade',label:'A criança possui responsabilidades compatíveis com a idade?',type:'select',options:['Sim','Parcialmente','Não']},
+       ]},
+       {type:'checklist',key:'areasDeResponsabilidade',label:'Transferência Gradual de Responsabilidade — Áreas em Que Já Assume Alguma Responsabilidade',seedItems:[
+         'Autocuidado','Organização dos pertences','Tarefas domésticas simples','Material escolar','Rotina','Uso do tempo','Pequenas decisões','Resolução de pequenos conflitos','Ainda não possui responsabilidades consistentes',
+       ]},
+       {type:'fields',key:'adultoFazPelaCrianca',label:'Transferência Gradual de Responsabilidade — Tarefas Que o Adulto Ainda Faz Pela Criança',fields:[
+         {key:'oAdultoCostumaFazerPelaCriancaTarefasQueElaJaConsegueRealizar',label:'O adulto costuma fazer pela criança tarefas que ela já consegue realizar?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'respeitoAPerspectivaDaCrianca',label:'F. Respeito à Perspectiva da Criança',fields:[
+         {key:'oCuidadorEscutaAOpiniaoDaCriancaMesmoQuandoNaoConcorda',label:'O cuidador escuta a opinião da criança mesmo quando não concorda?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aCriancaPodeDiscordarRespeitosamenteDoAdulto',label:'A criança pode discordar respeitosamente do adulto?',type:'select',options:['Sim','Às vezes','Não']},
+         {key:'oCuidadorProcuraCompreenderOMotivoDeDeterminadoComportamentoAntesDeResponder',label:'O cuidador procura compreender o motivo de determinado comportamento antes de responder?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'asExplicacoesDasRegrasSaoCompativeisComAIdade',label:'As explicações das regras são compatíveis com a idade?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'controlePsicologico',label:'G. Controle Psicológico — Quando Deseja Que a Criança Obedeça, o Cuidador Utiliza',seedItems:[
+         'Explicação breve e limite claro','Consequência previamente combinada','Negociação','Culpa','Chantagem emocional','Ameaça de retirada de afeto','Silêncio/afastamento afetivo','Comparação com irmãos ou outras crianças','Humilhação','Indução de vergonha','"Depois de tudo que faço por você..."','Ameaça de abandono','Aprovação condicionada ao comportamento','Nenhuma dessas estratégias',
+       ]},
+       {type:'fields',key:'culpaEResponsabilidadeEmocional',label:'H. Culpa e Responsabilidade Emocional',fields:[
+         {key:'aCriancaEResponsabilizadaPeloEstadoEmocionalDoAdultoExVoceEstaMeDeixandoTristeVoceVaiAcabarComigoOlhaOQueVoceFezComigo',label:'A criança é responsabilizada pelo estado emocional do adulto? (ex.: "Você está me deixando triste.", "Você vai acabar comigo.", "Olha o que você fez comigo.")',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'oAdultoUtilizaSofrimentoEmocionalParaInduzirObediencia',label:'O adulto utiliza sofrimento emocional para induzir obediência?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aCriancaDemonstraPreocupacaoExcessivaEmNaoDesapontarOCuidador',label:'A criança demonstra preocupação excessiva em não desapontar o cuidador?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca','Não observado']},
+       ]},
+       {type:'checklist',key:'afetoCondicionado',label:'I. Afeto Condicionado — Após Comportamentos Inadequados, o Adulto Costuma',seedItems:[
+         'Manter vínculo e limitar o comportamento','Reduzir interação por um período curto para se regular','Ignorar a criança por longos períodos','Retirar demonstrações de afeto','Dizer que não gosta mais dela','Evitar contato como punição','Variar muito conforme a situação',
+       ]},
+       {type:'fields',key:'percepcaoDeAfetoCondicionado',label:'Afeto Condicionado — Percepção da Criança',fields:[
+         {key:'aCriancaParecePerceberQueOAfetoDependeDeSeComportarBem',label:'A criança parece perceber que o afeto depende de "se comportar bem"?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca','Não sabemos']},
+       ]},
+       {type:'fields',key:'intrusaoESuperprotecao',label:'J. Intrusão e Superproteção',fields:[
+         {key:'oAdultoIntervemAntesQueACriancaTenhaOportunidadeDeTentar',label:'O adulto intervém antes que a criança tenha oportunidade de tentar?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'evitaSituacoesAdequadasAIdadePorqueTemeQueACriancaFiqueFrustrada',label:'Evita situações adequadas à idade porque teme que a criança fique frustrada?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'tomaDecisoesQueACriancaJaTeriaCapacidadeDeTomar',label:'Toma decisões que a criança já teria capacidade de tomar?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'fazPerguntasOuControlaDetalhesExcessivamenteQuandoACriancaEstaRealizandoUmaTarefa',label:'Faz perguntas ou controla detalhes excessivamente quando a criança está realizando uma tarefa?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aCriancaDemonstraDependerDaAprovacaoDoAdultoParaPequenasDecisoes',label:'A criança demonstra depender da aprovação do adulto para pequenas decisões?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca','Não observado']},
+       ]},
+       {type:'fields',key:'autonomiaEmocional',label:'K. Autonomia Emocional',fields:[
+         {key:'aCriancaPodeDemonstrarEmocoesNegativasSemSerPunidaPorSentilas',label:'A criança pode demonstrar emoções negativas sem ser punida por senti-las?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'podeDizerQueEstaComRaivaDoAdultoSemQueIssoSejaInterpretadoComoDesrespeitoAutomaticamente',label:'Pode dizer que está com raiva do adulto sem que isso seja interpretado como desrespeito automaticamente?',type:'select',options:['Sim','Às vezes','Não']},
+         {key:'oCuidadorDiferenciaEmocaoDeComportamentoExVocePodeEstarComRaivaMasNaoPodeBater',label:'O cuidador diferencia emoção de comportamento? (ex.: "Você pode estar com raiva, mas não pode bater.")',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aCriancaSenteNecessidadeDeEsconderEmocoesParaEvitarReacaoDoAdulto',label:'A criança sente necessidade de esconder emoções para evitar reação do adulto?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca','Não sabemos']},
+       ]},
+       {type:'checklist',key:'padraoPredominanteObservado',label:'L. Padrão Predominante Observado (Selecione Até 3)',seedItems:[
+         'Bom apoio à autonomia','Suporte adequado com estrutura','Ajuda excessiva','Superproteção','Poucas oportunidades de decisão','Adulto resolve problemas pela criança','Dificuldade em tolerar erros da criança','Controle psicológico frequente','Uso de culpa/chantagem emocional','Afeto condicionado ao comportamento','Incentivo consistente à independência','Transferência de responsabilidade compatível com a idade',
+       ]},
+       {type:'fields',key:'sinteseFinal',label:'Síntese',fields:[
+         {key:'principalAspectoRelacionadoAAutonomiaQueMereceOrientacaoParental',label:'Principal aspecto relacionado à autonomia que merece orientação parental'},
+       ]},
+     ]},
+    {id:'scaffolding',title:'Suporte Executivo Parental — Scaffolding',desc:'Avalia como o cuidador estrutura tarefas, oferece pistas e transfere gradualmente à criança o planejamento, o controle e a resolução de problemas.',
+     sections:[
+       {type:'fields',key:'ajusteDaAjudaACapacidade',label:'1. Ajuste da Ajuda à Capacidade da Criança',fields:[
+         {key:'antesDeAjudarOCuidadorPermiteQueACriancaTenteSozinha',label:'Antes de ajudar, o cuidador permite que a criança tente sozinha?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'oNivelDeAjudaCostumaVariarDeAcordoComADificuldadeDaTarefa',label:'O nível de ajuda costuma variar de acordo com a dificuldade da tarefa?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'quandoPercebeQueACriancaConsegueRealizarUmaEtapaReduzAAjuda',label:'Quando percebe que a criança consegue realizar uma etapa, reduz a ajuda?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'quandoPercebeDificuldadeRealAumentaTemporariamenteOSuporte',label:'Quando percebe dificuldade real, aumenta temporariamente o suporte?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'oCuidadorTendeA',label:'O cuidador tende a',type:'select',options:['Oferecer ajuda apenas quando necessária','Ajudar um pouco mais do que necessário','Ajudar muito mais do que necessário','Oferecer ajuda insuficiente','Variar muito']},
+       ]},
+       {type:'checklist',key:'iniciacaoDaTarefa',label:'2. Iniciação da Tarefa — Quando a Criança Precisa Começar Algo, o Cuidador Costuma',seedItems:[
+         'Dizer claramente qual é o primeiro passo','Perguntar "por onde você vai começar?"','Ajudar a organizar os materiais','Utilizar pista visual','Dar um pequeno lembrete','Repetir diversas vezes a ordem','Começar a tarefa pela criança','Fazer junto sem permitir tentativa independente','Apenas mandar "vá fazer"',
+       ]},
+       {type:'fields',key:'dependeDoAdultoParaIniciar',label:'Iniciação da Tarefa — Dependência do Adulto',fields:[
+         {key:'aCriancaDependeDoAdultoParaIniciarTarefasQueJaConhece',label:'A criança depende do adulto para iniciar tarefas que já conhece?',type:'select',options:['Quase sempre','Frequentemente','Às vezes','Raramente','Não']},
+       ]},
+       {type:'fields',key:'ajudaAPensarNoNecessario',label:'3. Planejamento',fields:[
+         {key:'antesDeUmaTarefaOCuidadorAjudaACriancaAPensarNoQueSeraNecessario',label:'Antes de uma tarefa, o cuidador ajuda a criança a pensar no que será necessário?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'estimulaPerguntasDePlanejamento',label:'Planejamento — Estimula Perguntas Como',seedItems:[
+         'O que precisamos fazer?','O que vem primeiro?','O que vamos precisar?','Quanto tempo temos?','Qual pode ser a parte mais difícil?','O que faremos se não funcionar?',
+       ]},
+       {type:'fields',key:'cuidadorNormalmentePlanejamento',label:'Planejamento — Postura do Cuidador',fields:[
+         {key:'oCuidadorNormalmente',label:'O cuidador normalmente',type:'select',options:['Planeja junto com a criança','Dá pistas para que ela planeje','Informa todo o plano pronto','Executa sem planejamento explícito','Não costuma trabalhar planejamento']},
+       ]},
+       {type:'checklist',key:'divisaoDeTarefasComplexas',label:'4. Divisão de Tarefas Complexas — Quando Uma Tarefa é Difícil, o Cuidador Costuma',seedItems:[
+         'Dividir em etapas menores','Apresentar uma etapa por vez','Destacar a etapa atual','Utilizar checklist','Utilizar imagens/rotina visual','Demonstrar apenas a etapa necessária','Entregar todas as instruções de uma vez','Repetir toda a sequência sempre que a criança esquece','Assumir a tarefa quando há dificuldade',
+       ]},
+       {type:'fields',key:'complexidadeAjustadaACapacidade',label:'Divisão de Tarefas Complexas — Ajuste da Complexidade',fields:[
+         {key:'aComplexidadeDaTarefaEAjustadaACapacidadeAtualDaCrianca',label:'A complexidade da tarefa é ajustada à capacidade atual da criança?',type:'select',options:['Geralmente','Às vezes','Raramente','Não']},
+       ]},
+       {type:'checklist',key:'suportesDeMemoriaDeTrabalho',label:'5. Suporte à Memória de Trabalho — O Cuidador Utiliza',seedItems:[
+         'Listas','Rotinas visuais','Calendário','Checklist','Sequências ilustradas','Alarmes/lembretes','Organização dos materiais por etapas','Repetição breve da instrução','Solicita que a criança repita a instrução','Nenhum suporte externo',
+       ]},
+       {type:'fields',key:'estiloDeInstrucoes',label:'Suporte à Memória de Trabalho — Estilo de Instruções',fields:[
+         {key:'aoDarInstrucoesCostuma',label:'Ao dar instruções, costuma',type:'select',options:['Dar uma instrução por vez','Dar poucas etapas compatíveis com a idade','Dar muitas instruções simultaneamente','Variar muito']},
+         {key:'perguntaACriancaOQueVocePrecisaFazerAgoraEmVezDeRepetirAutomaticamente',label:'Pergunta à criança "o que você precisa fazer agora?" em vez de repetir automaticamente?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'controleInibitorioCondutas',label:'6. Controle Inibitório — Diante de Situações Que Exigem Esperar ou Interromper Uma Resposta, o Cuidador',seedItems:[
+         'Antecipa a necessidade de esperar','Define claramente quanto tempo será necessário','Utiliza sinais visuais/temporais','Lembra a regra antes da situação','Oferece alternativas de comportamento','Ajuda a criança a parar e pensar','Exige controle sem preparação','Repete "não" diversas vezes','Retira imediatamente toda a demanda',
+       ]},
+       {type:'checklist',key:'linguagemDeControleInibitorio',label:'Controle Inibitório — O Cuidador Utiliza Linguagem Como',seedItems:[
+         '"Pare e pense."','"O que você precisa fazer antes?"','"Qual é a regra agora?"','"O que pode acontecer se fizer isso?"',
+       ]},
+       {type:'fields',key:'oportunidadeDePraticarEspera',label:'Controle Inibitório — Oportunidade de Praticar Espera',fields:[
+         {key:'aCriancaRecebeOportunidadeDePraticarEsperaAdequadaAIdade',label:'A criança recebe oportunidade de praticar espera adequada à idade?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'flexibilidadeCognitivaCondutas',label:'7. Flexibilidade Cognitiva — Quando Algo Muda, o Cuidador',seedItems:[
+         'Antecipa a mudança quando possível','Ajuda a pensar em um plano B','Pergunta "que outra maneira podemos tentar?"','Apresenta duas alternativas','Incentiva tentativa diferente','Modifica gradualmente a estratégia','Resolve imediatamente pela criança','Insiste repetidamente na mesma estratégia','Evita mudanças para impedir desconforto',
+       ]},
+       {type:'fields',key:'estimuloAGerarSolucoes',label:'Flexibilidade Cognitiva — Geração de Soluções',fields:[
+         {key:'estimulaACriancaAGerarMaisDeUmaSolucao',label:'Estimula a criança a gerar mais de uma solução?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'quandoUmaEstrategiaFalhaAjudaACriancaAPerceberQueEPossivelMudarSemTransformarOErroEmFracasso',label:'Quando uma estratégia falha, ajuda a criança a perceber que é possível mudar sem transformar o erro em fracasso?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'linguagemComoFerramentaExecutiva',label:'8. Linguagem Como Ferramenta Executiva — Durante Uma Tarefa, o Cuidador Costuma',seedItems:[
+         'Nomear o objetivo','Descrever as etapas','Fazer perguntas','Pedir que a criança explique o plano','Pedir que verbalize o que está fazendo','Pedir que explique por que escolheu uma estratégia','Antecipar possíveis dificuldades','Fazer toda a explicação sem participação da criança','Dar apenas comandos',
+       ]},
+       {type:'fields',key:'tipoPredominanteDeFala',label:'Linguagem Como Ferramenta Executiva — Tipo Predominante de Fala',fields:[
+         {key:'tipoPredominanteDeFala',label:'Tipo predominante de fala',type:'select',options:['Perguntas que estimulam raciocínio','Pistas breves','Explicações diretas','Ordens/comandos','Correções constantes','Muito variável']},
+       ]},
+       {type:'fields',key:'primeiraReacaoAoProblema',label:'9. Resolução de Problemas — Primeira Reação do Cuidador',fields:[
+         {key:'quandoSurgeUmProblemaOCuidadorTendePrimeiroA',label:'Quando surge um problema, o cuidador tende primeiro a',type:'select',options:['Perguntar à criança o que ela poderia fazer','Oferecer uma pista','Dar duas possibilidades','Mostrar como resolver','Dar imediatamente a solução','Resolver pela criança']},
+       ]},
+       {type:'checklist',key:'criancaEstimuladaAResolucao',label:'Resolução de Problemas — A Criança é Estimulada a',seedItems:[
+         'Identificar o problema','Pensar em alternativas','Escolher uma estratégia','Antecipar consequências','Testar a solução','Verificar se funcionou','Tentar outra estratégia',
+       ]},
+       {type:'checklist',key:'perguntasDeMonitoramento',label:'10. Monitoramento do Próprio Desempenho — Durante ou Após Uma Tarefa, o Cuidador Pergunta',seedItems:[
+         '"Está funcionando?"','"Você terminou tudo?"','"Tem algo que precisa corrigir?"','"O resultado ficou como você esperava?"','"O que funcionou melhor?"','"O que você faria diferente da próxima vez?"',
+       ]},
+       {type:'fields',key:'conferenciaDoProprioTrabalho',label:'Monitoramento do Próprio Desempenho — Conferência e Identificação de Erros',fields:[
+         {key:'aCriancaEIncentivadaAConferirOProprioTrabalhoAntesDoAdultoCorrigir',label:'A criança é incentivada a conferir o próprio trabalho antes do adulto corrigir?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'quemGeralmenteIdentificaOsErrosPrimeiro',label:'Quem geralmente identifica os erros primeiro?',type:'select',options:['A própria criança','Adulto dá uma pista e a criança identifica','Adulto aponta diretamente','Adulto corrige por ela']},
+       ]},
+       {type:'checklist',key:'manejoDoErroNoScaffolding',label:'11. Manejo do Erro Durante o Scaffolding — Quando a Criança Erra, o Cuidador Tende a',seedItems:[
+         'Esperar para ver se ela percebe','Perguntar se algo parece diferente','Dar uma pista','Pedir nova tentativa','Demonstrar uma parte','Corrigir imediatamente','Dar a resposta correta','Assumir a tarefa','Demonstrar irritação',
+       ]},
+       {type:'fields',key:'nivelDeAjudaAposOErro',label:'Manejo do Erro Durante o Scaffolding — Nível de Ajuda Após o Erro',fields:[
+         {key:'nivelDeAjudaAposOErro',label:'Nível de ajuda após o erro',type:'select',options:['Mínimo necessário','Moderado','Excessivo','Insuficiente','Muito variável']},
+       ]},
+       {type:'checklist',key:'persistenciaDianteDaDificuldade',label:'12. Persistência Diante da Dificuldade — Quando a Criança Diz "Não Consigo", o Cuidador',seedItems:[
+         'Ajuda a identificar qual parte está difícil','Reduz temporariamente a dificuldade','Divide a tarefa','Oferece pista','Incentiva nova tentativa','Faz junto uma etapa e devolve a tarefa','Faz pela criança','Permite abandono imediato','Pressiona para continuar independentemente do nível de dificuldade',
+       ]},
+       {type:'fields',key:'equilibrioEntreDesafioECapacidade',label:'Persistência Diante da Dificuldade — Equilíbrio Entre Desafio e Capacidade',fields:[
+         {key:'existeEquilibrioEntreDesafioECapacidade',label:'Existe equilíbrio entre desafio e capacidade?',type:'select',options:['Geralmente','Às vezes','Raramente','Não']},
+       ]},
+       {type:'checklist',key:'retiradaGradualDoSuporte',label:'13. Retirada Gradual do Suporte (Fading) — Conforme a Criança Aprende, o Cuidador',seedItems:[
+         'Reduz lembretes','Reduz demonstrações','Reduz pistas','Deixa de organizar materiais por ela','Transfere planejamento','Transfere conferência do trabalho','Transfere responsabilidade sobre horários','Mantém praticamente a mesma ajuda apesar da competência','Aumenta a autonomia gradualmente',
+       ]},
+       {type:'fields',key:'suporteDiminuiComACompetencia',label:'Retirada Gradual do Suporte — Ajuste com a Competência',fields:[
+         {key:'oSuporteDiminuiConformeACompetenciaAumenta',label:'O suporte diminui conforme a competência aumenta?',type:'select',options:['Consistentemente','Parcialmente','Pouco','Não','Não foi possível observar']},
+       ]},
+       {type:'checklist',key:'generalizacaoDeContextos',label:'14. Generalização — O Cuidador Ajuda a Criança a Utilizar a Mesma Estratégia em',seedItems:[
+         'Outras tarefas domésticas','Atividades escolares','Organização pessoal','Interações sociais','Novos problemas','Diferentes ambientes',
+       ]},
+       {type:'checklist',key:'perguntasDeGeneralizacao',label:'Generalização — Pergunta Coisas Como',seedItems:[
+         '"Onde mais poderíamos usar essa estratégia?"','"Lembra quando fizemos algo parecido?"','"O que daquela situação pode ajudar aqui?"',
+       ]},
+       {type:'fields',key:'usaEstrategiasComMenosAjuda',label:'Generalização — Uso Independente das Estratégias',fields:[
+         {key:'aCriancaConsegueUtilizarEstrategiasAprendidasSemOMesmoNivelDeAjuda',label:'A criança consegue utilizar estratégias aprendidas sem o mesmo nível de ajuda?',type:'select',options:['Frequentemente','Às vezes','Raramente','Ainda não']},
+       ]},
+       {type:'checklist',key:'dependenciaDePromptsAdultos',label:'15. Dependência de Prompts Adultos — A Criança Frequentemente Espera o Adulto',seedItems:[
+         'Dizer para começar','Dizer cada etapa','Lembrar o que precisa levar','Lembrar compromissos','Dizer quando parar','Corrigir erros','Resolver dificuldades','Confirmar se fez corretamente','Decidir o próximo passo',
+       ]},
+       {type:'fields',key:'nivelDeDependenciaDeLembretes',label:'Dependência de Prompts Adultos — Nível de Dependência',fields:[
+         {key:'nivelDeDependenciaDeLembretesExternos',label:'Nível de dependência de lembretes externos',type:'select',options:['Baixo','Compatível com a idade','Moderadamente elevado','Muito elevado']},
+       ]},
+       {type:'fields',key:'adequacaoDoSuporte',label:'16. Adequação do Suporte à Idade e Competência',fields:[
+         {key:'oSuporteOferecidoAtualmenteParece',label:'O suporte oferecido atualmente parece',type:'select',options:['Abaixo do necessário','Adequado à necessidade atual','Um pouco acima do necessário','Muito acima do necessário','Muito variável']},
+         {key:'oAdultoTendePredominantementeA',label:'O adulto tende predominantemente a',type:'select',options:['Subassistir — oferece menos apoio que o necessário','Scaffold adequadamente — oferece e retira apoio conforme a necessidade','Superassistir — oferece mais ajuda do que a criança necessita','Substituir — executa frequentemente a função pela criança']},
+       ]},
+       {type:'fields',key:'perfilDeScaffoldingExecutivo',label:'Perfil de Scaffolding Executivo',fields:[
+         {key:'ajusteContingenteDaAjuda',label:'Ajuste contingente da ajuda',type:'select',options:['Adequado','Parcial','Necessita atenção']},
+         {key:'iniciacao',label:'Iniciação',type:'select',options:['Adequado','Parcial','Necessita atenção']},
+         {key:'planejamento',label:'Planejamento',type:'select',options:['Adequado','Parcial','Necessita atenção']},
+         {key:'memoriaDeTrabalhoSuportesExternos',label:'Memória de trabalho — suportes externos',type:'select',options:['Adequado','Parcial','Necessita atenção']},
+         {key:'controleInibitorio',label:'Controle inibitório',type:'select',options:['Adequado','Parcial','Necessita atenção']},
+         {key:'flexibilidade',label:'Flexibilidade',type:'select',options:['Adequado','Parcial','Necessita atenção']},
+         {key:'resolucaoDeProblemas',label:'Resolução de problemas',type:'select',options:['Adequado','Parcial','Necessita atenção']},
+         {key:'automonitoramento',label:'Automonitoramento',type:'select',options:['Adequado','Parcial','Necessita atenção']},
+         {key:'retiradaGradualDoSuporte',label:'Retirada gradual do suporte',type:'select',options:['Adequado','Parcial','Necessita atenção']},
+         {key:'generalizacao',label:'Generalização',type:'select',options:['Adequado','Parcial','Necessita atenção']},
+       ]},
+       {type:'fields',key:'sinteseFinal',label:'Síntese',fields:[
+         {key:'emQuaisSituacoesACriancaMaisDependeDoSuporteDoAdulto',label:'Em quais situações a criança mais depende do suporte do adulto?'},
+         {key:'quaisEstrategiasDeSuporteFuncionamMelhor',label:'Quais estratégias de suporte funcionam melhor?'},
+         {key:'emQuaisTarefasOAdultoPareceOferecerMaisAjudaDoQueACriancaNecessita',label:'Em quais tarefas o adulto parece oferecer mais ajuda do que a criança necessita?'},
+         {key:'principalObjetivoDeOrientacaoParentalRelacionadoAoScaffolding',label:'Principal objetivo de orientação parental relacionado ao scaffolding'},
+       ]},
+     ]},
+    {id:'recompensaMotivacao',title:'Recompensa, Consequência e Motivação',desc:'Analisa como criança e cuidadores modificam reciprocamente seus comportamentos por meio de atenção, recompensas, consequências, escape, alívio e previsibilidade.',
+     sections:[
+       {type:'checklist',key:'oQueTemValorParaACrianca',label:'1. O Que Tem Valor Para Esta Criança — A Criança Parece Valorizar Especialmente',seedItems:[
+         'Atenção individual do adulto','Elogio/reconhecimento','Aprovação do cuidador','Proximidade física','Brincadeira compartilhada','Conversa com o adulto','Escolher uma atividade','Ter controle sobre alguma decisão','Tela','Brinquedos/objetos','Alimentos','Dinheiro','Pontos/estrelas/fichas','Atividades especiais','Sair de uma demanda','Adiar uma tarefa','Ficar sozinho','Movimento/atividade física','Interação com amigos','Outro',
+       ]},
+       {type:'fields',key:'principalFonteDeValor',label:'O Que Tem Valor Para Esta Criança — Principal Fonte de Valor Percebida',fields:[
+         {key:'principalFonteDeValorPercebidaAtualmente',label:'Principal fonte de valor percebida atualmente',type:'select',options:['Social/relacional','Atividade','Autonomia/escolha','Material','Digital','Escape/alívio','Muito variável']},
+       ]},
+       {type:'checklist',key:'atencaoAoComportamentoAdequado',label:'2. Família → Criança — Quando a Criança Apresenta Comportamento Adequado, os Adultos',seedItems:[
+         'Percebem rapidamente','Elogiam','Demonstram afeto','Comentam especificamente o que ela fez','Dão atenção','Continuam a rotina sem reconhecer','Percebem mais os erros do que os acertos',
+       ]},
+       {type:'fields',key:'frequenciaDeAtencaoAoAdequado',label:'Família → Criança — Frequência de Atenção ao Comportamento Adequado',fields:[
+         {key:'comportamentosAdequadosRecebemAtencao',label:'Comportamentos adequados recebem atenção',type:'select',options:['Muito frequentemente','Frequentemente','Às vezes','Raramente']},
+       ]},
+       {type:'checklist',key:'respostaAoComportamentoDisruptivo',label:'Família → Criança — Quando Há Comportamento Disruptivo',seedItems:[
+         'Adultos interrompem imediatamente o que estão fazendo','Conversam longamente','Repetem instruções várias vezes','Negociam','Elevam o tom de voz','Dão muita atenção','Outros familiares entram na situação','A criança recebe mais interação do que normalmente receberia',
+       ]},
+       {type:'fields',key:'comportamentoQueMaisMobiliza',label:'Família → Criança — Qual Comportamento Mobiliza Mais Rapidamente o Adulto',fields:[
+         {key:'qualComportamentoMobilizaMaisRapidamenteOAdulto',label:'Qual comportamento mobiliza mais rapidamente o adulto?',type:'select',options:['Comportamento adequado','Pedido apropriado','Choro/reclamação','Insistência','Comportamento disruptivo','Aproximadamente igual']},
+       ]},
+       {type:'fields',key:'clarezaDaContingencia',label:'3. Clareza da Contingência',fields:[
+         {key:'oComportamentoEsperadoEDefinidoPreviamente',label:'O comportamento esperado é definido previamente?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aCriancaSabeExatamenteOQuePrecisaFazer',label:'A criança sabe exatamente o que precisa fazer?',type:'select',options:['Sim','Parcialmente','Não']},
+         {key:'aConsequenciaEstaClaramenteRelacionadaAoComportamento',label:'A consequência está claramente relacionada ao comportamento?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aRecompensaEOferecidaDepoisDoComportamentoEsperado',label:'A recompensa é oferecida depois do comportamento esperado?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'ouCostumaSerPrometidaDuranteUmaCriseParaInterrompela',label:'Ou costuma ser prometida durante uma crise para interrompê-la?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'imediaticidadeDaConsequencia',label:'4. Imediaticidade da Consequência',fields:[
+         {key:'depoisDoComportamentoAConsequenciaGeralmenteOcorre',label:'Depois do comportamento, a consequência geralmente ocorre',type:'select',options:['Imediatamente','Em poucos minutos','Horas depois','Muito tempo depois','Não há padrão']},
+         {key:'aFamiliaCostumaAdiarRecompensasPrometidas',label:'A família costuma adiar recompensas prometidas?',type:'select',options:['Nunca','Raramente','Às vezes','Frequentemente']},
+         {key:'aCriancaConsegueRelacionarComportamentoEConsequenciaQuandoHaAtraso',label:'A criança consegue relacionar comportamento e consequência quando há atraso?',type:'select',options:['Sim','Com ajuda','Dificilmente','Não observado']},
+       ]},
+       {type:'fields',key:'previsibilidadeDaConsequencia',label:'5. Previsibilidade',fields:[
+         {key:'paraOMesmoComportamentoAConsequenciaCostumaSer',label:'Para o mesmo comportamento, a consequência costuma ser',type:'select',options:['Bastante previsível','Moderadamente previsível','Variável','Muito imprevisível']},
+       ]},
+       {type:'checklist',key:'variacaoDaRespostaPorDia',label:'Previsibilidade — Dependendo do Dia, o Mesmo Comportamento Pode',seedItems:[
+         'Ser ignorado','Receber atenção','Receber recompensa','Receber punição','Levar o adulto a ceder','Não há grande variação',
+       ]},
+       {type:'checklist',key:'fatoresQueMudamAResposta',label:'Previsibilidade — A Resposta Muda Principalmente Conforme',seedItems:[
+         'Humor do adulto','Cansaço','Pressa','Local público × casa','Presença de outras pessoas','Qual cuidador está presente','Intensidade do comportamento da criança','Não muda significativamente',
+       ]},
+       {type:'checklist',key:'respostaAposUmNao',label:'6. Escalada da Criança — Após Receber um "Não", a Criança Costuma',seedItems:[
+         'Aceitar','Perguntar novamente','Negociar','Insistir repetidamente','Chorar','Gritar','Ameaçar','Agredir','Desorganizar-se emocionalmente','Procurar outro cuidador',
+       ]},
+       {type:'fields',key:'intensidadeMudaADecisao',label:'Escalada da Criança — Intensidade e Mudança de Decisão',fields:[
+         {key:'quantoMaiorAIntensidadeDoComportamentoMaiorAProbabilidadeDeOAdultoMudarADecisao',label:'Quanto maior a intensidade do comportamento, maior a probabilidade de o adulto mudar a decisão?',type:'select',options:['Nunca','Raramente','Às vezes','Frequentemente','Quase sempre']},
+       ]},
+       {type:'checklist',key:'adultoCedeDepoisDe',label:'Escalada da Criança — O Adulto Costuma Ceder Depois de',seedItems:[
+         'Pedido apropriado','Algumas solicitações','Longa insistência','Choro','Grito','Crise intensa','Agressão','Não costuma ceder',
+       ]},
+       {type:'checklist',key:'respostaADemandaComportamentoDificil',label:'7. Escape e Evitação de Demandas — Quando a Criança Apresenta Comportamento Difícil Durante Uma Demanda, Normalmente',seedItems:[
+         'A tarefa continua','A tarefa é simplificada','Recebe ajuda','Ganha uma pausa e depois retorna','A tarefa é adiada','A tarefa é cancelada','O adulto faz pela criança','A criança é enviada para outro local','Recebe uma atividade preferida',
+       ]},
+       {type:'fields',key:'disruptivoEncerraDemandas',label:'Escape e Evitação de Demandas — Eficácia do Comportamento Disruptivo',fields:[
+         {key:'comportamentoDisruptivoConsegueEncerrarDemandas',label:'Comportamento disruptivo consegue encerrar demandas?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'oQueACriancaAprendeuQuePermite',label:'Escape e Evitação de Demandas — A Criança Parece Ter Aprendido Que Determinadas Respostas Permitem',seedItems:[
+         'Adiar tarefa','Evitar tarefa','Fazer o adulto executar','Reduzir a dificuldade','Sair do ambiente','Nada disso é observado',
+       ]},
+       {type:'checklist',key:'oQueAconteceQuandoOAdultoCede',label:'8. Criança → Família — Quando o Adulto Cede, Geralmente Acontece',seedItems:[
+         'A criança para de chorar','Para de gritar','A discussão termina','O ambiente fica silencioso','A criança demonstra afeto','A criança coopera imediatamente','O adulto sente alívio','O adulto consegue voltar ao que estava fazendo','Evita constrangimento em público',
+       ]},
+       {type:'checklist',key:'pensamentosDoCuidadorAoCeder',label:'Criança → Família — O Cuidador Relata Pensamentos Semelhantes a',seedItems:[
+         '"Era mais fácil ceder."','"Eu só queria que aquilo acabasse."','"Não tínhamos tempo para discutir."','"Eu estava exausto."','"Em público eu prefiro evitar crise."','"Eu sabia que não deveria, mas funcionou."','Nenhum',
+       ]},
+       {type:'checklist',key:'oQueACriancaEnsinaOAdultoAFazer',label:'9. O Que a Criança Ensina o Adulto a Fazer — Ao Longo do Tempo, o Cuidador Passou a',seedItems:[
+         'Evitar dizer "não"','Evitar determinadas demandas','Fazer tarefas pela criança','Negociar mais','Oferecer recompensa antecipadamente','Usar telas para evitar conflito','Repetir ordens muitas vezes','Gritar porque parece funcionar mais rápido','Ameaçar porque produz obediência imediata','Evitar determinados lugares','Modificar a rotina para evitar crises','Não percebe mudanças desse tipo',
+       ]},
+       {type:'checklist',key:'oQueOAdultoEnsinaACriancaAFazer',label:'10. O Que o Adulto Ensina a Criança a Fazer — Pelos Resultados Que Obtém, a Criança Pode Estar Aprendendo Que',seedItems:[
+         'Pedir adequadamente funciona','Esperar funciona','Cooperar funciona','Negociar adequadamente funciona','Persistir em uma tarefa funciona','Pedir ajuda funciona','Chorar aumenta a chance de conseguir','Insistir aumenta a chance','Gritar funciona mais rapidamente','Agressividade encerra demandas','Demorar faz o adulto fazer pela criança','Ignorar repetidamente elimina a demanda','Procurar outro cuidador muda a decisão','Fazer uma crise em público aumenta a chance de conseguir',
+       ]},
+       {type:'fields',key:'cicloCoercitivoSolicitacao',label:'11. Ciclo Coercitivo Bidirecional — Mapeamento de Uma Situação Real — O Adulto Solicita',fields:[
+         {key:'oAdultoSolicita',label:'O adulto solicita'},
+       ]},
+       {type:'checklist',key:'cicloCoercitivoRespostaDaCrianca',label:'Ciclo Coercitivo — A Criança Responde',seedItems:[
+         'Cumpre','Ignora','Reclama','Negocia','Chora','Grita','Agride','Foge/evita',
+       ]},
+       {type:'checklist',key:'cicloCoercitivoRespostaDoAdulto',label:'Ciclo Coercitivo — O Adulto Responde',seedItems:[
+         'Repete','Explica','Negocia','Ameaça','Grita','Oferece recompensa','Reduz demanda','Faz pela criança','Desiste',
+       ]},
+       {type:'checklist',key:'cicloCoercitivoCriancaEntao',label:'Ciclo Coercitivo — A Criança Então',seedItems:[
+         'Coopera','Continua','Aumenta intensidade','Diminui intensidade','Obtém o que queria','Escapa da tarefa',
+       ]},
+       {type:'checklist',key:'cicloCoercitivoComoTermina',label:'Ciclo Coercitivo — Como a Situação Termina',seedItems:[
+         'Criança realiza o solicitado','Adulto cede','Adulto faz pela criança','Ambos desistem','Criança recebe algo','Demanda é retirada','Escala para conflito maior',
+       ]},
+       {type:'checklist',key:'cicloCoercitivoQuemObteveAlivio',label:'Ciclo Coercitivo — Quem Obteve Alívio',seedItems:[
+         'Criança','Adulto','Ambos',
+       ]},
+       {type:'fields',key:'barganhaEInflacaoDaRecompensa',label:'12. Barganha e "Inflação" da Recompensa',fields:[
+         {key:'aCriancaCostumaPerguntarOQueEuGanhoSeFizer',label:'A criança costuma perguntar "O que eu ganho se fizer?"',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'oValorNecessarioParaMotivalaAumentouComOTempo',label:'O valor necessário para motivá-la aumentou com o tempo?',type:'select',options:['Sim, muito','Um pouco','Não','Não se aplica']},
+         {key:'osAdultosPrecisamOferecerRecompensasMaioresParaObterOMesmoComportamento',label:'Os adultos precisam oferecer recompensas maiores para obter o mesmo comportamento?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'haNegociacaoCrescenteExUmaEstrelaNaoQueroDuasSeEuFizerIssoQueroMaisTempoDeTela',label:'Há negociação crescente? (ex.: "Uma estrela não, quero duas.", "Se eu fizer isso, quero mais tempo de tela.")',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'paraQueAsRecompensasSaoUtilizadas',label:'Barganha e "Inflação" da Recompensa — Recompensas São Utilizadas Para',seedItems:[
+         'Aprender um comportamento novo','Sustentar comportamento difícil inicialmente','Rotinas já dominadas','Praticamente todas as solicitações','Apenas situações específicas','Não são utilizadas',
+       ]},
+       {type:'checklist',key:'recompensaSocial',label:'13. Tipo de Recompensa Predominante — Social',seedItems:[
+         'Elogio','Atenção','Carinho','Tempo junto','Celebração',
+       ]},
+       {type:'checklist',key:'recompensaAtividade',label:'Tipo de Recompensa Predominante — Atividade',seedItems:[
+         'Escolher brincadeira','Passeio','Jogo','Atividade preferida',
+       ]},
+       {type:'checklist',key:'recompensaAutonomia',label:'Tipo de Recompensa Predominante — Autonomia',seedItems:[
+         'Escolher','Decidir ordem','Ganhar responsabilidade/privilégio',
+       ]},
+       {type:'checklist',key:'recompensaMaterial',label:'Tipo de Recompensa Predominante — Material',seedItems:[
+         'Brinquedo','Dinheiro','Comida','Presente',
+       ]},
+       {type:'checklist',key:'recompensaDigital',label:'Tipo de Recompensa Predominante — Digital',seedItems:[
+         'Tela','Jogo','Robux/moeda virtual','Celular',
+       ]},
+       {type:'fields',key:'predominioDoTipoDeRecompensa',label:'Tipo de Recompensa Predominante — Predomínio Geral',fields:[
+         {key:'predominio',label:'Predomínio',type:'select',options:['Social/relacional','Experiências','Autonomia','Material','Digital','Muito equilibrado']},
+       ]},
+       {type:'checklist',key:'elogioOQueEReforcado',label:'14. Elogio — O Adulto Elogia Principalmente',seedItems:[
+         'Resultado (ex.: "Você tirou 10.")','Habilidade/traço (ex.: "Você é muito inteligente.")','Processo/estratégia (ex.: "Você tentou outra estratégia quando a primeira não funcionou.")','Persistência (ex.: "Você continuou mesmo quando ficou difícil.")','Autorregulação (ex.: "Você estava irritado e conseguiu esperar.")','Autonomia (ex.: "Você lembrou sozinho do que precisava fazer.")','Cooperação (ex.: "Você percebeu que seu irmão precisava de ajuda.")','Elogio genérico (ex.: "Parabéns.")',
+       ]},
+       {type:'fields',key:'recompensaImediataXAtrasada',label:'15. Recompensa Imediata × Recompensa Atrasada',fields:[
+         {key:'aCriancaConsegueRealizarAlgoAgoraParaObterBeneficioDepois',label:'A criança consegue realizar algo agora para obter benefício depois?',type:'select',options:['Com facilidade compatível com a idade','Com lembretes','Com bastante dificuldade','Quase nunca']},
+       ]},
+       {type:'checklist',key:'recursosParaRepresentarRecompensaFutura',label:'Recompensa Imediata × Atrasada — Recursos Para Tornar a Recompensa Futura Representável',seedItems:[
+         'Calendário','Quadro visual','Fichas/pontos','Contagem regressiva','Meta semanal','Lembretes visuais','Não utiliza',
+       ]},
+       {type:'checklist',key:'condutaQuandoARecompensaDemora',label:'Recompensa Imediata × Atrasada — Quando a Recompensa Demora, o Adulto',seedItems:[
+         'Mantém o combinado','Lembra o progresso','Dá marcadores intermediários','Entrega antecipadamente','Muda a recompensa','Aumenta o valor','Desiste do sistema',
+       ]},
+       {type:'fields',key:'recompensaAutonomiaEMotivacao',label:'16. Recompensa, Autonomia e Motivação',fields:[
+         {key:'aCriancaEntendePorQueATarefaImporta',label:'A criança entende por que a tarefa importa?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'participaDaDefinicaoDeMetas',label:'Participa da definição de metas?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'podeEscolherComoAtingirDeterminadasMetas',label:'Pode escolher como atingir determinadas metas?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'oCuidadorReconheceCompetenciaEProgresso',label:'O cuidador reconhece competência e progresso?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'atividadesAntesEspontaneasPassaramAOcorrerSomenteQuandoHaPremio',label:'Atividades antes espontâneas passaram a ocorrer somente quando há prêmio?',type:'select',options:['Sim','Em algumas áreas','Não','Não sabemos']},
+       ]},
+       {type:'checklist',key:'consequenciasNaturaisPermitidas',label:'17. Consequências Naturais e Lógicas — Quando Possível, a Família Permite Que a Criança Experimente',seedItems:[
+         'Consequências naturais seguras','Consequências diretamente relacionadas ao comportamento','Reparação do que fez','Resolver problemas gerados pelo próprio comportamento','Assumir responsabilidade proporcional à idade',
+       ]},
+       {type:'checklist',key:'tendenciaAPunicaoGenerica',label:'Consequências Naturais e Lógicas — Ou Tende a',seedItems:[
+         'Criar punições sem relação com o comportamento','Retirar tela para qualquer comportamento','Aumentar punição conforme fica irritada','Retirar vários privilégios ao mesmo tempo',
+       ]},
+       {type:'fields',key:'consequenciaPredominante',label:'Consequências Naturais e Lógicas — Consequência Predominante',fields:[
+         {key:'tipoConsequenciaPredominante',label:'Consequência predominante',type:'select',options:['Natural/lógica','Reforço de comportamento alternativo','Perda de privilégio relacionada','Punição genérica','Muito variável']},
+       ]},
+       {type:'checklist',key:'ensinoDeComportamentosAlternativos',label:'18. Comportamentos Adequados Alternativos — A Família Ensina Explicitamente a Criança a',seedItems:[
+         'Pedir atenção adequadamente','Pedir ajuda','Pedir pausa','Negociar','Esperar','Expressar discordância','Solicitar algo','Lidar com um "não"','Retornar a uma tarefa','Reparar depois de um erro',
+       ]},
+       {type:'fields',key:'reforcoDosComportamentosAlternativos',label:'Comportamentos Adequados Alternativos — Reforço Quando Aparecem',fields:[
+         {key:'essesComportamentosAlternativosSaoReforcadosQuandoAparecem',label:'Esses comportamentos alternativos são reforçados quando aparecem?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'recompensaEntreIrmaosConsistencia',label:'19. Recompensa Entre Irmãos',fields:[
+         {key:'osMesmosComportamentosRecebemRespostasSemelhantesEntreIrmaos',label:'Os mesmos comportamentos recebem respostas semelhantes entre irmãos?',type:'select',options:['Sim','Geralmente','Não','Não se aplica']},
+       ]},
+       {type:'checklist',key:'comparacaoEntreIrmaos',label:'Recompensa Entre Irmãos — Há Comparação?',seedItems:[
+         '"Olha como seu irmão faz."','Competição por recompensas','Recompensa só para o "melhor"','Prêmios individualizados por metas próprias','Não há comparação relevante',
+       ]},
+       {type:'checklist',key:'oQueFazOCuidadorSentirQueFuncionou',label:'20. Sistema de Recompensas dos Próprios Pais — O Que Faz o Cuidador Sentir Que Sua Estratégia "Funcionou"',seedItems:[
+         'Obediência imediata','Silêncio','Ausência de crise','Criança feliz','Criança concordando','Tarefa concluída','Criança aprendendo gradualmente','Redução de conflitos no longo prazo','Desenvolvimento de autonomia',
+       ]},
+       {type:'fields',key:'toleranciaParentalAoAtraso',label:'21. Tolerância Parental ao Atraso da Própria Recompensa',fields:[
+         {key:'oCuidadorConsegueSustentarUmaEstrategiaMesmoQuandoOResultadoNaoApareceImediatamente',label:'O cuidador consegue sustentar uma estratégia mesmo quando o resultado não aparece imediatamente?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'condutaQuandoEstrategiaNaoFunciona',label:'Tolerância Parental ao Atraso — Quando Uma Nova Estratégia Não Funciona nos Primeiros Dias, Costuma',seedItems:[
+         'Manter com consistência','Ajustar criteriosamente','Trocar rapidamente','Voltar à estratégia antiga','Aumentar punições','Aumentar recompensas',
+       ]},
+       {type:'fields',key:'sinteseFinal',label:'Síntese',fields:[
+         {key:'oQueAtualmentePareceTerMaiorValorMotivacionalParaACrianca',label:'O que atualmente parece ter maior valor motivacional para a criança?'},
+         {key:'qualComportamentoDaCriancaMaisFrequentementeModificaADecisaoDosAdultos',label:'Qual comportamento da criança mais frequentemente modifica a decisão dos adultos?'},
+         {key:'qualComportamentoDoAdultoMaisRapidamenteModificaOComportamentoDaCrianca',label:'Qual comportamento do adulto mais rapidamente modifica o comportamento da criança?'},
+         {key:'descrevaBrevementeUmCicloRecorrenteDeConflito',label:'Descreva brevemente um ciclo recorrente de conflito'},
+         {key:'principalObjetivoParaOrientacaoParental',label:'Principal objetivo para orientação parental'},
+       ]},
+     ]},
+    {id:'relacaoComErro',title:'Relação da Família com Erro, Esforço e Dificuldade',desc:'Investiga como a família responde ao erro, ao esforço e aos desafios, favorecendo ou dificultando persistência, flexibilidade, aprendizagem e autonomia diante de situações difíceis.',
+     sections:[
+       {type:'checklist',key:'significadoDoErro',label:'1. Crença Familiar Sobre o Erro — Na Percepção do Cuidador, Errar Geralmente Significa',seedItems:[
+         'Parte natural da aprendizagem',
+         'Indicação de que é preciso mudar a estratégia',
+         'Falta de atenção',
+         'Falta de esforço',
+         'Falta de capacidade',
+         'Desobediência/descuido',
+         'Algo que deve ser evitado',
+         'Algo constrangedor',
+         'Depende muito da situação',
+       ]},
+       {type:'checklist',key:'pensamentoDiantErroRepetido',label:'Crença Familiar Sobre o Erro — Quando a Criança Erra Repetidamente, o Cuidador Tende a Pensar',seedItems:[
+         '"Ainda não encontrou a estratégia adequada."',
+         '"Precisa de mais prática."',
+         '"Talvez a tarefa esteja muito difícil."',
+         '"Precisa de outro tipo de ajuda."',
+         '"Não está se esforçando."',
+         '"Ela não leva jeito para isso."',
+         '"Ela sabe fazer, mas não quer."',
+         '"Está fazendo de propósito."',
+       ]},
+       {type:'fields',key:'crencaDificuldadeAprendizagem',label:'Crença Familiar Sobre o Erro — Crença Sobre Dificuldades e Aprendizagem',fields:[
+         {key:'oCuidadorAcreditaQueDificuldadesPodemContribuirParaAprendizagem',label:'O cuidador acredita que dificuldades podem contribuir para aprendizagem?',type:'select',options:['Fortemente','Em parte','Pouco','Não','Não sabemos']},
+       ]},
+       {type:'checklist',key:'primeiraReacaoAoErro',label:'2. Primeira Reação do Adulto ao Erro — Quando Percebe um Erro, o Adulto Costuma Primeiro',seedItems:[
+         'Esperar para ver se a criança percebe',
+         'Perguntar se ela deseja conferir',
+         'Pedir que observe novamente',
+         'Dar uma pista',
+         'Perguntar o que aconteceu',
+         'Mostrar onde está o erro',
+         'Corrigir imediatamente',
+         'Dar a resposta correta',
+         'Fazer a tarefa pela criança',
+         'Demonstrar irritação',
+         'Criticar',
+         'Ignorar completamente',
+       ]},
+       {type:'fields',key:'tempoParaAutocorrecao',label:'Primeira Reação do Adulto ao Erro — Tempo Oferecido Para Autocorreção',fields:[
+         {key:'tempoOferecidoParaAutocorrecao',label:'Tempo oferecido para autocorreção',type:'select',options:['Geralmente suficiente','Às vezes suficiente','Muito curto','O adulto corrige quase imediatamente']},
+       ]},
+       {type:'checklist',key:'perguntasAposErro',label:'3. O Erro Gera Investigação ou Apenas Correção? — Quando Algo Não Funciona, a Família Costuma Perguntar',seedItems:[
+         '"O que aconteceu?"',
+         '"Onde começou a dar errado?"',
+         '"O que você pensou que aconteceria?"',
+         '"Qual estratégia você usou?"',
+         '"O que poderia tentar diferente?"',
+         '"Quer conferir alguma etapa?"',
+         '"O que você aprendeu com essa tentativa?"',
+         'Não costuma fazer esse tipo de pergunta',
+       ]},
+       {type:'fields',key:'padraoPredominanteErro',label:'O Erro Gera Investigação ou Apenas Correção? — Padrão Predominante',fields:[
+         {key:'padraoPredominanteDiantErro',label:'Padrão predominante',type:'select',options:['Explorar o erro','Corrigir o erro','Evitar o erro','Criticar o erro','Resolver pela criança']},
+       ]},
+       {type:'checklist',key:'tiposDeFeedback',label:'4. Feedback Fornecido Após o Erro — O Adulto Costuma Fornecer',seedItems:[
+         'Apenas "certo/errado"',
+         'Resposta correta imediatamente',
+         'Explicação sobre onde ocorreu o erro',
+         'Pista para nova tentativa',
+         'Comparação entre estratégia usada e resultado',
+         'Pergunta para estimular autocorreção',
+         'Demonstração parcial',
+         'Demonstração completa',
+         'Nenhum feedback',
+       ]},
+       {type:'fields',key:'eficaciaDoFeedback',label:'Feedback Fornecido Após o Erro — Eficácia do Feedback',fields:[
+         {key:'oFeedbackNormalmenteAjudaACriancaASaberOQueFazerDiferente',label:'O feedback normalmente ajuda a criança a saber o que fazer diferente?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'respostaEmocionalAoErro',label:'5. Resposta Emocional do Adulto ao Erro — Diante de Erros da Criança, o Cuidador Costuma Demonstrar',seedItems:[
+         'Tranquilidade',
+         'Curiosidade',
+         'Paciência',
+         'Encorajamento',
+         'Preocupação excessiva',
+         'Impaciência',
+         'Frustração',
+         'Irritação',
+         'Vergonha/constrangimento',
+         'Ansiedade',
+         'Decepção',
+       ]},
+       {type:'fields',key:'intensidadeEmocionalAoRepetir',label:'Resposta Emocional do Adulto ao Erro — Intensidade Emocional',fields:[
+         {key:'aIntensidadeEmocionalDoAdultoAumentaConformeOsErrosSeRepetem',label:'A intensidade emocional do adulto aumenta conforme os erros se repetem?',type:'select',options:['Muito','Moderadamente','Pouco','Não']},
+         {key:'aCriancaPareceMonitorarAReacaoDoAdultoAntesDeVerificarOProprioErro',label:'A criança parece monitorar a reação do adulto antes de verificar o próprio erro?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'segurancaParaNaoSaber',label:'6. Segurança Para Não Saber',fields:[
+         {key:'aCriancaPodeDizerNaoSeiSemReceberCriticaOuConstrangimento',label:'A criança pode dizer "não sei" sem receber crítica ou constrangimento?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'podePedirAjuda',label:'Pode pedir ajuda?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'podeAdmitirQueNaoEntendeu',label:'Pode admitir que não entendeu?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'condutaQuandoNaoSabe',label:'Segurança Para Não Saber — Quando Não Sabe, Costuma',seedItems:[
+         'Perguntar',
+         'Tentar',
+         'Procurar pistas',
+         'Observar outro modelo',
+         'Adivinhar para não admitir',
+         'Evitar responder',
+         'Ficar ansiosa',
+         'Desistir',
+         'Esperar que o adulto faça',
+       ]},
+       {type:'checklist',key:'oQueAFamiliaReconhece',label:'7. Relação com o Esforço — A Família Reconhece',seedItems:[
+         'Esforço',
+         'Persistência',
+         'Estratégia',
+         'Mudança de estratégia',
+         'Organização',
+         'Planejamento',
+         'Pedir ajuda adequadamente',
+         'Revisar o próprio erro',
+         'Resultado final',
+       ]},
+       {type:'checklist',key:'respostaQuandoEsforcoNaoBasta',label:'Relação com o Esforço — Quando a Criança se Esforça Muito, Mas Continua Sem Conseguir, o Adulto Tende a',seedItems:[
+         'Sugerir pausa',
+         'Rever a estratégia',
+         'Reduzir temporariamente a dificuldade',
+         'Dar uma pista',
+         'Ensinar uma nova estratégia',
+         'Dizer apenas "tente mais"',
+         'Exigir ainda mais esforço',
+         'Fazer pela criança',
+         'Permitir abandono imediato',
+       ]},
+       {type:'fields',key:'persistirVsMudarEstrategia',label:'Relação com o Esforço — Persistir × Mudar Estratégia',fields:[
+         {key:'oAdultoDiferenciaPrecisaPersistirDePrecisaMudarAEstrategia',label:'O adulto diferencia "precisa persistir" de "precisa mudar a estratégia"?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'tipoDeElogioErro',label:'8. Tipo de Elogio — O Adulto Costuma Elogiar Principalmente',seedItems:[
+         'Resultado (ex.: "Você acertou!")',
+         'Capacidade (ex.: "Você é muito inteligente.")',
+         'Esforço (ex.: "Você se esforçou muito.")',
+         'Estratégia (ex.: "Essa estratégia funcionou melhor.")',
+         'Flexibilidade (ex.: "Você percebeu que não funcionava e tentou diferente.")',
+         'Monitoramento (ex.: "Você encontrou seu próprio erro.")',
+         'Persistência (ex.: "Você continuou apesar da dificuldade.")',
+         'Autonomia (ex.: "Você resolveu sem precisar que eu fizesse.")',
+         'Elogio genérico (ex.: "Muito bem!")',
+       ]},
+       {type:'fields',key:'especificidadeDoElogio',label:'Tipo de Elogio — Especificidade',fields:[
+         {key:'oElogioE',label:'O elogio é',type:'select',options:['Específico e relacionado ao comportamento','Geralmente específico','Predominantemente genérico','Excessivo/constante','Raro']},
+       ]},
+       {type:'fields',key:'escolhaDeDesafios',label:'9. Dificuldade Adequada × Dificuldade Excessiva — Escolha de Desafios',fields:[
+         {key:'oAdultoCostumaEscolherDesafios',label:'O adulto costuma escolher desafios',type:'select',options:['Abaixo da capacidade','Ligeiramente acima do que a criança faz sozinha','Bastante acima da capacidade','Muito variável']},
+       ]},
+       {type:'checklist',key:'condutaQuandoTarefaFicaDificil',label:'Dificuldade Adequada × Excessiva — Quando a Tarefa Fica Difícil, o Adulto',seedItems:[
+         'Mantém a dificuldade e oferece suporte',
+         'Divide em etapas',
+         'Oferece pista',
+         'Reduz temporariamente a complexidade',
+         'Troca por uma tarefa mais fácil',
+         'Retira completamente a tarefa',
+         'Assume a execução',
+       ]},
+       {type:'checklist',key:'tendenciaFamiliarADesafios',label:'Dificuldade Adequada × Excessiva — A Família Tende a',seedItems:[
+         'Buscar desafios progressivos',
+         'Manter apenas aquilo que a criança já domina',
+         'Exigir tarefas muito acima da capacidade',
+         'Evitar desafios para prevenir frustração',
+       ]},
+       {type:'checklist',key:'protecaoExcessiva',label:'10. Proteção Excessiva Contra Dificuldade — O Cuidador Costuma',seedItems:[
+         'Evitar atividades em que a criança possa falhar',
+         'Antecipar erros e impedir que aconteçam',
+         'Dar a resposta antes que a criança fique frustrada',
+         'Realizar partes difíceis pela criança',
+         'Diminuir expectativas para evitar desconforto',
+         'Intervir ao primeiro sinal de dificuldade',
+         'Permitir tentativa compatível com a capacidade',
+       ]},
+       {type:'fields',key:'toleranciaAoDesconforto',label:'Proteção Excessiva Contra Dificuldade — Tolerância ao Desconforto',fields:[
+         {key:'quantoDesconfortoFrustracaoOCuidadorToleraObservar',label:'Quanto desconforto/frustração o cuidador tolera observar?',type:'select',options:['Adequadamente','Moderadamente','Pouco','Quase nenhum']},
+       ]},
+       {type:'checklist',key:'pressaoExcessivaParaPersistir',label:'11. Pressão Excessiva Para Persistir — O Cuidador Costuma Exigir Que a Criança Continue Mesmo Quando',seedItems:[
+         'Está claramente exausta',
+         'Não compreendeu a tarefa',
+         'A estratégia não funciona',
+         'Está muito desregulada',
+         'O nível está muito acima da capacidade atual',
+         'Está demonstrando dor/desconforto físico',
+         'Não costuma ocorrer',
+       ]},
+       {type:'fields',key:'percepcaoDePararOuPedirAjuda',label:'Pressão Excessiva Para Persistir — Percepção Sobre Parar ou Pedir Ajuda',fields:[
+         {key:'aFamiliaConsideraPararOuPedirAjudaComo',label:'A família considera parar ou pedir ajuda como',type:'select',options:['Estratégia possível','Às vezes aceitável','Falta de persistência','Fracasso/desistência']},
+       ]},
+       {type:'checklist',key:'incentivoAMudarEstrategia',label:'12. Capacidade de Mudar de Estratégia — Quando a Primeira Tentativa Falha, a Família Incentiva',seedItems:[
+         'Repetir exatamente igual',
+         'Analisar o erro',
+         'Fazer pequena mudança',
+         'Buscar outra estratégia',
+         'Pedir ajuda',
+         'Observar alguém',
+         'Fazer pausa e retornar',
+         'Abandonar',
+       ]},
+       {type:'fields',key:'quantidadeDeEstrategias',label:'Capacidade de Mudar de Estratégia — Quantidade de Estratégias Incentivadas',fields:[
+         {key:'quantasEstrategiasDiferentesACriancaCostumaSerIncentivadaAExperimentar',label:'Quantas estratégias diferentes a criança costuma ser incentivada a experimentar?',type:'select',options:['Várias','Algumas','Geralmente uma','O adulto fornece diretamente a estratégia']},
+       ]},
+       {type:'fields',key:'buscaVoluntariaPorDesafios',label:'13. Busca Voluntária por Desafios',fields:[
+         {key:'aCriancaCostumaEscolher',label:'A criança costuma escolher',type:'select',options:['Tarefas mais difíceis','Tarefas moderadamente desafiadoras','Apenas tarefas que sabe que conseguirá','Evita atividades com possibilidade de erro']},
+       ]},
+       {type:'checklist',key:'condutaAoEscolherEntreFacilEDificil',label:'Busca Voluntária por Desafios — Quando Pode Escolher Entre Algo Fácil e Algo Difícil, o Adulto',seedItems:[
+         'Incentiva explorar o desafio',
+         'Pergunta qual deseja tentar',
+         'Obriga a escolher o mais difícil',
+         'Recomenda o mais fácil para evitar frustração',
+         'Não interfere',
+       ]},
+       {type:'checklist',key:'atribuicaoDeSucesso',label:'14. Atribuição de Sucesso — Quando a Criança Consegue Algo Difícil, a Família Atribui Principalmente a',seedItems:[
+         'Estratégia utilizada',
+         'Prática',
+         'Persistência',
+         'Organização',
+         'Ajuda recebida',
+         'Capacidade/inteligência',
+         'Sorte',
+         'Facilidade da tarefa',
+       ]},
+       {type:'checklist',key:'atribuicaoDeFracasso',label:'15. Atribuição de Fracasso — Quando Não Consegue, o Adulto Tende a Atribuir a',seedItems:[
+         'Estratégia inadequada',
+         'Falta de conhecimento/prática',
+         'Nível de dificuldade',
+         'Cansaço/estado atual',
+         'Necessidade de ajuda',
+         'Falta de esforço',
+         'Falta de atenção',
+         'Incapacidade',
+         'Preguiça',
+         'Desobediência',
+       ]},
+       {type:'checklist',key:'linguagemFocadaNaIdentidade',label:'16. Erro e Identidade — Rastrear Uso Frequente de',seedItems:[
+         '"Você é inteligente."',
+         '"Você é preguiçoso."',
+         '"Você é distraído."',
+         '"Você é ruim nisso."',
+         '"Você sempre faz errado."',
+         '"Você nunca presta atenção."',
+         'Linguagem focada na ação/estratégia, não na identidade',
+       ]},
+       {type:'checklist',key:'falaDaCriancaAposFalhar',label:'Erro e Identidade — Após Falhar, a Criança Costuma Dizer',seedItems:[
+         '"Ainda não consegui."',
+         '"Preciso tentar diferente."',
+         '"Isso está difícil."',
+         '"Eu sou burro."',
+         '"Eu não sei fazer nada."',
+         '"Nunca vou conseguir."',
+         '"Não quero mais tentar."',
+       ]},
+       {type:'checklist',key:'comparacaoComQuem',label:'17. Comparação com Outras Crianças — Quando a Criança Tem Dificuldade, os Adultos Comparam Com',seedItems:[
+         'Irmãos',
+         'Colegas',
+         'Primos',
+         'Crianças da mesma idade',
+         'O próprio desempenho anterior',
+         'Não costumam comparar',
+       ]},
+       {type:'checklist',key:'frasesDeComparacao',label:'Comparação com Outras Crianças — Frases Semelhantes Aparecem?',seedItems:[
+         '"Seu irmão já consegue."',
+         '"Todo mundo da sua sala sabe."',
+         '"Quando você era menor fazia melhor."',
+         '"Veja o quanto você melhorou desde a última vez."',
+       ]},
+       {type:'checklist',key:'modelagemDoErroPeloAdulto',label:'18. Modelagem do Erro Pelos Próprios Cuidadores — Quando o Adulto Erra, Costuma',seedItems:[
+         'Admitir o erro',
+         'Corrigir',
+         'Pedir desculpas',
+         'Verbalizar o que aprendeu',
+         'Mostrar nova estratégia',
+         'Rir do próprio erro de forma saudável',
+         'Esconder o erro',
+         'Culpar outra pessoa',
+         'Irritar-se',
+         'Demonstrar vergonha excessiva',
+         'Evitar tentar novamente',
+       ]},
+       {type:'checklist',key:'falaDoAdultoObservadaPelaCrianca',label:'Modelagem do Erro Pelos Próprios Cuidadores — A Criança Vê Adultos Dizerem',seedItems:[
+         '"Eu errei."',
+         '"Vou tentar de outro jeito."',
+         '"Ainda não sei."',
+         '"Preciso de ajuda."',
+         '"Vamos conferir."',
+         '"Eu deveria ter feito diferente."',
+       ]},
+       {type:'checklist',key:'linguagemFamiliarSobreDificuldade',label:'19. Linguagem Familiar Sobre Dificuldade',seedItems:[
+         '"Isso está difícil."',
+         '"Vamos descobrir qual parte está difícil."',
+         '"Tente mais uma vez."',
+         '"Tente de outro jeito."',
+         '"O que você já tentou?"',
+         '"Onde você precisa de ajuda?"',
+         '"Você consegue."',
+         '"Isso é muito fácil."',
+         '"Você deveria saber isso."',
+         '"Isso não é difícil."',
+         '"Você não está tentando."',
+         '"Deixa que eu faço."',
+       ]},
+     ]},
+    {id:'coparentalidade',title:'Coparentalidade e Coerência Educativa',desc:'Como os adultos trabalham como equipe na educação daquela criança.',
+     sections:[
+       {type:'fields',key:'alinhamentoDeRegras',label:'1. Alinhamento de Regras',fields:[
+         {key:'osCuidadoresConcordamSobreAsPrincipaisRegrasDaCrianca',label:'Os cuidadores concordam sobre as principais regras da criança?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'asRegrasPermanecemSemelhantesEntreOsCuidadores',label:'As regras permanecem semelhantes entre os cuidadores?',type:'select',options:['Sim','Em grande parte','Pouco','Não']},
+         {key:'existemRegrasClaramenteDiferentesDependendoDeQuemEstaComACrianca',label:'Existem regras claramente diferentes dependendo de quem está com a criança?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'asDiferencasDeRegrasSaoPreviamenteCombinadasEntreOsAdultos',label:'As diferenças de regras são previamente combinadas entre os adultos?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'expectativasSobreACrianca',label:'2. Expectativas Sobre a Criança',fields:[
+         {key:'osCuidadoresTemExpectativasSemelhantesSobreOQueACriancaJaDeveriaConseguirFazer',label:'Os cuidadores têm expectativas semelhantes sobre o que a criança já deveria conseguir fazer?',type:'select',options:['Muito semelhantes','Parcialmente semelhantes','Muito diferentes']},
+       ]},
+       {type:'checklist',key:'divergenciasImportantesSobre',label:'Expectativas Sobre a Criança — Existem Divergências Importantes Sobre',seedItems:[
+         'Autonomia',
+         'Comportamento',
+         'Desempenho escolar',
+         'Organização',
+         'Sono',
+         'Alimentação',
+         'Uso de telas',
+         'Responsabilidades domésticas',
+         'Interação social',
+         'Manejo das emoções',
+         'Limites',
+         'Nenhuma relevante',
+       ]},
+       {type:'fields',key:'cuidadorConsideraCapazMaisQueOutro',label:'Expectativas Sobre a Criança — Percepção de Capacidade',fields:[
+         {key:'umCuidadorCostumaConsiderarACriancaCapazDeAlgoQueOOutroAcreditaQueElaAindaNaoConsegue',label:'Um cuidador costuma considerar a criança capaz de algo que o outro acredita que ela ainda não consegue?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'coerenciaDasConsequencias',label:'3. Coerência das Consequências',fields:[
+         {key:'paraComportamentosSemelhantesOsCuidadoresCostumamResponderDeManeiraSemelhante',label:'Para comportamentos semelhantes, os cuidadores costumam responder de maneira semelhante?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'umaConsequenciaEstabelecidaPorUmCuidadorCostumaSerMantidaPeloOutro',label:'Uma consequência estabelecida por um cuidador costuma ser mantida pelo outro?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'umCuidadorCostumaRetirarUmaConsequenciaEstabelecidaPeloOutroSemConversarPreviamente',label:'Um cuidador costuma retirar uma consequência estabelecida pelo outro sem conversar previamente?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aCriancaConseguePreverOQueAconteceraIndependentementeDeQualCuidadorEstejaPresente',label:'A criança consegue prever aproximadamente o que acontecerá independentemente de qual cuidador esteja presente?',type:'select',options:['Sim','Parcialmente','Pouco','Não']},
+       ]},
+       {type:'checklist',key:'condutaDianteDeDecisaoDoOutro',label:'4. Desautorização entre Cuidadores — Diante de Uma Decisão do Outro Cuidador',seedItems:[
+         'Mantém a decisão naquele momento e conversa posteriormente em particular',
+         'Pergunta antes de modificar',
+         'Modifica na frente da criança',
+         'Critica a decisão diante da criança',
+         'Diz que o outro "está errado"',
+         'Faz exceções sem comunicar',
+         'Não há padrão claro',
+       ]},
+       {type:'fields',key:'desautorizacaoEApoio',label:'Desautorização entre Cuidadores — Desautorização e Apoio',fields:[
+         {key:'umCuidadorCostumaDesautorizarExplicitamenteOOutroDiantDaCrianca',label:'Um cuidador costuma desautorizar explicitamente o outro diante da criança?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'existeApoioExplicitoAsDecisoesEducativasDoOutroCuidador',label:'Existe apoio explícito às decisões educativas do outro cuidador?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'padroesDeTriangulacao',label:'5. Triangulação da Criança — A Criança Costuma',seedItems:[
+         'Procurar outro cuidador depois de receber um "não"',
+         'Pedir a mesma coisa separadamente aos dois',
+         'Esconder de um cuidador o que o outro permitiu',
+         'Utilizar frases como "a mãe deixa" / "o pai deixa"',
+         'Pedir que um adulto convença o outro',
+         'Levar mensagens entre os cuidadores',
+         'Tentar mediar conflitos entre adultos',
+         'Não apresenta esse padrão',
+       ]},
+       {type:'fields',key:'condutaDoSegundoCuidadorAposNegativa',label:'Triangulação da Criança — Conduta do Segundo Cuidador Após uma Negativa',fields:[
+         {key:'quandoACriancaProcuraOutroCuidadorDepoisDeReceberUmaNegativaOSegundoCuidadorGeralmente',label:'Quando a criança procura outro cuidador depois de receber uma negativa, o segundo cuidador geralmente',type:'select',options:['Confirma a decisão anterior','Verifica com o outro adulto','Muda a decisão','Depende da situação']},
+       ]},
+       {type:'fields',key:'discussoesDiantDaCrianca',label:'6. Discussões Educativas Diante da Criança',fields:[
+         {key:'osAdultosDiscutemDivergenciasSobreEducacaoNaPresencaDaCrianca',label:'Os adultos discutem divergências sobre educação na presença da criança?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'temasDasDiscussoes',label:'Discussões Educativas Diante da Criança — Essas Discussões Costumam Envolver',seedItems:[
+         'Regras',
+         'Punições/consequências',
+         'Escola',
+         'Diagnóstico',
+         'Comportamento',
+         'Uso de telas',
+         'Rotina',
+         'Autonomia',
+         'Outro',
+       ]},
+       {type:'fields',key:'efeitosDasDiscussoes',label:'Discussões Educativas Diante da Criança — Efeitos',fields:[
+         {key:'aCriancaPresenciaUmAdultoCriticandoAFormaComoOOutroEduca',label:'A criança presencia um adulto criticando a forma como o outro educa?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'osAdultosConseguemAdiarADiscussaoParaConversarEmParticular',label:'Os adultos conseguem adiar a discussão para conversar em particular?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'compartilhamentoDeInformacoes',label:'7. Comunicação Entre Cuidadores',fields:[
+         {key:'osCuidadoresCompartilhamInformacoesImportantesSobreACrianca',label:'Os cuidadores compartilham informações importantes sobre a criança?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'temasCompartilhados',label:'Comunicação Entre Cuidadores — Compartilham Informações Sobre',seedItems:[
+         'Mudanças de comportamento',
+         'Escola',
+         'Saúde',
+         'Sono',
+         'Medicação',
+         'Atendimentos profissionais',
+         'Regras novas',
+         'Consequências aplicadas',
+         'Situações emocionalmente importantes',
+         'Compromissos',
+       ]},
+       {type:'fields',key:'decisoesConjuntas',label:'Comunicação Entre Cuidadores — Decisões Conjuntas',fields:[
+         {key:'decisoesImportantesSaoTomadasConjuntamenteQuandoPossivel',label:'Decisões importantes são tomadas conjuntamente quando possível?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'responsabilidadesDefinidas',label:'8. Clareza de Responsabilidades — Existe Definição Relativamente Clara de Quem é Responsável Por',seedItems:[
+         'Escola',
+         'Saúde',
+         'Terapias/atendimentos',
+         'Rotina diária',
+         'Sono',
+         'Alimentação',
+         'Atividades extracurriculares',
+         'Organização de materiais',
+         'Limites/telas',
+         'Comunicação com profissionais',
+       ]},
+       {type:'fields',key:'percepcaoDaDistribuicao',label:'Clareza de Responsabilidades — Percepção da Distribuição',fields:[
+         {key:'asResponsabilidadesSaoPercebidasComo',label:'As responsabilidades são percebidas como',type:'select',options:['Bem distribuídas','Parcialmente distribuídas','Concentradas em um cuidador','Confusas/indefinidas']},
+         {key:'umCuidadorSenteQuePrecisaLembrarOuSupervisionarConstantementeOOutro',label:'Um cuidador sente que precisa lembrar ou supervisionar constantemente o outro?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'apoioCoparental',label:'9. Apoio Coparental',fields:[
+         {key:'quandoUmCuidadorEstaSobrecarregadoOOutroCostumaAssumirParteDasDemandas',label:'Quando um cuidador está sobrecarregado, o outro costuma assumir parte das demandas?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'osCuidadoresReconhecemOsEsforcosUmDoOutroDiantDaCrianca',label:'Os cuidadores reconhecem os esforços um do outro diante da criança?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'existeSensacaoDeEstamosDoMesmoLadoDiantDosDesafiosDaCrianca',label:'Existe sensação de "estamos do mesmo lado" diante dos desafios da criança?',type:'select',options:['Forte','Moderada','Baixa','Ausente']},
+         {key:'quandoUmaEstrategiaNaoFuncionaOsCuidadoresConseguemRevisarJuntosSemCulpabilizacao',label:'Quando uma estratégia não funciona, os cuidadores conseguem revisar juntos sem culpabilização?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'condutasDeCompeticaoPelaPreferencia',label:'10. Competição pela Preferência da Criança — Algum Cuidador Costuma',seedItems:[
+         'Ser mais permissivo para ser preferido',
+         'Oferecer presentes/privilégios para conquistar preferência',
+         'Evitar colocar limites para não frustrar a criança',
+         'Criticar o outro cuidador para aproximar a criança de si',
+         'Tentar ser o "adulto legal" enquanto o outro assume limites',
+         'Não há comportamento desse tipo',
+       ]},
+       {type:'fields',key:'existeCompeticaoPelaPreferencia',label:'Competição pela Preferência da Criança — Intensidade',fields:[
+         {key:'existeCompeticaoPelaPreferenciaOuAfetoDaCrianca',label:'Existe competição pela preferência ou afeto da criança?',type:'select',options:['Frequente','Ocasional','Rara','Não observada']},
+       ]},
+       {type:'checklist',key:'outrosAdultosQueParticipam',label:'11. Participação de Avós e Outros Cuidadores — Outros Adultos Participam Regularmente da Educação',seedItems:[
+         'Avós',
+         'Tios',
+         'Babá/cuidador',
+         'Padrasto/madrasta',
+         'Outros familiares',
+         'Não',
+       ]},
+       {type:'fields',key:'conhecimentoEManutencaoDosCombinados',label:'Participação de Avós e Outros Cuidadores — Conhecimento e Manutenção dos Combinados',fields:[
+         {key:'essesAdultosConhecemAsPrincipaisRegrasDaCrianca',label:'Esses adultos conhecem as principais regras da criança?',type:'select',options:['Sim','Parcialmente','Não']},
+         {key:'costumamManterOsCombinadosDosCuidadoresPrincipais',label:'Costumam manter os combinados dos cuidadores principais?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'existemInterferenciasImportantes',label:'Existem interferências importantes?',type:'select',options:['Não','Algumas','Frequentes']},
+       ]},
+       {type:'checklist',key:'areasDeInterferencia',label:'Participação de Avós e Outros Cuidadores — Quando Existem, Envolvem Principalmente',seedItems:[
+         'Alimentação',
+         'Telas',
+         'Sono',
+         'Disciplina',
+         'Presentes',
+         'Rotina',
+         'Autonomia',
+         'Escola',
+         'Outro',
+       ]},
+       {type:'fields',key:'compreensaoCompartilhada',label:'12. Compreensão Compartilhada das Necessidades da Criança',fields:[
+         {key:'osCuidadoresCompreendemDeManeiraSemelhanteAsDificuldadesDaCrianca',label:'Os cuidadores compreendem de maneira semelhante as dificuldades da criança?',type:'select',options:['Sim','Parcialmente','Não']},
+       ]},
+       {type:'checklist',key:'divergenciaSobreNaturezaDoComportamento',label:'Compreensão Compartilhada das Necessidades da Criança — Há Divergência Sobre se Determinado Comportamento é',seedItems:[
+         'Desenvolvimento esperado',
+         '"Falta de limite"',
+         'Dificuldade de autorregulação',
+         'Característica do neurodesenvolvimento',
+         'Ansiedade/medo',
+         'Busca por atenção',
+         'Dificuldade sensorial',
+         'Falta de esforço',
+         'Desobediência intencional',
+       ]},
+       {type:'fields',key:'orientacoesProfissionaisRecebidas',label:'Compreensão Compartilhada das Necessidades da Criança — Orientações Profissionais',fields:[
+         {key:'todosOsCuidadoresReceberamAsMesmasOrientacoesProfissionais',label:'Todos os cuidadores receberam as mesmas orientações profissionais?',type:'select',options:['Sim','Parcialmente','Não']},
+         {key:'aplicamAsOrientacoesDeManeiraSemelhante',label:'Aplicam as orientações de maneira semelhante?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'flexibilidadeEntreContextos',label:'13. Flexibilidade Entre Contextos',fields:[
+         {key:'osAdultosConseguemManterOMesmoPrincipioAdaptandoAEstrategiaAoContexto',label:'Os adultos conseguem manter o mesmo princípio, adaptando a estratégia ao contexto?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'diferencasEntreCuidadoresParecem',label:'Diferenças entre cuidadores parecem',type:'select',options:['Complementares e funcionais','Neutras','Confusas para a criança','Frequentemente conflitantes']},
+       ]},
+       {type:'fields',key:'revisaoCoparental',label:'14. Reunião e Revisão Coparental',fields:[
+         {key:'osCuidadoresConversamSobreOQueEstaFuncionandoNaEducacaoDaCrianca',label:'Os cuidadores conversam sobre o que está funcionando na educação da criança?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'temasDeRevisao',label:'Reunião e Revisão Coparental — Costumam Revisar',seedItems:[
+         'Regras',
+         'Rotinas',
+         'Consequências',
+         'Autonomia',
+         'Demandas escolares',
+         'Estratégias orientadas por profissionais',
+         'Mudanças próprias do desenvolvimento',
+       ]},
+       {type:'fields',key:'compreensaoDaMudanca',label:'Reunião e Revisão Coparental — Compreensão da Mudança',fields:[
+         {key:'quandoDecidemMudarUmaEstrategiaAmbosCompreendemAMudanca',label:'Quando decidem mudar uma estratégia, ambos compreendem a mudança?',type:'select',options:['Sim','Parcialmente','Não']},
+       ]},
+     ]},
+    {id:'irmaosTratamentoDiferencial',title:'Relação entre Irmãos e Tratamento Diferencial',desc:'Avalia como diferenças de atenção, regras, responsabilidades, afeto e expectativas entre irmãos são percebidas e manejadas pela família.',
+     sections:[
+       {type:'fields',key:'equidadeNoTratamento',label:'1. Equidade no Tratamento',fields:[
+         {key:'asDiferencasEntreIrmaosSaoCompativeisComIdadeDesenvolvimentoENecessidadesIndividuais',label:'As diferenças entre irmãos são compatíveis com idade, desenvolvimento e necessidades individuais?',type:'select',options:['Sim','Parcialmente','Não']},
+         {key:'quandoExistemRegrasOuPrivilegiosDiferentesOsAdultosExplicamOMotivo',label:'Quando existem regras ou privilégios diferentes, os adultos explicam o motivo?',type:'select',options:['Sempre','Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aCriancaDemonstraPerceberOTratamentoFamiliarComoInjusto',label:'A criança demonstra perceber o tratamento familiar como injusto?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'haUmIrmaoQueRecebeConsistentementeMaisAtencaoToleranciaOuPrivilegiosSemRazaoClara',label:'Há um irmão que recebe consistentemente mais atenção, tolerância ou privilégios sem razão clara?',type:'select',options:['Sim','Às vezes','Não','Não foi possível avaliar']},
+       ]},
+       {type:'fields',key:'comparacaoDeAtencaoEntreIrmaos',label:'2. Atenção e Disponibilidade dos Cuidadores — Em Comparação aos Irmãos, Esta Criança Recebe',fields:[
+         {key:'atencaoPositiva',label:'Atenção positiva',type:'select',options:['Mais','Semelhante','Menos']},
+         {key:'tempoIndividual',label:'Tempo individual',type:'select',options:['Mais','Semelhante','Menos']},
+         {key:'ajudaSuporte',label:'Ajuda/suporte',type:'select',options:['Mais','Semelhante','Menos']},
+         {key:'correcoesRepreensoes',label:'Correções/repreensões',type:'select',options:['Mais','Semelhante','Menos']},
+         {key:'afetoEAcolhimento',label:'Afeto e acolhimento',type:'select',options:['Mais','Semelhante','Menos']},
+       ]},
+       {type:'fields',key:'atencaoAumentaComProblemas',label:'Atenção e Disponibilidade dos Cuidadores — Atenção e Problemas',fields:[
+         {key:'aAtencaoDosAdultosAumentaPrincipalmenteQuandoACriancaApresentaProblemas',label:'A atenção dos adultos aumenta principalmente quando a criança apresenta problemas?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'regrasConsequenciasEResponsabilidades',label:'3. Regras, Consequências e Responsabilidades',fields:[
+         {key:'paraComportamentosSemelhantesOsIrmaosRecebemConsequenciasCoerentesConsiderandoIdadeEDesenvolvimento',label:'Para comportamentos semelhantes, os irmãos recebem consequências coerentes considerando idade e desenvolvimento?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'algumIrmaoCostumaReceberConsequenciasMaisSeverasOuSerResponsabilizadoPrimeiro',label:'Algum irmão costuma receber consequências mais severas ou ser responsabilizado primeiro?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'asResponsabilidadesDomesticasEPessoaisSaoDistribuidasDeFormaProporcionalACapacidade',label:'As responsabilidades domésticas e pessoais são distribuídas de forma proporcional à capacidade?',type:'select',options:['Sim','Parcialmente','Não']},
+         {key:'existeUmFilhoQueAssumeResponsabilidadesExcessivasPorSerConsideradoMaisResponsavelOuMaduro',label:'Existe um filho que assume responsabilidades excessivas porque é considerado "mais responsável" ou "mais maduro"?',type:'select',options:['Sim','Parcialmente','Não']},
+       ]},
+       {type:'fields',key:'comparacaoEntreIrmaosPelosCuidadores',label:'4. Comparações e Papéis Familiares',fields:[
+         {key:'osCuidadoresComparamOsIrmaosEntreSi',label:'Os cuidadores comparam os irmãos entre si?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'rotulosRecorrentes',label:'Comparações e Papéis Familiares — Existem Rótulos Recorrentes?',seedItems:[
+         'O responsável',
+         'O difícil',
+         'O inteligente',
+         'O sensível',
+         'O desobediente',
+         'O independente',
+         'O que precisa de proteção',
+         'O bebê da família',
+         'Não há rótulos relevantes',
+       ]},
+       {type:'fields',key:'rotulosInfluenciamInterpretacao',label:'Comparações e Papéis Familiares — Influência dos Rótulos',fields:[
+         {key:'essesRotulosInfluenciamAFormaComoOComportamentoAtualDeCadaCriancaEInterpretado',label:'Esses rótulos influenciam a forma como o comportamento atual de cada criança é interpretado?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'relacaoEntreIrmaosPredominante',label:'5. Competição e Cooperação — A Relação Entre os Irmãos é Predominantemente',fields:[
+         {key:'relacaoPredominante',label:'Relação predominante',type:'select',options:['Cooperativa','Equilibrada','Competitiva','Muito competitiva','Muito variável']},
+       ]},
+       {type:'checklist',key:'motivosDeCompeticao',label:'Competição e Cooperação — A Competição Ocorre Principalmente Por',seedItems:[
+         'Atenção dos adultos',
+         'Afeto',
+         'Privilégios',
+         'Objetos',
+         'Desempenho',
+         'Reconhecimento',
+         'Não há competição relevante',
+       ]},
+       {type:'fields',key:'usoDeComparacaoOuCooperacao',label:'Competição e Cooperação — Uso de Comparação e Cooperação',fields:[
+         {key:'osAdultosUtilizamComparacaoOuCompeticaoParaMotivar',label:'Os adultos utilizam comparação ou competição para motivar?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'aFamiliaTambemCriaOportunidadesDeCooperacaoEntreIrmaos',label:'A família também cria oportunidades de cooperação entre irmãos?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'frequenciaDosConflitos',label:'6. Conflitos Entre Irmãos — Frequência dos Conflitos',fields:[
+         {key:'nivelDeFrequenciaDosConflitos',label:'Frequência dos conflitos',type:'select',options:['Baixa','Moderada','Alta','Muito alta']},
+       ]},
+       {type:'checklist',key:'condutaDosAdultosNosConflitos',label:'Conflitos Entre Irmãos — Nos Conflitos, os Adultos Tendem a',seedItems:[
+         'Ouvir os dois lados',
+         'Ajudar na negociação',
+         'Incentivar reparação',
+         'Identificar rapidamente um culpado',
+         'Pedir sempre ao mais velho que ceda',
+         'Proteger sempre o mais novo',
+         'Punir ambos',
+         'Resolver o problema pelos filhos',
+       ]},
+       {type:'fields',key:'resolucaoAutonomaDeConflitos',label:'Conflitos Entre Irmãos — Resolução Autônoma',fields:[
+         {key:'osIrmaosConseguemResolverPequenosConflitosSemIntervencaoAdulta',label:'Os irmãos conseguem resolver pequenos conflitos sem intervenção adulta?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'fields',key:'necessidadesDiferentesEntreIrmaos',label:'7. Necessidades Diferentes Entre Irmãos',fields:[
+         {key:'osDemaisCompreendemPorQueEleRecebeTratamentoDiferente',label:'Os demais compreendem por que ele recebe tratamento diferente?',type:'select',options:['Sim','Parcialmente','Não']},
+         {key:'asNecessidadesDosOutrosIrmaosContinuamRecebendoAtencao',label:'As necessidades dos outros irmãos continuam recebendo atenção?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+         {key:'osDemaisPrecisamAdaptarSeExcessivamenteAsNecessidadesDeUmIrmao',label:'Os demais precisam adaptar-se excessivamente às necessidades de um irmão?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+       {type:'checklist',key:'oportunidadesDeIndividualidade',label:'8. Individualidade de Cada Filho — Cada Criança Possui Oportunidades de Ter',seedItems:[
+         'Tempo individual com cuidadores',
+         'Interesses próprios',
+         'Atividades próprias',
+         'Espaço/pertences respeitados',
+         'Metas adequadas às próprias capacidades',
+       ]},
+       {type:'fields',key:'reconhecimentoDaIndividualidade',label:'Individualidade de Cada Filho — Reconhecimento pela Família',fields:[
+         {key:'aFamiliaConsegueReconhecerAsCriancasComoIndividuosSemEsperarQueUmIrmaoFuncioneComoOOutro',label:'A família consegue reconhecer as crianças como indivíduos, sem esperar que um irmão funcione como o outro?',type:'select',options:['Frequentemente','Às vezes','Raramente','Nunca']},
+       ]},
+     ]},
    ]},
   {id:'gestao',title:'Gestão de Negócio',icon:'folder',moduleId:'gerenciar',
    meta:'Documentação, jurídico, financeiro e rotina do consultório.',

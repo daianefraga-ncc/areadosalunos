@@ -625,10 +625,12 @@
   .material-card .meta{font-size:11.5px;color:var(--text-mute);margin-bottom:8px;}
   .category-sub{color:var(--text-mute);font-size:12px;margin:-6px 0 14px;}
   .biz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:28px;}
-  .biz-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;display:flex;flex-direction:column;gap:8px;}
+  .biz-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;display:flex;flex-direction:column;gap:10px;}
+  .biz-card-head{display:flex;align-items:center;gap:10px;}
+  .biz-icon{width:34px;height:34px;border-radius:10px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .biz-icon .icon{width:18px;height:18px;stroke:var(--accent-2);}
   .biz-card .title{font-size:14px;font-weight:700;}
-  .biz-card .desc{font-size:12.5px;color:var(--text-dim);line-height:1.45;flex:1;}
-  .biz-card .biz-meta{font-size:12px;font-weight:700;color:var(--accent-2);}
+  .biz-card .desc{font-size:12.5px;color:var(--text-dim);line-height:1.45;}
   .btn-mini{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--accent-2);}
   .btn-mini .icon{width:13px;height:13px;}
 
@@ -1391,6 +1393,12 @@ const ICONS = {
   escola:'<circle cx="12" cy="4.6" r="2.3"/><path d="M7.8 9.6c1.3-1.7 2.9-2.6 4.2-2.6s2.9.9 4.2 2.6"/><path d="M9.3 10.6c.9-.5 1.8-.7 2.7-.7s1.8.2 2.7.7"/><path d="M12 11.3v7.6"/><path d="M5 11c2.5-1.1 5-.8 7 .3v7.5c-2-1.1-4.5-1.4-7-.3z"/><path d="M19 11c-2.5-1.1-5-.8-7 .3v7.5c2-1.1 4.5-1.4 7-.3z"/><circle cx="4.6" cy="14.3" r="0.9"/><circle cx="19.4" cy="14.3" r="0.9"/>',
   neuro:'<path d="M9.5 3.3c-2 .3-3.4 1.9-3.4 3.9 0 .6.1 1.1.4 1.6-1.3.6-2.2 1.9-2.2 3.4 0 1.3.7 2.4 1.7 3.1-.3.5-.4 1.1-.4 1.7 0 2 1.6 3.6 3.6 3.6.4 0 .8-.1 1.1-.2"/><path d="M14.5 3.3c2 .3 3.4 1.9 3.4 3.9 0 .6-.1 1.1-.4 1.6 1.3.6 2.2 1.9 2.2 3.4 0 1.3-.7 2.4-1.7 3.1.3.5.4 1.1.4 1.7 0 2-1.6 3.6-3.6 3.6-.4 0-.8-.1-1.1-.2"/><path d="M12 3.3v17.4"/><path d="M9 7.5c1 .8 1 2.2 0 3M15 7.5c-1 .8-1 2.2 0 3M8.5 13c1.2.5 1.2 2 0 2.8M15.5 13c-1.2.5-1.2 2 0 2.8"/>',
   biblioteca:'<path d="M4 19.5V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v14.5"/><path d="M10 19.5V5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v14.5"/><path d="M4 19.5h11"/><path d="M16.3 19l-2-13.2a1 1 0 0 1 .8-1.1l3.6-.6a1 1 0 0 1 1.1.8l2 13.2a1 1 0 0 1-.8 1.1l-3.6.6a1 1 0 0 1-1.1-.8z"/>',
+  book:'<path d="M4 6a2 2 0 0 1 2-2h5v16H6a2 2 0 0 1-2-2z"/><path d="M20 6a2 2 0 0 0-2-2h-5v16h5a2 2 0 0 0 2-2z"/><path d="M11 4v16"/>',
+  briefcase:'<rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/>',
+  tablet:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M11 18h2"/>',
+  gamepad:'<rect x="2" y="8" width="20" height="10" rx="4"/><path d="M7 11v4M5 13h4"/><circle cx="16" cy="11" r="1" fill="currentColor" stroke="none"/><circle cx="18.5" cy="13.5" r="1" fill="currentColor" stroke="none"/>',
+  sliders:'<path d="M4 6h9M17 6h3M4 12h3M9 12h11M4 18h13M19 18h1"/><circle cx="13" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+  pathicon:'<circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/><path d="M6.5 17.5C10 13 14 11 17.5 6.5"/>',
 };
 function icon(name,cls){return `<svg class="icon ${cls||''}" viewBox="0 0 24 24">${ICONS[name]}</svg>`;}
 function fillIcon(name,cls){return `<svg class="icon ${cls||''}" viewBox="0 0 24 24" fill="currentColor" stroke="none">${ICONS[name]}</svg>`;}
@@ -9105,35 +9113,34 @@ function renderMateriais(){
 }
 
 const BUSINESS_LIBRARY = [
-  {numero:'01',titulo:'Neurodesenvolvimento',sub:'4 negócios · referências internacionais · preço de referência',itens:[
-    {titulo:'Programa de Intervenção Precoce Mediada pelos Pais',desc:'0 a 5 anos, ciclos de 12 semanas. Referência: intervenções naturalísticas desenvolvimentais-comportamentais (NDBI).',meta:'Psicólogo, fono, TO · R$ 3.000–6.000 por ciclo'},
-    {titulo:'Treinamento Parental Comportamental para TDAH',desc:'Primeira linha para 4 e 5 anos na diretriz da Academia Americana de Pediatria (2019).',meta:'Psicólogo · R$ 1.500–3.500 por programa'},
-    {titulo:'Navegação do Cuidado Pós-Diagnóstico',desc:'Organiza terapias, escola, direitos e prioridades nos três meses após o laudo.',meta:'Todas as formações · R$ 1.200–3.000 por família'},
-    {titulo:'Habilidades Sociais para Adolescentes Autistas',desc:'14 semanas, com adolescentes e pais. Referência: PEERS®, UCLA (EUA).',meta:'Psicólogo, fono · R$ 500–900/mês'},
+  {numero:'01',titulo:'Neurodesenvolvimento',sub:'4 negócios · referências internacionais',itens:[
+    {icon:'family',titulo:'Programa de Intervenção Precoce Mediada pelos Pais',desc:'Ciclos de 12 semanas para crianças de 0 a 5 anos, com base em intervenções NDBI.'},
+    {icon:'target',titulo:'Treinamento Parental Comportamental para TDAH',desc:'Primeira linha de tratamento para TDAH em crianças pequenas, segundo a Academia Americana de Pediatria.'},
+    {icon:'compass',titulo:'Navegação do Cuidado Pós-Diagnóstico',desc:'Organiza terapias, escola e prioridades nos primeiros meses após o diagnóstico.'},
+    {icon:'comment',titulo:'Habilidades Sociais para Adolescentes Autistas',desc:'Programa de 14 semanas com adolescentes e pais, baseado no modelo PEERS® (UCLA).'},
   ]},
-  {numero:'02',titulo:'Vínculo e parentalidade',sub:'4 negócios · referências internacionais · preço de referência',itens:[
-    {titulo:'Parentalidade Baseada em Evidências',desc:'Grupos de 8 semanas. Referências: Triple P (Austrália) e Incredible Years (EUA).',meta:'Todas as formações · R$ 600–1.200 por família'},
-    {titulo:'Vídeo-feedback para Sensibilidade Parental',desc:'Visitas com vídeo da interação entre pais e criança. Referência: VIPP-SD, Universidade de Leiden.',meta:'Psicólogo com formação específica · R$ 2.000–4.000'},
-    {titulo:'Prevenção do Burnout Parental',desc:'Grupos para mães e pais exaustos. Referência: pesquisas de Mikolajczak e Roskam (Bélgica).',meta:'Educativo: todas; clínico: psicólogo · R$ 700–1.500'},
-    {titulo:'Apoio Corporativo à Parentalidade',desc:'Para o RH, dentro da gestão de riscos psicossociais da NR-1.',meta:'Todas as formações · R$ 3.000–12.000/mês por empresa'},
+  {numero:'02',titulo:'Vínculo e parentalidade',sub:'4 negócios · referências internacionais',itens:[
+    {icon:'book',titulo:'Parentalidade Baseada em Evidências',desc:'Grupos de 8 semanas baseados nos modelos Triple P e Incredible Years.'},
+    {icon:'video',titulo:'Vídeo-feedback para Sensibilidade Parental',desc:'Visitas com vídeo da interação entre pais e criança, modelo VIPP-SD (Leiden).'},
+    {icon:'heart',titulo:'Prevenção do Burnout Parental',desc:'Grupos de apoio para mães e pais exaustos, com base em pesquisas sobre burnout parental.'},
+    {icon:'briefcase',titulo:'Apoio Corporativo à Parentalidade',desc:'Suporte ao RH das empresas dentro da gestão de riscos psicossociais da NR-1.'},
   ]},
-  {numero:'03',titulo:'Tecnologia, telas e IA',sub:'4 negócios · referências internacionais · preço de referência',itens:[
-    {titulo:'Plano de Mídia Familiar',desc:'Consultoria e grupos para famílias. Referência: Family Media Plan, Academia Americana de Pediatria.',meta:'Todas as formações · R$ 400–900 por família'},
-    {titulo:'Uso Problemático de Internet e Jogos',desc:'Prevenção com adolescentes e pais. O transtorno de jogo está na CID-11 da OMS.',meta:'Educativo: todas; clínico: psicólogo · R$ 500–1.200'},
-    {titulo:'Design Adequado à Idade',desc:'Consultoria para apps, jogos e edtechs cumprirem o ECA Digital.',meta:'Com formação específica · R$ 15.000–60.000 por projeto'},
-    {titulo:'Certificado NCC',desc:'Avaliação científica de brinquedos, aplicativos e espaços para crianças.',meta:'Rede NCC · R$ 5.000–30.000 por certificação'},
+  {numero:'03',titulo:'Tecnologia, telas e IA',sub:'4 negócios · referências internacionais',itens:[
+    {icon:'tablet',titulo:'Plano de Mídia Familiar',desc:'Consultoria para famílias organizarem o uso de telas em casa.'},
+    {icon:'gamepad',titulo:'Uso Problemático de Internet e Jogos',desc:'Prevenção com adolescentes e pais do uso problemático de jogos e internet.'},
+    {icon:'sliders',titulo:'Design Adequado à Idade',desc:'Consultoria para apps e jogos cumprirem o ECA Digital.'},
+    {icon:'award',titulo:'Certificado NCC',desc:'Avaliação científica de brinquedos, aplicativos e espaços infantis.'},
   ]},
-  {numero:'04',titulo:'Futuro do trabalho',sub:'4 negócios · referências internacionais · preço de referência',itens:[
-    {titulo:'Funções Executivas para Estudantes',desc:'Planejamento, organização e autorregulação, inclusive para estudantes com TDAH.',meta:'Todas as formações · R$ 600–1.500/mês'},
-    {titulo:'Transição para a Vida Adulta',desc:'Adolescentes neurodivergentes: escola, trabalho e autonomia. Referência: lei IDEA (EUA).',meta:'Todas as formações · R$ 800–2.000 por jovem'},
-    {titulo:'Gestores de Jovens Aprendizes',desc:'Neurociência do adolescente aplicada à gestão de pessoas, para empresas.',meta:'Todas as formações · R$ 4.000–15.000 por turma'},
-    {titulo:'Profissionais de Apoio em Neurodesenvolvimento',desc:'Formação de acompanhantes e mediadores, com demanda ampliada após a RN 539/2022 da ANS.',meta:'Formadores habilitados · R$ 1.500–4.000 por aluno'},
+  {numero:'04',titulo:'Futuro do trabalho',sub:'4 negócios · referências internacionais',itens:[
+    {icon:'neuro',titulo:'Funções Executivas para Estudantes',desc:'Treino de planejamento, organização e autorregulação para estudantes.'},
+    {icon:'pathicon',titulo:'Transição para a Vida Adulta',desc:'Apoio a adolescentes neurodivergentes na transição para escola, trabalho e autonomia.'},
+    {icon:'users',titulo:'Gestores de Jovens Aprendizes',desc:'Neurociência do adolescente aplicada à gestão de jovens aprendizes.'},
+    {icon:'idcard',titulo:'Profissionais de Apoio em Neurodesenvolvimento',desc:'Formação de acompanhantes e mediadores para neurodesenvolvimento.'},
   ]},
 ];
 
 /* ================= VIEW: BIBLIOTECA DE NEGÓCIOS =================
-   Catálogo de modelos de negócio complementares, organizado por frente estratégica — cada frente
-   com referências internacionais e preço de referência por negócio (ver BUSINESS_LIBRARY acima). */
+   Catálogo de modelos de negócio complementares, organizado por frente estratégica (ver BUSINESS_LIBRARY acima). */
 function renderBiblioteca(){
   document.getElementById('view-biblioteca').innerHTML = `
     <p class="section-sub">Modelos de negócio complementares para os profissionais NCC, organizados por frente estratégica.</p>
@@ -9144,9 +9151,11 @@ function renderBiblioteca(){
         <div class="biz-grid">
           ${f.itens.map(it=>`
             <div class="biz-card">
-              <div class="title">${it.titulo}</div>
+              <div class="biz-card-head">
+                <div class="biz-icon">${icon(it.icon)}</div>
+                <div class="title">${it.titulo}</div>
+              </div>
               <div class="desc">${it.desc}</div>
-              <div class="biz-meta">${it.meta}</div>
             </div>
           `).join('')}
         </div>

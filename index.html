@@ -625,12 +625,13 @@
   .material-card .meta{font-size:11.5px;color:var(--text-mute);margin-bottom:8px;}
   .category-sub{color:var(--text-mute);font-size:12px;margin:-6px 0 14px;}
   .biz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:28px;}
-  .biz-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;display:flex;flex-direction:column;gap:10px;}
-  .biz-card-head{display:flex;align-items:center;gap:10px;}
-  .biz-icon{width:34px;height:34px;border-radius:10px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .biz-icon .icon{width:18px;height:18px;stroke:var(--accent-2);}
-  .biz-card .title{font-size:14px;font-weight:700;}
-  .biz-card .desc{font-size:12.5px;color:var(--text-dim);line-height:1.45;}
+  .biz-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;}
+  .biz-card .qi{width:42px;height:42px;border-radius:12px;background:var(--shared-soft);display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+  .biz-card .qi .icon{stroke:var(--shared);}
+  .biz-card .title{font-size:15px;font-weight:700;margin-bottom:6px;}
+  .biz-card .desc{font-size:12px;color:var(--text-dim);}
+  .biz-card .biz-meta{font-size:12px;color:var(--text-dim);margin-top:10px;}
+  .biz-card .biz-meta strong{color:var(--shared);}
   .btn-mini{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--accent-2);}
   .btn-mini .icon{width:13px;height:13px;}
 
@@ -9114,28 +9115,28 @@ function renderMateriais(){
 
 const BUSINESS_LIBRARY = [
   {numero:'01',titulo:'Neurodesenvolvimento',sub:'4 negócios · referências internacionais',itens:[
-    {icon:'family',titulo:'Programa de Intervenção Precoce Mediada pelos Pais',desc:'Ciclos de 12 semanas para crianças de 0 a 5 anos, com base em intervenções NDBI.'},
-    {icon:'target',titulo:'Treinamento Parental Comportamental para TDAH',desc:'Primeira linha de tratamento para TDAH em crianças pequenas, segundo a Academia Americana de Pediatria.'},
-    {icon:'compass',titulo:'Navegação do Cuidado Pós-Diagnóstico',desc:'Organiza terapias, escola e prioridades nos primeiros meses após o diagnóstico.'},
-    {icon:'comment',titulo:'Habilidades Sociais para Adolescentes Autistas',desc:'Programa de 14 semanas com adolescentes e pais, baseado no modelo PEERS® (UCLA).'},
+    {icon:'family',titulo:'Programa de Intervenção Precoce Mediada pelos Pais',desc:'Ciclos de 12 semanas para crianças de 0 a 5 anos, com base em intervenções NDBI.',quem:'Psicólogo, fono, TO',valor:'R$ 3.000–6.000 por ciclo'},
+    {icon:'target',titulo:'Treinamento Parental Comportamental para TDAH',desc:'Primeira linha de tratamento para TDAH em crianças pequenas, segundo a Academia Americana de Pediatria.',quem:'Psicólogo',valor:'R$ 1.500–3.500 por programa'},
+    {icon:'compass',titulo:'Navegação do Cuidado Pós-Diagnóstico',desc:'Organiza terapias, escola e prioridades nos primeiros meses após o diagnóstico.',quem:'Todas as formações',valor:'R$ 1.200–3.000 por família'},
+    {icon:'comment',titulo:'Habilidades Sociais para Adolescentes Autistas',desc:'Programa de 14 semanas com adolescentes e pais, baseado no modelo PEERS® (UCLA).',quem:'Psicólogo, fono',valor:'R$ 500–900/mês'},
   ]},
   {numero:'02',titulo:'Vínculo e parentalidade',sub:'4 negócios · referências internacionais',itens:[
-    {icon:'book',titulo:'Parentalidade Baseada em Evidências',desc:'Grupos de 8 semanas baseados nos modelos Triple P e Incredible Years.'},
-    {icon:'video',titulo:'Vídeo-feedback para Sensibilidade Parental',desc:'Visitas com vídeo da interação entre pais e criança, modelo VIPP-SD (Leiden).'},
-    {icon:'heart',titulo:'Prevenção do Burnout Parental',desc:'Grupos de apoio para mães e pais exaustos, com base em pesquisas sobre burnout parental.'},
-    {icon:'briefcase',titulo:'Apoio Corporativo à Parentalidade',desc:'Suporte ao RH das empresas dentro da gestão de riscos psicossociais da NR-1.'},
+    {icon:'book',titulo:'Parentalidade Baseada em Evidências',desc:'Grupos de 8 semanas baseados nos modelos Triple P e Incredible Years.',quem:'Todas as formações',valor:'R$ 600–1.200 por família'},
+    {icon:'video',titulo:'Vídeo-feedback para Sensibilidade Parental',desc:'Visitas com vídeo da interação entre pais e criança, modelo VIPP-SD (Leiden).',quem:'Psicólogo com formação específica',valor:'R$ 2.000–4.000'},
+    {icon:'heart',titulo:'Prevenção do Burnout Parental',desc:'Grupos de apoio para mães e pais exaustos, com base em pesquisas sobre burnout parental.',quem:'Educativo: todas; clínico: psicólogo',valor:'R$ 700–1.500'},
+    {icon:'briefcase',titulo:'Apoio Corporativo à Parentalidade',desc:'Suporte ao RH das empresas dentro da gestão de riscos psicossociais da NR-1.',quem:'Todas as formações',valor:'R$ 3.000–12.000/mês por empresa'},
   ]},
   {numero:'03',titulo:'Tecnologia, telas e IA',sub:'4 negócios · referências internacionais',itens:[
-    {icon:'tablet',titulo:'Plano de Mídia Familiar',desc:'Consultoria para famílias organizarem o uso de telas em casa.'},
-    {icon:'gamepad',titulo:'Uso Problemático de Internet e Jogos',desc:'Prevenção com adolescentes e pais do uso problemático de jogos e internet.'},
-    {icon:'sliders',titulo:'Design Adequado à Idade',desc:'Consultoria para apps e jogos cumprirem o ECA Digital.'},
-    {icon:'award',titulo:'Certificado NCC',desc:'Avaliação científica de brinquedos, aplicativos e espaços infantis.'},
+    {icon:'tablet',titulo:'Plano de Mídia Familiar',desc:'Consultoria para famílias organizarem o uso de telas em casa.',quem:'Todas as formações',valor:'R$ 400–900 por família'},
+    {icon:'gamepad',titulo:'Uso Problemático de Internet e Jogos',desc:'Prevenção com adolescentes e pais do uso problemático de jogos e internet.',quem:'Educativo: todas; clínico: psicólogo',valor:'R$ 500–1.200'},
+    {icon:'sliders',titulo:'Design Adequado à Idade',desc:'Consultoria para apps e jogos cumprirem o ECA Digital.',quem:'Com formação específica',valor:'R$ 15.000–60.000 por projeto'},
+    {icon:'award',titulo:'Certificado NCC',desc:'Avaliação científica de brinquedos, aplicativos e espaços infantis.',quem:'Rede NCC',valor:'R$ 5.000–30.000 por certificação'},
   ]},
   {numero:'04',titulo:'Futuro do trabalho',sub:'4 negócios · referências internacionais',itens:[
-    {icon:'neuro',titulo:'Funções Executivas para Estudantes',desc:'Treino de planejamento, organização e autorregulação para estudantes.'},
-    {icon:'pathicon',titulo:'Transição para a Vida Adulta',desc:'Apoio a adolescentes neurodivergentes na transição para escola, trabalho e autonomia.'},
-    {icon:'users',titulo:'Gestores de Jovens Aprendizes',desc:'Neurociência do adolescente aplicada à gestão de jovens aprendizes.'},
-    {icon:'idcard',titulo:'Profissionais de Apoio em Neurodesenvolvimento',desc:'Formação de acompanhantes e mediadores para neurodesenvolvimento.'},
+    {icon:'neuro',titulo:'Funções Executivas para Estudantes',desc:'Treino de planejamento, organização e autorregulação para estudantes.',quem:'Todas as formações',valor:'R$ 600–1.500/mês'},
+    {icon:'pathicon',titulo:'Transição para a Vida Adulta',desc:'Apoio a adolescentes neurodivergentes na transição para escola, trabalho e autonomia.',quem:'Todas as formações',valor:'R$ 800–2.000 por jovem'},
+    {icon:'users',titulo:'Gestores de Jovens Aprendizes',desc:'Neurociência do adolescente aplicada à gestão de jovens aprendizes.',quem:'Todas as formações',valor:'R$ 4.000–15.000 por turma'},
+    {icon:'idcard',titulo:'Profissionais de Apoio em Neurodesenvolvimento',desc:'Formação de acompanhantes e mediadores para neurodesenvolvimento.',quem:'Formadores habilitados',valor:'R$ 1.500–4.000 por aluno'},
   ]},
 ];
 
@@ -9151,11 +9152,10 @@ function renderBiblioteca(){
         <div class="biz-grid">
           ${f.itens.map(it=>`
             <div class="biz-card">
-              <div class="biz-card-head">
-                <div class="biz-icon">${icon(it.icon)}</div>
-                <div class="title">${it.titulo}</div>
-              </div>
+              <div class="qi">${icon(it.icon)}</div>
+              <div class="title">${it.titulo}</div>
               <div class="desc">${it.desc}</div>
+              <div class="biz-meta"><strong>${it.quem}</strong> · <strong>${it.valor}</strong></div>
             </div>
           `).join('')}
         </div>

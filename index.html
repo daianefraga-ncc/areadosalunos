@@ -623,6 +623,12 @@
   .material-card .mi{flex:1;min-width:0;}
   .material-card .title{font-size:13.5px;font-weight:700;margin-bottom:2px;}
   .material-card .meta{font-size:11.5px;color:var(--text-mute);margin-bottom:8px;}
+  .category-sub{color:var(--text-mute);font-size:12px;margin:-6px 0 14px;}
+  .biz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:28px;}
+  .biz-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;display:flex;flex-direction:column;gap:8px;}
+  .biz-card .title{font-size:14px;font-weight:700;}
+  .biz-card .desc{font-size:12.5px;color:var(--text-dim);line-height:1.45;flex:1;}
+  .biz-card .biz-meta{font-size:12px;font-weight:700;color:var(--accent-2);}
   .btn-mini{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--accent-2);}
   .btn-mini .icon{width:13px;height:13px;}
 
@@ -9098,12 +9104,54 @@ function renderMateriais(){
   });
 }
 
+const BUSINESS_LIBRARY = [
+  {numero:'01',titulo:'Neurodesenvolvimento',sub:'4 negócios · referências internacionais · preço de referência',itens:[
+    {titulo:'Programa de Intervenção Precoce Mediada pelos Pais',desc:'0 a 5 anos, ciclos de 12 semanas. Referência: intervenções naturalísticas desenvolvimentais-comportamentais (NDBI).',meta:'Psicólogo, fono, TO · R$ 3.000–6.000 por ciclo'},
+    {titulo:'Treinamento Parental Comportamental para TDAH',desc:'Primeira linha para 4 e 5 anos na diretriz da Academia Americana de Pediatria (2019).',meta:'Psicólogo · R$ 1.500–3.500 por programa'},
+    {titulo:'Navegação do Cuidado Pós-Diagnóstico',desc:'Organiza terapias, escola, direitos e prioridades nos três meses após o laudo.',meta:'Todas as formações · R$ 1.200–3.000 por família'},
+    {titulo:'Habilidades Sociais para Adolescentes Autistas',desc:'14 semanas, com adolescentes e pais. Referência: PEERS®, UCLA (EUA).',meta:'Psicólogo, fono · R$ 500–900/mês'},
+  ]},
+  {numero:'02',titulo:'Vínculo e parentalidade',sub:'4 negócios · referências internacionais · preço de referência',itens:[
+    {titulo:'Parentalidade Baseada em Evidências',desc:'Grupos de 8 semanas. Referências: Triple P (Austrália) e Incredible Years (EUA).',meta:'Todas as formações · R$ 600–1.200 por família'},
+    {titulo:'Vídeo-feedback para Sensibilidade Parental',desc:'Visitas com vídeo da interação entre pais e criança. Referência: VIPP-SD, Universidade de Leiden.',meta:'Psicólogo com formação específica · R$ 2.000–4.000'},
+    {titulo:'Prevenção do Burnout Parental',desc:'Grupos para mães e pais exaustos. Referência: pesquisas de Mikolajczak e Roskam (Bélgica).',meta:'Educativo: todas; clínico: psicólogo · R$ 700–1.500'},
+    {titulo:'Apoio Corporativo à Parentalidade',desc:'Para o RH, dentro da gestão de riscos psicossociais da NR-1.',meta:'Todas as formações · R$ 3.000–12.000/mês por empresa'},
+  ]},
+  {numero:'03',titulo:'Tecnologia, telas e IA',sub:'4 negócios · referências internacionais · preço de referência',itens:[
+    {titulo:'Plano de Mídia Familiar',desc:'Consultoria e grupos para famílias. Referência: Family Media Plan, Academia Americana de Pediatria.',meta:'Todas as formações · R$ 400–900 por família'},
+    {titulo:'Uso Problemático de Internet e Jogos',desc:'Prevenção com adolescentes e pais. O transtorno de jogo está na CID-11 da OMS.',meta:'Educativo: todas; clínico: psicólogo · R$ 500–1.200'},
+    {titulo:'Design Adequado à Idade',desc:'Consultoria para apps, jogos e edtechs cumprirem o ECA Digital.',meta:'Com formação específica · R$ 15.000–60.000 por projeto'},
+    {titulo:'Certificado NCC',desc:'Avaliação científica de brinquedos, aplicativos e espaços para crianças.',meta:'Rede NCC · R$ 5.000–30.000 por certificação'},
+  ]},
+  {numero:'04',titulo:'Futuro do trabalho',sub:'4 negócios · referências internacionais · preço de referência',itens:[
+    {titulo:'Funções Executivas para Estudantes',desc:'Planejamento, organização e autorregulação, inclusive para estudantes com TDAH.',meta:'Todas as formações · R$ 600–1.500/mês'},
+    {titulo:'Transição para a Vida Adulta',desc:'Adolescentes neurodivergentes: escola, trabalho e autonomia. Referência: lei IDEA (EUA).',meta:'Todas as formações · R$ 800–2.000 por jovem'},
+    {titulo:'Gestores de Jovens Aprendizes',desc:'Neurociência do adolescente aplicada à gestão de pessoas, para empresas.',meta:'Todas as formações · R$ 4.000–15.000 por turma'},
+    {titulo:'Profissionais de Apoio em Neurodesenvolvimento',desc:'Formação de acompanhantes e mediadores, com demanda ampliada após a RN 539/2022 da ANS.',meta:'Formadores habilitados · R$ 1.500–4.000 por aluno'},
+  ]},
+];
+
 /* ================= VIEW: BIBLIOTECA DE NEGÓCIOS =================
-   Ainda sem conteúdo definido — placeholder até a Daiane definir quais documentos/modelos vão aqui. */
+   Catálogo de modelos de negócio complementares, organizado por frente estratégica — cada frente
+   com referências internacionais e preço de referência por negócio (ver BUSINESS_LIBRARY acima). */
 function renderBiblioteca(){
   document.getElementById('view-biblioteca').innerHTML = `
-    <p class="section-sub">Modelos, documentos e materiais de apoio para a gestão do negócio dos profissionais NCC.</p>
-    <div class="empty-state">Conteúdo desta biblioteca ainda será definido.</div>
+    <p class="section-sub">Modelos de negócio complementares para os profissionais NCC, organizados por frente estratégica.</p>
+    ${BUSINESS_LIBRARY.map(f=>`
+      <div class="category-block">
+        <h2 class="section-title">Frente ${f.numero} — ${f.titulo}</h2>
+        <p class="category-sub">${f.sub}</p>
+        <div class="biz-grid">
+          ${f.itens.map(it=>`
+            <div class="biz-card">
+              <div class="title">${it.titulo}</div>
+              <div class="desc">${it.desc}</div>
+              <div class="biz-meta">${it.meta}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('')}
   `;
 }
 

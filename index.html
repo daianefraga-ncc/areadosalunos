@@ -1223,9 +1223,10 @@
     <button class="nav-item" data-view="agenda"></button>
     <button class="nav-item" data-view="materiais"></button>
 
-    <div class="nav-group-label" id="nav-group-metodo">Meu Método</div>
+    <div class="nav-group-label" id="nav-group-metodo">Profissionais NCC</div>
     <button class="nav-item shared" data-view="dashboard"></button>
     <button class="nav-item shared" data-view="painel"></button>
+    <button class="nav-item shared" data-view="biblioteca"></button>
 
     <div class="nav-group-label" id="nav-group-individual">Minha Área</div>
     <button class="nav-item individual" data-view="sessoes"></button>
@@ -1299,6 +1300,7 @@
       <div class="view" id="view-materiais"></div>
       <div class="view" id="view-dashboard"></div>
       <div class="view" id="view-painel"></div>
+      <div class="view" id="view-biblioteca"></div>
       <div class="view" id="view-sessoes"></div>
       <div class="view" id="view-metas"></div>
       <div class="view" id="view-interno"></div>
@@ -1382,6 +1384,7 @@ const ICONS = {
   familia:'<circle cx="5" cy="4.6" r="2.3"/><path d="M5 7.3v3.2M2.6 12.5c0-1.8 1-3 2.4-3s2.4 1.2 2.4 3"/><path d="M2.6 12.5v7.3M7.4 12.5v7.3"/><circle cx="19" cy="4.6" r="2.3"/><path d="M19 7.3v3.2M16.6 12.5c0-1.8 1-3 2.4-3s2.4 1.2 2.4 3"/><path d="M16.6 12.5v7.3M21.4 12.5v7.3"/><circle cx="12" cy="10.3" r="1.7"/><path d="M12 12.4v4.8M10.3 15v5.5M13.7 15v5.5"/><path d="M7.4 13.5L10.6 12.9M16.6 13.5L13.4 12.9"/>',
   escola:'<circle cx="12" cy="4.6" r="2.3"/><path d="M7.8 9.6c1.3-1.7 2.9-2.6 4.2-2.6s2.9.9 4.2 2.6"/><path d="M9.3 10.6c.9-.5 1.8-.7 2.7-.7s1.8.2 2.7.7"/><path d="M12 11.3v7.6"/><path d="M5 11c2.5-1.1 5-.8 7 .3v7.5c-2-1.1-4.5-1.4-7-.3z"/><path d="M19 11c-2.5-1.1-5-.8-7 .3v7.5c2-1.1 4.5-1.4 7-.3z"/><circle cx="4.6" cy="14.3" r="0.9"/><circle cx="19.4" cy="14.3" r="0.9"/>',
   neuro:'<path d="M9.5 3.3c-2 .3-3.4 1.9-3.4 3.9 0 .6.1 1.1.4 1.6-1.3.6-2.2 1.9-2.2 3.4 0 1.3.7 2.4 1.7 3.1-.3.5-.4 1.1-.4 1.7 0 2 1.6 3.6 3.6 3.6.4 0 .8-.1 1.1-.2"/><path d="M14.5 3.3c2 .3 3.4 1.9 3.4 3.9 0 .6-.1 1.1-.4 1.6 1.3.6 2.2 1.9 2.2 3.4 0 1.3-.7 2.4-1.7 3.1.3.5.4 1.1.4 1.7 0 2-1.6 3.6-3.6 3.6-.4 0-.8-.1-1.1-.2"/><path d="M12 3.3v17.4"/><path d="M9 7.5c1 .8 1 2.2 0 3M15 7.5c-1 .8-1 2.2 0 3M8.5 13c1.2.5 1.2 2 0 2.8M15.5 13c-1.2.5-1.2 2 0 2.8"/>',
+  biblioteca:'<path d="M4 19.5V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v14.5"/><path d="M10 19.5V5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v14.5"/><path d="M4 19.5h11"/><path d="M16.3 19l-2-13.2a1 1 0 0 1 .8-1.1l3.6-.6a1 1 0 0 1 1.1.8l2 13.2a1 1 0 0 1-.8 1.1l-3.6.6a1 1 0 0 1-1.1-.8z"/>',
 };
 function icon(name,cls){return `<svg class="icon ${cls||''}" viewBox="0 0 24 24">${ICONS[name]}</svg>`;}
 function fillIcon(name,cls){return `<svg class="icon ${cls||''}" viewBox="0 0 24 24" fill="currentColor" stroke="none">${ICONS[name]}</svg>`;}
@@ -1392,6 +1395,7 @@ const NAV_LABELS = {
   ranking:['award','Ranking'],
   agenda:['calendar','Agenda ao Vivo'], materiais:['folder','Materiais'],
   dashboard:['chart','Dashboard'], painel:['compass','Painel Profissional'],
+  biblioteca:['biblioteca','Biblioteca de Negócios'],
   sessoes:['video','Minhas Sessões 1:1'], metas:['target','Minhas Metas'],
   interno:['lock','Acompanhamento Interno'],
   conteudo:['upload','Gerenciar Conteúdo'],
@@ -1402,9 +1406,9 @@ const NAV_LABELS = {
   financeiro:['money','Financeiro'],
 };
 const BADGE = {
-  dashboard:'shared', painel:'shared', sessoes:'individual', metas:'individual', interno:'restrict', conteudo:'restrict', visaogeral:'restrict', vendas:'restrict', clientes:'restrict',
+  dashboard:'shared', painel:'shared', biblioteca:'shared', sessoes:'individual', metas:'individual', interno:'restrict', conteudo:'restrict', visaogeral:'restrict', vendas:'restrict', clientes:'restrict',
 };
-const BADGE_TEXT = { shared:'Meu Método', individual:'Minha Área', restrict:'Acesso Restrito' };
+const BADGE_TEXT = { shared:'Profissionais NCC', individual:'Minha Área', restrict:'Acesso Restrito' };
 
 /* ================= DATA: SEU MÉTODO ================= */
 // Módulos do método e checklist de progresso do Dashboard (personalize abaixo).
@@ -7471,17 +7475,18 @@ function setRole(role){
   document.getElementById('nav-financeiro').style.display = staffNav ? 'flex' : 'none';
   /* Enquanto a equipe interna estiver no modo "Equipe Interna", a barra lateral mostra só o que é dela —
      os itens que são a experiência do próprio aluno (Início, Aulas, Comunidade, Ranking, Dashboard,
-     Painel Profissional, Sessões, Metas, Prontuários) ficam escondidos. Eles voltam a aparecer só quando
-     a equipe interna troca para o modo "Aluno" (pelo botão aqui em cima, ou clicando em "Abrir" na
-     Visão Geral) — exatamente como o aluno vê a própria conta hoje. Para quem realmente é aluno,
+     Painel Profissional, Biblioteca de Negócios, Sessões, Metas, Prontuários) ficam escondidos. Eles voltam
+     a aparecer só quando a equipe interna troca para o modo "Aluno" (pelo botão aqui em cima, ou clicando em
+     "Abrir" na Visão Geral) — exatamente como o aluno vê a própria conta hoje. Para quem realmente é aluno,
      currentRole nunca sai de 'aluno', então esses itens continuam sempre visíveis para ele.
      Um aluno do curso gravado (tier 'curso' — sem mentoria individual) tem acesso a Aulas, Comunidade e
-     Dashboard, mesmo no modo "Aluno": os itens de mentoria individual (Painel Profissional, Sessões, Metas,
-     Ranking, Prontuários, e o próprio Início) ficam escondidos também aí. getViewingTier() resolve pro
-     tier de quem está sendo visto — a própria conta, ou o mentorado selecionado pela equipe interna. */
+     Dashboard, mesmo no modo "Aluno": os itens de mentoria individual (Painel Profissional, Biblioteca de
+     Negócios, Sessões, Metas, Ranking, Prontuários, e o próprio Início) ficam escondidos também aí.
+     getViewingTier() resolve pro tier de quem está sendo visto — a própria conta, ou o mentorado
+     selecionado pela equipe interna. */
   const viewingTier = getViewingTier();
   const isCursoView = role==='aluno' && viewingTier==='curso';
-  ['ranking','painel','sessoes','metas'].forEach(v=>{
+  ['ranking','painel','biblioteca','sessoes','metas'].forEach(v=>{
     const el = document.querySelector(`.nav-item[data-view="${v}"]`);
     if(el) el.style.display = (role==='aluno' && !isCursoView) ? 'flex' : 'none';
   });
@@ -7497,7 +7502,7 @@ function setRole(role){
   prontEl.innerHTML = prontSvg + '<span>Prontuários</span>' + (isCursoView
     ? `<span style="margin-left:auto;display:flex" title="Disponível apenas para mentorados da Mentoria">${icon('lock','tiny')}</span>` : '');
   prontEl.dataset.locked = isCursoView ? '1' : '';
-  /* Os rótulos "Meu Método" e "Minha Área" só fazem sentido junto dos itens que eles agrupam — some junto
+  /* Os rótulos "Profissionais NCC" e "Minha Área" só fazem sentido junto dos itens que eles agrupam — some junto
      com eles (modo Equipe Interna, ou aluno do Curso Gravado, que não tem mentoria individual). */
   document.getElementById('nav-group-metodo').style.display = role==='aluno' ? 'flex' : 'none';
   document.getElementById('nav-group-individual').style.display = role==='aluno' ? 'flex' : 'none';
@@ -7521,8 +7526,8 @@ function setRole(role){
   renderProfile();
   updateNotifBadge();
   if(role==='aluno' && ['interno','conteudo','visaogeral','vendas','clientes','financeiro'].includes(currentView)){ goTo('inicio'); }
-  if(role==='aluno' && isCursoView && ['ranking','painel','sessoes','metas'].includes(currentView)){ goTo('inicio'); }
-  if(role==='staff' && ['inicio','aulas','comunidade','ranking','dashboard','painel','sessoes','metas'].includes(currentView)){ goTo('visaogeral'); }
+  if(role==='aluno' && isCursoView && ['ranking','painel','biblioteca','sessoes','metas'].includes(currentView)){ goTo('inicio'); }
+  if(role==='staff' && ['inicio','aulas','comunidade','ranking','dashboard','painel','biblioteca','sessoes','metas'].includes(currentView)){ goTo('visaogeral'); }
 }
 
 function renderProfile(){
@@ -7589,7 +7594,7 @@ function goTo(view){
 
 function renderCurrentView(){
   const map = {inicio:renderInicio, aulas:renderAulas, comunidade:renderComunidade, ranking:renderRanking, agenda:renderAgenda,
-               materiais:renderMateriais, dashboard:renderDashboard, painel:renderPainel,
+               materiais:renderMateriais, dashboard:renderDashboard, painel:renderPainel, biblioteca:renderBiblioteca,
                sessoes:renderSessoes, metas:renderMetas, interno:renderInterno, conteudo:renderConteudo, visaogeral:renderVisaoGeral,
                vendas:renderVendas, analise:renderAnalise, clientes:renderClientes, financeiro:renderFinanceiro};
   const NEEDS_STUDENT = ['inicio','dashboard','painel','sessoes','metas','interno'];
@@ -9091,6 +9096,15 @@ function renderMateriais(){
       downloadPlaceholder(m.title.replace(/\s+/g,'_')+'.txt', m.title);
     });
   });
+}
+
+/* ================= VIEW: BIBLIOTECA DE NEGÓCIOS =================
+   Ainda sem conteúdo definido — placeholder até a Daiane definir quais documentos/modelos vão aqui. */
+function renderBiblioteca(){
+  document.getElementById('view-biblioteca').innerHTML = `
+    <p class="section-sub">Modelos, documentos e materiais de apoio para a gestão do negócio dos profissionais NCC.</p>
+    <div class="empty-state">Conteúdo desta biblioteca ainda será definido.</div>
+  `;
 }
 
 /* ================= VIEW: DASHBOARD (compartilhado aluno + equipe) ================= */

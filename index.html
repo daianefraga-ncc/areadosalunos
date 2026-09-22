@@ -9147,7 +9147,7 @@ function renderBiblioteca(){
     <p class="section-sub">Modelos de negócio complementares para os profissionais NCC, organizados por frente estratégica.</p>
     ${BUSINESS_LIBRARY.map(f=>`
       <div class="category-block">
-        <h2 class="section-title">Frente ${f.numero} — ${f.titulo}</h2>
+        <h2 class="section-title">${f.titulo}</h2>
         <p class="category-sub">${f.sub}</p>
         <div class="biz-grid">
           ${f.itens.map(it=>`

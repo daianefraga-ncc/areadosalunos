@@ -71,6 +71,11 @@
     --rank-2-bg:rgba(216,187,154,0.18);
     --rank-2-fg:#d8bb9a;
     --logo-filter:none;
+    /* "Modo leitura" do texto completo da notícia (mural de novidades): fundo mais claro e
+       texto mais forte que o resto do card, pra ficar confortável de ler um texto longo mesmo
+       no tema escuro — como uma folha de papel dentro do app. */
+    --read-bg:#453522;
+    --read-text:#fdf6ea;
     --radius:14px;
     --radius-sm:8px;
     --font-display:'Mak',var(--font-body);
@@ -132,6 +137,9 @@
     /* Logo NCC Plat é colorida (dourado/preto) e já fica legível em fundo claro ou
        escuro, então não precisa de nenhum filtro de inversão aqui. */
     --logo-filter:none;
+    /* Modo leitura no tema claro: fundo quase branco, texto marrom bem escuro/forte. */
+    --read-bg:#fdfbf7;
+    --read-text:#3a2610;
     color-scheme:light;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
@@ -374,11 +382,16 @@
   .novidade-row .novidade-dot{background:var(--shared);margin-top:4px;}
   .novidade-data{font-size:10.5px;font-weight:700;letter-spacing:.03em;color:var(--text-mute);text-transform:uppercase;margin-bottom:2px;}
   .novidade-fonte{font-size:11.5px;color:var(--text-mute);margin-top:4px;font-style:italic;}
+  /* Na listagem, a descrição fica sempre em no máximo 2 linhas (o JS já corta o texto e
+     acrescenta "(...)"; isto aqui é só uma garantia visual extra). */
+  .novidade-row .desc{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   .novidade-detail{padding-top:2px;}
   .novidade-detail .novidade-data{margin-bottom:0;}
   .novidade-detail h3{margin:2px 0 0;}
   .novidade-detail .novidade-fonte{margin-top:6px;}
-  .novidade-detail .novidade-texto{font-size:13px;color:var(--text-dim);margin-top:12px;line-height:1.55;white-space:pre-wrap;}
+  /* Texto completo da notícia (modo leitura): fundo mais claro que o resto do card, letra mais
+     forte e mais espaço entre linhas, pra ficar fácil de ler um texto longo. */
+  .novidade-detail .novidade-texto{font-size:14.5px;font-weight:500;color:var(--read-text);background:var(--read-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;margin-top:14px;line-height:1.9;white-space:pre-wrap;}
   .novidade-detail .novidade-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
   .novidade-comments{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
   .novidade-comment-row{display:flex;gap:8px;padding:6px 0;align-items:flex-start;}
@@ -7893,9 +7906,21 @@ function novidadeCommentsHtml(novidadeId){
     </div>
   `;
 }
+/* Resumo curto da notícia pra lista (2 linhas): corta no espaço mais próximo do limite pra não
+   partir palavra no meio, e acrescenta "(...)". O texto completo só aparece no detalhe. */
+function novidadeExcerpt(texto, maxLen){
+  maxLen = maxLen || 130;
+  const t = (texto||'').trim();
+  if(t.length <= maxLen) return t;
+  let cut = t.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(' ');
+  if(lastSpace > 40) cut = cut.slice(0, lastSpace);
+  return cut + ' (...)';
+}
 /* Linha da lista de novidades — mesmo visual das linhas de tópico do Painel Profissional
    (bolinha + título em negrito + descrição em cinza), com data acima do título e fonte abaixo,
-   conforme o esboço enviado. Clicar abre o detalhe (com texto completo, comentários e copiar). */
+   conforme o esboço enviado. A descrição fica resumida em 2 linhas (ver novidadeExcerpt); o
+   texto completo só aparece ao clicar e abrir o detalhe (com comentários e copiar). */
 function novidadeRowHtml(n){
   return `
     <button type="button" class="topic-row novidade-row" data-open-novidade="${n.id}">
@@ -7903,7 +7928,7 @@ function novidadeRowHtml(n){
       <div class="ti">
         ${n.createdAt? `<div class="novidade-data">${new Date(n.createdAt).toLocaleDateString('pt-BR')}</div>` : ''}
         <div class="title">${escapeHtml(n.titulo)}</div>
-        ${n.texto? `<div class="desc">${escapeHtml(n.texto)}</div>` : ''}
+        ${n.texto? `<div class="desc">${escapeHtml(novidadeExcerpt(n.texto))}</div>` : ''}
         ${n.fonte? `<div class="novidade-fonte">${escapeHtml(n.fonte)}</div>` : ''}
       </div>
     </button>

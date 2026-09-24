@@ -1053,6 +1053,7 @@
   .wf-choice-btn{padding:13px 26px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text);font-weight:700;font-size:14.5px;cursor:pointer;}
   .wf-choice-btn:hover{border-color:var(--accent);}
   .wf-choice-btn.selected{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-2);}
+  .wf-multi-btn{text-align:left;font-weight:600;flex:1 1 100%;}
   .wf-scale{display:flex;gap:7px;flex-wrap:wrap;}
   .wf-scale-btn{width:42px;height:42px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text);font-weight:700;cursor:pointer;}
   .wf-scale-btn:hover{border-color:var(--accent);}
@@ -1236,14 +1237,14 @@
     <button class="nav-item shared" data-view="dashboard"></button>
     <button class="nav-item shared" data-view="painel"></button>
     <button class="nav-item shared" data-view="biblioteca"></button>
-    <a class="nav-item shared" id="nav-prontuarios" href="#" data-config-link="prontuario" target="_blank" rel="noopener">
-      <svg class="icon" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg>
-      <span>Prontuários</span>
-    </a>
 
     <div class="nav-group-label" id="nav-group-individual">Minha Área</div>
     <button class="nav-item individual" data-view="sessoes"></button>
     <button class="nav-item individual" data-view="metas"></button>
+    <a class="nav-item individual" id="nav-prontuarios" href="#" data-config-link="prontuario" target="_blank" rel="noopener">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></svg>
+      <span>Prontuários</span>
+    </a>
 
     <div class="nav-group-label" id="staff-group-label" style="display:none"><svg class="icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Equipe Interna</div>
     <button class="nav-item restrict" id="nav-visaogeral" data-view="visaogeral" style="display:none"></button>
@@ -1339,7 +1340,7 @@ const SUPABASE_URL = 'https://hzgkzeokqrmenlfmcfme.supabase.co';            // e
 const SUPABASE_KEY = 'sb_publishable_iS06A7W069_RrhlDTvs0Uw_KAhyE1M1';     // "anon public" / "publishable" key (NUNCA a service_role)
 const CONFIG_LINK_EVENTO   = '';   // link do banner da página Início (deixe vazio para esconder o banner)
 const CONFIG_BANNER_EVENTO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNjAwIiBoZWlnaHQ9IjUwMCIgdmlld0JveD0iMCAwIDE2MDAgNTAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM4ZDkxNmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0YjRkM2IiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iMTYwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9InVybCgjZykiLz48dGV4dCB4PSI4MDAiIHk9IjIzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkhlbHZldGljYSwgQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNjQiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPkJBTk5FUiBETyBTRVUgRVZFTlRPPC90ZXh0Pjx0ZXh0IHg9IjgwMCIgeT0iMzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMCIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC44NSI+VHJvcXVlIGVzdGEgaW1hZ2VtIGVtIENPTkZJR19CQU5ORVJfRVZFTlRPICh0b3BvIGRvIGPDs2RpZ28pPC90ZXh0Pjwvc3ZnPg=='; // imagem do banner da página Início: troque por 'data:image/...' ou uma URL; deixe '' para esconder
-const CONFIG_LINK_PRONTUARIO = 'https://daianefraga-ncc.github.io/prontuario/'; // link externo do item "Prontuários" do menu (sistema de prontuário que você usa)
+const CONFIG_LINK_PRONTUARIO = '#'; // link externo do item "Prontuários" do menu (sistema de prontuário que você usa)
 if(/^COLE_AQUI/.test(SUPABASE_URL) || /^COLE_AQUI/.test(SUPABASE_KEY)){
   document.addEventListener('DOMContentLoaded', ()=>{
     document.body.innerHTML = '<div style="font-family:sans-serif;max-width:640px;margin:80px auto;padding:24px;border:1px solid #ccc;border-radius:12px;line-height:1.5"><h2>Sistema ainda não configurado</h2><p>Abra o <b>index.html</b>, procure o bloco <b>CONFIGURAÇÃO</b> e preencha <code>SUPABASE_URL</code> e <code>SUPABASE_KEY</code> com os dados do seu projeto Supabase. O passo a passo completo está no <b>README.md</b>.</p></div>';
@@ -1487,40 +1488,46 @@ const MODULE_CHECKLIST = {
 // Perguntas reais das abas "Respostas Wispform" e "Diagnóstico Abertura" da planilha
 // interna de Acompanhamento de Mentorados — usadas na tela Acompanhamento Interno.
 const WISPFORM_QUESTIONS = [
-  {cat:'1. Sobre Você e o Seu Negócio', perguntas:[
-    {text:'Qual seu nome completo?', type:'short'},
-    {text:'Há quanto tempo você tem consultório/clínica própria?', type:'short'},
-    {text:'O consultório é sua única fonte de renda hoje?', type:'yesno'},
-    {text:'Numa escala de 0 a 10, o quanto seu negócio está "redondo" hoje?', type:'scale'},
+  {cat:'Sua formação', perguntas:[
+    {text:'Qual é a sua formação ou principal área profissional?', type:'singleselect', options:[
+      'Psicologia','Pedagogia','Psicopedagogia','Fonoaudiologia','Terapia Ocupacional','Fisioterapia','Medicina','Orientação parental','Gestão escolar','Pesquisa','Outra',
+    ]},
   ]},
-  {cat:'2. Ser | Marketing e Branding', perguntas:[
-    {text:'Qual é o seu nicho e subnicho de atuação hoje?', type:'short'},
-    {text:'Você já tem uma persona definida (dores, desejos, medos e crenças mapeados)?', type:'yesno'},
-    {text:'Seus títulos de pós-graduação estão devidamente registrados no COREN?', type:'yesno'},
-    {text:'Você tem uma frase de transformação clara e ela está presente nos seus materiais?', type:'yesno'},
+  {cat:'Sua prática', perguntas:[
+    {text:'Quando surge uma situação difícil na sua prática, o que mais faz falta para você?', type:'multiselect', options:[
+      'Entender por que aquele comportamento está acontecendo',
+      'Saber o que observar antes de tomar uma decisão',
+      'Encontrar estudos científicos confiáveis rapidamente',
+      'Saber como transformar teoria em ação',
+      'Organizar melhor as informações do caso',
+      'Ter ferramentas e instrumentos adequados',
+      'Sentir mais segurança para conversar com famílias ou escolas',
+      'Ter um lugar para organizar meu raciocínio',
+    ]},
   ]},
-  {cat:'3. Conectar | Pontos de Contato', perguntas:[
-    {text:'Quais canais digitais você já tem ativos?', type:'short'},
-    {text:'Com que frequência você posta conteúdo hoje, na prática?', type:'short'},
-    {text:'Como você atrai a maior parte dos seus pacientes hoje?', type:'long'},
-    {text:'Em média, quantas conversas qualificadas você gera por mês?', type:'number'},
+  {cat:'Onde você busca respostas', perguntas:[
+    {text:'Hoje, quando você tem uma dúvida sobre uma criança, família ou situação profissional, onde costuma buscar respostas?', type:'multiselect', options:[
+      'Artigos científicos','Google','Redes sociais','Cursos e aulas','Supervisão ou colegas','Livros','IA','Muitas vezes não sei onde procurar',
+    ]},
   ]},
-  {cat:'4. Transformar | Jornada do Usuário e Vendas', perguntas:[
-    {text:'Você já trabalha com protocolo/programa terapêutico estruturado?', type:'yesno'},
-    {text:'Você oferece consulta de retorno como parte natural do seu fluxo?', type:'yesno'},
-    {text:'De quem faz a primeira consulta, aproximadamente que % fecha um protocolo?', type:'short'},
+  {cat:'Confiança na plataforma', perguntas:[
+    {text:'O que faria você se sentir mais seguro(a) utilizando uma plataforma como esta?', type:'multiselect', options:[
+      'Saber de onde vêm as informações científicas',
+      'Encontrar as referências dos estudos utilizados',
+      'Ter clareza sobre os limites das informações apresentadas',
+      'Saber que meus casos e materiais são privados',
+      'Poder revisar e decidir antes de qualquer aplicação',
+      'Ter conteúdos específicos para minha profissão',
+      'Poder acessar suporte quando tiver dúvidas',
+    ]},
   ]},
-  {cat:'5. Gerenciar | Gestão e Financeiro', perguntas:[
-    {text:'Você tem clareza dos seus custos fixos e variáveis do consultório?', type:'yesno'},
-    {text:'Qual seu faturamento médio mensal hoje com o consultório?', type:'short'},
-    {text:'Quantos pacientes ativos em acompanhamento/protocolo você tem hoje?', type:'number'},
-    {text:'Você acompanha indicadores semanais do negócio?', type:'yesno'},
+  {cat:'Seu crescimento', perguntas:[
+    {text:'Existe alguma área da sua atuação em que você gostaria de se sentir mais preparado(a) nos próximos meses?', type:'short',
+     placeholder:'Ex.: compreensão de comportamento, orientação parental, escola, neurodiversidade, avaliação, pesquisa, negócio profissional...'},
   ]},
-  {cat:'6. Objetivos e Compromissos', perguntas:[
-    {text:'Qual é hoje o seu maior gargalo?', type:'long'},
-    {text:'Se essa mentoria funcionar muito bem, como fica seu consultório em 12 meses?', type:'long'},
-    {text:'Quantas horas por semana você consegue dedicar à execução do negócio?', type:'number'},
-    {text:'Existe algo no seu contexto que eu precise saber para te ajudar de forma realista?', type:'long'},
+  {cat:'O que seria sucesso', perguntas:[
+    {text:'Daqui a alguns meses, o que faria você pensar: "o NCC realmente mudou minha atuação"?', type:'long',
+     placeholder:'Ex.: "Sentir que não preciso mais lidar sozinho(a) com tantas dúvidas e que agora tenho um lugar seguro para pensar, estudar e tomar decisões com mais confiança."'},
   ]},
 ];
 const DIAGNOSTICO_ABERTURA_QUESTIONS = [
@@ -1557,22 +1564,8 @@ const DIAGNOSTICO_ABERTURA_QUESTIONS = [
     {text:'O que você espera de mim como mentor, e o que acha que depende só de você?', type:'long'},
   ]},
 ];
-// Mapeia perguntas do Wispform para os campos já existentes em s.diagnostico/s.cadastro,
-// para que as 3 alunas de exemplo já apareçam com respostas coerentes pré-preenchidas.
-const WISPFORM_SEED_MAP = {
-  'Qual seu nome completo?': s=>s.cadastro.nomeCompleto,
-  'Há quanto tempo você tem consultório/clínica própria?': s=>s.diagnostico.tempoConsultorio,
-  'O consultório é sua única fonte de renda hoje?': s=>s.diagnostico.unicaRenda,
-  'Numa escala de 0 a 10, o quanto seu negócio está "redondo" hoje?': s=>s.diagnostico.nota,
-  'Qual é o seu nicho e subnicho de atuação hoje?': s=>`${s.diagnostico.nicho} — ${s.diagnostico.subnicho}`,
-  'Você já tem uma persona definida (dores, desejos, medos e crenças mapeados)?': s=>s.diagnostico.personaDefinida,
-  'Qual seu faturamento médio mensal hoje com o consultório?': s=>s.diagnostico.faturamentoMedio,
-  'Quantos pacientes ativos em acompanhamento/protocolo você tem hoje?': s=>String(s.diagnostico.pacientesAtivos),
-  'Você acompanha indicadores semanais do negócio?': s=>s.diagnostico.indicadoresSemanais,
-  'Qual é hoje o seu maior gargalo?': s=>s.diagnostico.maiorGargalo,
-  'Se essa mentoria funcionar muito bem, como fica seu consultório em 12 meses?': s=>s.diagnostico.objetivo12meses,
-  'Quantas horas por semana você consegue dedicar à execução do negócio?': s=>s.diagnostico.horasSemana,
-};
+// Formulário de boas-vindas "NCC" — sem pré-preenchimento automático: cada aluna responde do zero.
+const WISPFORM_SEED_MAP = {};
 
 let COURSES = []; // populado em runtime a partir do Supabase (ver bootstrapData)
 
@@ -7790,10 +7783,22 @@ function renderInicio(){
 }
 
 /* ---- Formulário "Diagnóstico Inicial" — renderizado no lugar do Início até o aluno enviar ---- */
+const WF_MULTI_SEP = ' | ';
 function wfInputHtml(q, val){
   if(q.type==='yesno'){
     return `<div class="wf-choices" id="wf-field-wrap">
       ${['Sim','Não'].map(op=>`<button type="button" class="wf-choice-btn ${val===op?'selected':''}" data-wf-choice="${op}">${op}</button>`).join('')}
+    </div>`;
+  }
+  if(q.type==='singleselect'){
+    return `<div class="wf-choices" id="wf-field-wrap">
+      ${q.options.map(op=>`<button type="button" class="wf-choice-btn ${val===op?'selected':''}" data-wf-choice="${escapeAttr(op)}">${escapeHtml(op)}</button>`).join('')}
+    </div>`;
+  }
+  if(q.type==='multiselect'){
+    const sel = (val||'').split(WF_MULTI_SEP).filter(Boolean);
+    return `<div class="wf-choices" id="wf-field-wrap">
+      ${q.options.map(op=>`<button type="button" class="wf-choice-btn wf-multi-btn ${sel.includes(op)?'selected':''}" data-wf-multi="${escapeAttr(op)}">${sel.includes(op)?'☑':'☐'} ${escapeHtml(op)}</button>`).join('')}
     </div>`;
   }
   if(q.type==='scale'){
@@ -7803,12 +7808,12 @@ function wfInputHtml(q, val){
     </div>`;
   }
   if(q.type==='number'){
-    return `<input class="ps-input" type="number" min="0" id="wf-field" value="${escapeAttr(val||'')}" placeholder="Digite um número...">`;
+    return `<input class="ps-input" type="number" min="0" id="wf-field" value="${escapeAttr(val||'')}" placeholder="${escapeAttr(q.placeholder||'Digite um número...')}">`;
   }
   if(q.type==='long'){
-    return `<textarea class="ps-input" id="wf-field" rows="4" placeholder="Escreva sua resposta...">${escapeAttr(val||'')}</textarea>`;
+    return `<textarea class="ps-input" id="wf-field" rows="4" placeholder="${escapeAttr(q.placeholder||'Escreva sua resposta...')}">${escapeAttr(val||'')}</textarea>`;
   }
-  return `<input class="ps-input" type="text" id="wf-field" value="${escapeAttr(val||'')}" placeholder="Escreva sua resposta...">`;
+  return `<input class="ps-input" type="text" id="wf-field" value="${escapeAttr(val||'')}" placeholder="${escapeAttr(q.placeholder||'Escreva sua resposta...')}">`;
 }
 function renderWispformWizard(s){
   const flat = wispformFlatQuestions();
@@ -7832,7 +7837,7 @@ function renderWispformWizard(s){
           </div>`).join('')}
         <div class="wf-nav">
           <button class="btn-outline" id="wf-review-back">${icon('back')} Voltar</button>
-          <button class="btn-primary" id="wf-submit" style="width:auto;padding:12px 28px">Confirmar e enviar</button>
+          <button class="btn-primary" id="wf-submit" style="width:auto;padding:12px 28px">Criar meu ambiente NCC</button>
         </div>
       </div>`;
     document.getElementById('wf-review-back').addEventListener('click',()=>{ wfPhase='fill'; wfStep=total-1; renderCurrentView(); });
@@ -7847,8 +7852,8 @@ function renderWispformWizard(s){
   const pct = Math.round(((wfStep)/total)*100);
   root.innerHTML = `
     <div class="wf-shell">
-      <h1 style="margin-bottom:6px">Diagnóstico Inicial</h1>
-      <p class="section-sub" style="margin-top:-4px;margin-bottom:22px">Antes de começar, preencha esse diagnóstico rápido — é assim que a equipe entende seu momento e monta seu plano dentro do Neurociência do Comportamento da Criança.</p>
+      <h1 style="margin-bottom:6px">Boas-vindas ao NCC!</h1>
+      <p class="section-sub" style="margin-top:-4px;margin-bottom:22px">Antes de começar, queremos entender um pouco sobre você para organizar sua experiência de forma mais útil, segura e próxima da sua atuação.</p>
       <div class="wf-progress"><div class="wf-progress-fill" style="width:${pct}%"></div></div>
       <div class="wf-step-label">Pergunta ${wfStep+1} de ${total} · ${escapeHtml(q.cat||'')}</div>
       <div class="wf-question">${escapeHtml(q.text)}</div>
@@ -7860,13 +7865,23 @@ function renderWispformWizard(s){
       </div>
     </div>`;
 
-  if(q.type==='yesno'){
+  if(q.type==='yesno' || q.type==='singleselect'){
     document.querySelectorAll('[data-wf-choice]').forEach(b=>{
       b.addEventListener('click',()=>{ wfDraft[wfStep]=b.dataset.wfChoice; renderCurrentView(); });
     });
   } else if(q.type==='scale'){
     document.querySelectorAll('[data-wf-scale]').forEach(b=>{
       b.addEventListener('click',()=>{ wfDraft[wfStep]=b.dataset.wfScale; renderCurrentView(); });
+    });
+  } else if(q.type==='multiselect'){
+    document.querySelectorAll('[data-wf-multi]').forEach(b=>{
+      b.addEventListener('click',()=>{
+        const op = b.dataset.wfMulti;
+        let sel = (wfDraft[wfStep]||'').split(WF_MULTI_SEP).filter(Boolean);
+        sel = sel.includes(op) ? sel.filter(x=>x!==op) : [...sel, op];
+        wfDraft[wfStep] = sel.join(WF_MULTI_SEP);
+        renderCurrentView();
+      });
     });
   }
   const captureField = ()=>{
@@ -7889,7 +7904,7 @@ function renderWispformWizard(s){
 }
 async function submitWispform(s, flat){
   const btn = document.getElementById('wf-submit');
-  btn.disabled = true; btn.textContent = 'Enviando...';
+  btn.disabled = true; btn.textContent = 'Criando...';
   const rows = wfDraft.map((answer,idx)=>({student_id:s.id, diag_type:'wispform', idx, answer: answer||''}));
   try{
     const { error: e1 } = await sb.from('internal_diag_answers').upsert(rows);
@@ -7903,7 +7918,7 @@ async function submitWispform(s, flat){
     renderCurrentView();
   }catch(e){
     console.error(e);
-    btn.disabled = false; btn.textContent = 'Confirmar e enviar';
+    btn.disabled = false; btn.textContent = 'Criar meu ambiente NCC';
     alert('Não foi possível enviar agora. Verifique sua conexão e tente novamente.');
   }
 }

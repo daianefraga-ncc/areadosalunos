@@ -350,6 +350,12 @@
   .essencia-banner{display:block;margin-top:20px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);line-height:0;transition:opacity .15s, transform .15s;}
   a.essencia-banner:hover{opacity:0.92;transform:translateY(-1px);}
   .essencia-banner img{display:block;width:100%;height:auto;}
+  .novidades-list{display:flex;flex-direction:column;gap:10px;}
+  .novidade-card{display:block;padding:14px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);transition:border-color .15s, transform .15s;}
+  a.novidade-card:hover{border-color:var(--accent);transform:translateY(-1px);}
+  .novidade-card .novidade-titulo{font-weight:600;font-size:14.5px;color:var(--text);}
+  .novidade-card .novidade-data{font-size:11px;color:var(--text-mute);margin-top:2px;}
+  .novidade-card .novidade-texto{font-size:13px;color:var(--text-dim);margin-top:6px;line-height:1.5;}
   .stat-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:20px;}
   .stat-card{
     background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);
@@ -1366,6 +1372,7 @@ if('serviceWorker' in navigator){
 /* ================= ICONS ================= */
 const ICONS = {
   home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/>',
+  newspaper:'<path d="M4 5h13a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M19 8h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8"/><path d="M7 9h7M7 12h7M7 15h4"/>',
   film:'<rect x="2" y="3" width="20" height="18" rx="2"/><path d="M8 3v18M16 3v18M2 8h6M16 8h6M2 16h6M16 16h6"/>',
   users:'<circle cx="9" cy="8" r="3"/><path d="M2.5 20c0-3.3 2.9-5.5 6.5-5.5s6.5 2.2 6.5 5.5"/><circle cx="17.5" cy="9.5" r="2.3"/><path d="M15.8 20c.1-2.3 1.3-3.9 3.2-4.6"/>',
   calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
@@ -6046,6 +6053,11 @@ function mapLiveSessionRow(row){
 
 let MATERIALS = []; // populado em runtime a partir do Supabase (ver bootstrapData)
 
+/* Mural "O que está acontecendo no mundo sobre a Infância" — notícias/conteúdos curtos que a equipe
+   publica para os alunos verem na tela de Início. Populado em runtime a partir do Supabase (ver
+   bootstrapData); gerenciado pela equipe interna em Visão Geral (ver renderNovidadesAdmin). */
+let NOVIDADES = [];
+
 /* ================= STATE ================= */
 let currentStudentId = null;
 let currentRole = 'aluno';
@@ -6487,7 +6499,7 @@ async function bootstrapData(){
   PEOPLE = {};
   profiles.forEach(p=>{ PEOPLE[p.id] = {id:p.id, name:p.name, initials:p.initials, color:p.color, avatarUrl:p.avatar_url||null, role:p.role}; });
 
-  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows}] = await Promise.all([
+  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows}] = await Promise.all([
     sb.from('module_checklist_state').select('*'),
     sb.from('panel_data').select('*'),
     sb.from('panel_overrides').select('*'),
@@ -6500,6 +6512,9 @@ async function bootstrapData(){
     sb.from('community_likes').select('post_id').eq('student_id', currentUser.id),
     // Uma linha, só pra saber se a pessoa já publicou a apresentação dela (o mural vem paginado agora).
     sb.from('community_posts').select('id').eq('author_id', currentUser.id).eq('type','apresentacao').limit(1),
+    // Mural "O que está acontecendo no mundo sobre a Infância" — equipe vê tudo (inclusive inativas),
+    // aluno recebe só as ativas (RLS cuida disso); limitado às 30 mais recentes.
+    sb.from('novidades').select('*').order('created_at',{ascending:false}).limit(30),
   ]);
 
   LIVE_SESSIONS.length = 0;
@@ -6547,6 +6562,9 @@ async function bootstrapData(){
 
   MATERIALS.length = 0;
   (materialRows||[]).forEach(m=>MATERIALS.push({id:m.id, title:m.title, type:m.type, link:m.link||'', size:m.size||''}));
+
+  NOVIDADES.length = 0;
+  (novidadesRows||[]).forEach(n=>NOVIDADES.push({id:n.id, titulo:n.titulo, texto:n.texto||'', link:n.link||'', ativo:!!n.ativo, createdAt:n.created_at}));
 
   MEUS_LIKES = new Set((meusLikes||[]).map(l=>l.post_id));
   EU_JA_APRESENTEI = !!(apresentacaoRows && apresentacaoRows.length);
@@ -6937,6 +6955,18 @@ async function syncMaterialInsert(m){
 }
 function syncMaterialDelete(id){
   syncNow(sb.from('materials').delete().eq('id', id));
+}
+/* ---- Mural "O que está acontecendo no mundo sobre a Infância" (novidades) ---- */
+async function syncNovidadeInsert(n){
+  const { data, error } = await sb.from('novidades').insert({titulo:n.titulo, texto:n.texto||null, link:n.link||null}).select().single();
+  if(error) throw error;
+  return data;
+}
+function syncNovidadeDelete(id){
+  syncNow(sb.from('novidades').delete().eq('id', id));
+}
+function syncNovidadeUpdate(id, fields){
+  syncNow(sb.from('novidades').update(fields).eq('id', id));
 }
 /* ---- Registro de Sessões 1:1 (Vendas) — só equipe interna, importado da planilha de vendas ---- */
 function mapAnaliseRow(r){
@@ -7728,6 +7758,27 @@ function essenciaBannerHtml(){
     ${bannerTag}
   `;
 }
+/* Mural "O que está acontecendo no mundo sobre a Infância" — mostra as novidades ativas mais
+   recentes (gerenciadas pela equipe em Conteúdo). Some da tela quando não há nenhuma publicada. */
+function novidadesMuralHtml(){
+  const ativas = NOVIDADES.filter(n=>n.ativo).slice(0,5);
+  if(!ativas.length) return '';
+  return `
+    <h2 class="section-title" style="margin-bottom:2px">${icon('newspaper')} O que está acontecendo no mundo sobre a Infância</h2>
+    <p class="section-sub" style="margin-top:0">Notícias e conteúdos selecionados pela equipe do Neurociência do Comportamento da Criança.</p>
+    <div class="novidades-list">
+      ${ativas.map(n=>{
+        const tag = n.link ? 'a' : 'div';
+        const attrs = n.link ? `href="${escapeAttr(n.link)}" target="_blank" rel="noopener noreferrer"` : '';
+        return `<${tag} class="novidade-card" ${attrs}>
+          <div class="novidade-titulo">${escapeHtml(n.titulo)}</div>
+          <div class="novidade-data">${n.createdAt? new Date(n.createdAt).toLocaleDateString('pt-BR') : ''}</div>
+          ${n.texto? `<div class="novidade-texto">${escapeHtml(n.texto)}</div>` : ''}
+        </${tag}>`;
+      }).join('')}
+    </div>
+  `;
+}
 /* Início do aluno do Curso Gravado (Método): sem indicadores nem metas — só a saudação, o banner do
    CONCEC e as últimas interações da comunidade do curso. */
 function renderInicioCurso(s){
@@ -7741,6 +7792,7 @@ function renderInicioCurso(s){
     </div>
 
     ${essenciaBannerHtml()}
+    ${novidadesMuralHtml()}
 
     <h2 class="section-title">${icon('users')} Últimos na comunidade</h2>
     <div>${COMMUNITY_POSTS.filter(p=>!p.courseId && p.audience===getViewingTier()).slice(0,2).map(p=>postHtml(p,true,true)).join('') || '<p class="section-sub">Nenhuma interação na comunidade ainda.</p>'}</div>
@@ -7781,6 +7833,7 @@ function renderInicio(){
     </div>
 
     ${essenciaBannerHtml()}
+    ${novidadesMuralHtml()}
 
     <h2 class="section-title">Indicadores do consultório</h2>
     <div class="kpi-row">
@@ -11912,6 +11965,35 @@ function renderConteudo(){
   document.getElementById('view-conteudo').innerHTML = `
     <div class="staff-banner">${icon('lock')} Acesso restrito — visível apenas para a equipe interna. O que for publicado aqui aparece na hora em Aulas e Materiais, para todos os alunos.</div>
 
+    <h2 class="section-title">${icon('newspaper')} Mural — O que está acontecendo no mundo sobre a Infância</h2>
+    <p class="section-sub" style="margin-top:-6px">Publique aqui notícias, artigos ou conteúdos curtos sobre infância — aparece na tela de Início de todos os alunos, na ordem do mais novo pro mais antigo. Use "Pausar" para tirar algo do ar sem apagar.</p>
+    <div class="table-wrap">
+      <table class="check-table">
+        <thead><tr><th>Título</th><th>Texto</th><th>Link</th><th>Publicado em</th><th>Situação</th><th></th></tr></thead>
+        <tbody>
+          ${NOVIDADES.map(n=>`
+            <tr>
+              <td style="min-width:160px">${escapeHtml(n.titulo)}</td>
+              <td style="min-width:220px;color:var(--text-mute)">${escapeHtml((n.texto||'').slice(0,120))}${(n.texto||'').length>120?'…':''}</td>
+              <td>${n.link? `<a class="btn-mini" href="${escapeAttr(n.link)}" target="_blank" rel="noopener">${icon('externallink','tiny')} Abrir</a>` : '—'}</td>
+              <td style="white-space:nowrap">${n.createdAt? new Date(n.createdAt).toLocaleDateString('pt-BR') : '—'}</td>
+              <td><span class="resp-pill">${n.ativo? 'No ar' : 'Pausada'}</span></td>
+              <td style="white-space:nowrap">
+                <button class="btn-mini" data-toggle-novidade="${n.id}">${n.ativo? 'Pausar' : 'Reativar'}</button>
+                <button class="btn-mini danger" data-del-novidade="${n.id}">${icon('trash')} Remover</button>
+              </td>
+            </tr>
+          `).join('') || `<tr><td colspan="6" style="color:var(--text-mute)">Nenhuma novidade publicada ainda.</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+    <div class="add-form">
+      <div class="field full"><label>Título</label><input class="ps-input" type="text" id="new-novidade-titulo" placeholder="Ex.: Nova pesquisa sobre sono e desenvolvimento infantil"></div>
+      <div class="field full"><label>Texto (opcional)</label><textarea class="ps-input" id="new-novidade-texto" placeholder="Um resumo curto do que se trata..."></textarea></div>
+      <div class="field full"><label>Link (opcional)</label><input class="ps-input" type="text" id="new-novidade-link" placeholder="https://..."></div>
+      <div class="actions"><button class="btn-accent" id="add-novidade-btn">${icon('upload')} Publicar no mural</button></div>
+    </div>
+
     <h2 class="section-title">${icon('film')} Aulas</h2>
     <p class="section-sub" style="margin-top:-6px">Arraste pelo ícone ⠿ ou use as setas para reordenar as aulas dentro de cada módulo.</p>
     ${MODULES.map(mod=>{
@@ -12020,6 +12102,36 @@ function renderConteudo(){
     </div>
   `;
   bindConteudoCourseEvents();
+  document.getElementById('add-novidade-btn').addEventListener('click', async ()=>{
+    const titulo = document.getElementById('new-novidade-titulo').value.trim();
+    const texto = document.getElementById('new-novidade-texto').value.trim();
+    const link = document.getElementById('new-novidade-link').value.trim();
+    if(!titulo) return;
+    const btn = document.getElementById('add-novidade-btn');
+    btn.disabled = true;
+    try{
+      const row = await syncNovidadeInsert({titulo, texto, link});
+      NOVIDADES.unshift({id:row.id, titulo:row.titulo, texto:row.texto||'', link:row.link||'', ativo:!!row.ativo, createdAt:row.created_at});
+      renderConteudo();
+    }catch(e){ console.error(e); btn.disabled = false; }
+  });
+  document.querySelectorAll('[data-toggle-novidade]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const n = NOVIDADES.find(x=>x.id==btn.dataset.toggleNovidade);
+      if(!n) return;
+      n.ativo = !n.ativo;
+      syncNovidadeUpdate(n.id, {ativo:n.ativo});
+      renderConteudo();
+    });
+  });
+  document.querySelectorAll('[data-del-novidade]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(!confirmDelete('Remover esta novidade do mural? Essa ação não pode ser desfeita.')) return;
+      const idx = NOVIDADES.findIndex(n=>n.id==btn.dataset.delNovidade);
+      if(idx>-1){ syncNovidadeDelete(NOVIDADES[idx].id); NOVIDADES.splice(idx,1); }
+      renderConteudo();
+    });
+  });
   document.getElementById('add-course-btn').addEventListener('click',()=>{
     const title = document.getElementById('new-course-title').value.trim();
     const modId = document.getElementById('new-course-mod').value;

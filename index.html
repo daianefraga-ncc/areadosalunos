@@ -350,8 +350,6 @@
   .essencia-banner{display:block;margin-top:20px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);line-height:0;transition:opacity .15s, transform .15s;}
   a.essencia-banner:hover{opacity:0.92;transform:translateY(-1px);}
   .essencia-banner img{display:block;width:100%;height:auto;}
-  .essencia-banner-title{font-size:15px;font-weight:600;color:var(--text);margin:10px 0 2px;}
-  .essencia-banner-sub{color:var(--text-mute);font-size:12.5px;line-height:1.5;margin:0;}
   .stat-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:20px;}
   .stat-card{
     background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);
@@ -7725,9 +7723,9 @@ function essenciaBannerHtml(){
     ? `<a class="essencia-banner" href="${CONFIG_LINK_EVENTO}" target="_blank" rel="noopener noreferrer" aria-label="Banner do evento">${img}</a>`
     : `<div class="essencia-banner" aria-label="Banner do evento">${img}</div>`;
   return `
+    <h2 class="section-title" style="margin-bottom:2px">Eventos que indicamos</h2>
+    <p class="section-sub" style="margin-top:0">Selecionamos experiências que podem ampliar seu repertório, fortalecer sua atuação e aproximar você de discussões relevantes para a infância.</p>
     ${bannerTag}
-    <div class="essencia-banner-title">Eventos que indicamos</div>
-    <p class="essencia-banner-sub">Selecionamos experiências que podem ampliar seu repertório, fortalecer sua atuação e aproximar você de discussões relevantes para a infância.</p>
   `;
 }
 /* Início do aluno do Curso Gravado (Método): sem indicadores nem metas — só a saudação, o banner do

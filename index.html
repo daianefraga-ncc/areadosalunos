@@ -617,6 +617,14 @@
   }
   .aniv-banner .icon{color:var(--accent-2);flex-shrink:0;}
   .aniv-banner strong{color:var(--accent-2);}
+  /* Recado único do Início (comunicado_aluno) — logo abaixo da saudação, antes dos cartões de progresso. */
+  .comunicado-banner{
+    display:flex;align-items:flex-start;gap:12px;
+    background:var(--bg-card);border:1px solid var(--shared);border-left:4px solid var(--shared);border-radius:var(--radius);
+    padding:14px 16px;margin:16px 0;font-size:13.5px;color:var(--text);line-height:1.55;
+  }
+  .comunicado-banner .icon{color:var(--shared);flex-shrink:0;margin-top:1px;}
+  .comunicado-banner a{color:var(--shared);}
   /* Status do "Exportar backup" (Visão Geral) */
   .backup-status{margin-top:10px;font-size:12.5px;color:var(--text-dim);line-height:1.6;}
   .backup-status.ok{color:var(--success);}
@@ -1787,6 +1795,10 @@ function courseInStudentScope(c, student){
 function modulosDoCurso(cursoId){ return CURSO_MODULOS.filter(m=>m.cursoId===cursoId).sort((a,b)=>a.ordem-b.ordem); }
 function getCursoModulo(id){ return CURSO_MODULOS.find(m=>m.id===id); }
 let CURSO_MODULOS = []; // populado em runtime a partir do Supabase (ver bootstrapData) — módulos da Formação/Pós
+/* Recado único do Início ("Foi atualizada a aula 1", "Boa semana!", "Feliz Natal"...) — a equipe edita o
+   texto e liga/desliga quando quiser; enquanto ativo, aparece em destaque logo abaixo da saudação, pra
+   todo aluno (qualquer tier). Ver comunicadoBannerHtml() mais abaixo. */
+let COMUNICADO_ALUNO = {texto:'', ativo:false, updatedAt:null};
 
 // Cada tópico tem "sections" que descrevem os campos reais da planilha Painel Profissional
 // (a mesma estrutura que você usa hoje: Dados Sociodemográficos, Dores, Desejos etc. para Persona,
@@ -6727,13 +6739,15 @@ async function bootstrapData(){
   PEOPLE = {};
   profiles.forEach(p=>{ PEOPLE[p.id] = {id:p.id, name:p.name, initials:p.initials, color:p.color, avatarUrl:p.avatar_url||null, role:p.role}; });
 
-  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:cursoModuloRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows},{data:novidadeCommentRows},{data:estudoRows},{data:estudoMensagemRows}] = await Promise.all([
+  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:cursoModuloRows},{data:comunicadoRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows},{data:novidadeCommentRows},{data:estudoRows},{data:estudoMensagemRows}] = await Promise.all([
     sb.from('module_checklist_state').select('*'),
     sb.from('panel_data').select('*'),
     sb.from('panel_overrides').select('*'),
     sb.from('internal_diag_answers').select('*'),
     sb.from('courses').select('*, course_materials(*)').order('mod_id').order('order_index'),
     sb.from('curso_modulos').select('*').order('curso_id').order('ordem'),
+    // Recado único do Início ("comunicado aos alunos") — sempre 1 linha só (id fixo = 1).
+    sb.from('comunicado_aluno').select('*').eq('id',1).limit(1),
     sb.from('materials').select('*').order('id'),
     sb.from('live_sessions').select('*').order('event_date',{ascending:true}),
     sb.from('live_session_watched').select('live_session_id').eq('student_id', currentUser.id),
@@ -6799,6 +6813,11 @@ async function bootstrapData(){
   (cursoModuloRows||[]).forEach(m=>{
     CURSO_MODULOS.push({id:m.id, cursoId:m.curso_id, nome:m.nome, subtitulo:m.subtitulo||'', ordem:m.ordem||0, capaUrl:m.capa_url||null});
   });
+
+  const comunicadoRow = (comunicadoRows||[])[0];
+  COMUNICADO_ALUNO.texto = comunicadoRow ? (comunicadoRow.texto||'') : '';
+  COMUNICADO_ALUNO.ativo = !!(comunicadoRow && comunicadoRow.ativo);
+  COMUNICADO_ALUNO.updatedAt = comunicadoRow ? comunicadoRow.updated_at : null;
 
   MATERIALS.length = 0;
   (materialRows||[]).forEach(m=>MATERIALS.push({id:m.id, title:m.title, type:m.type, link:m.link||'', size:m.size||''}));
@@ -7241,6 +7260,12 @@ async function uploadCursoCapaFile(file, moduloId){
 /* ---- Programas extras do aluno (matrícula em Formação e/ou Pós-Graduação além do tier principal) ---- */
 function syncStudentExtraProgramsUpdate(id, extraPrograms){
   syncNow(sb.from('profiles').update({extra_programs: extraPrograms}).eq('id', id));
+}
+/* ---- Comunicado único do Início ---- */
+async function syncComunicadoUpdate(texto, ativo){
+  const { data, error } = await sb.from('comunicado_aluno').update({texto, ativo, updated_at:new Date().toISOString(), updated_by:currentUser.id}).eq('id',1).select().single();
+  if(error) throw error;
+  return data;
 }
 async function syncMaterialInsert(m){
   const { data, error } = await sb.from('materials').insert({title:m.title, type:m.type, link:m.link}).select().single();
@@ -8102,6 +8127,12 @@ function downloadPlaceholder(filename, label){
 /* ================= VIEW: INÍCIO ================= */
 /* Banners de eventos na tela de Início — carrossel horizontal (arrasta/rola pro lado) quando há mais
    de um banner em CONFIG_BANNERS_EVENTOS; com um banner só, fica exatamente como antes. */
+/* Recado único configurado pela equipe (COMUNICADO_ALUNO) — some sozinho quando "ativo" está desligado
+   ou o texto está vazio. Usado logo abaixo da saudação no Início, pra mentorado, curso, formação e pgncc. */
+function comunicadoBannerHtml(){
+  if(!COMUNICADO_ALUNO.ativo || !(COMUNICADO_ALUNO.texto||'').trim()) return '';
+  return `<div class="comunicado-banner">${icon('bell')}<div>${linkify(COMUNICADO_ALUNO.texto)}</div></div>`;
+}
 function essenciaBannerHtml(){
   const banners = (CONFIG_BANNERS_EVENTOS||[]).filter(b=>b && b.img);
   if(!banners.length) return '';
@@ -8647,6 +8678,7 @@ function renderInicioCurso(s){
       </div>
       ${initialsAvatar(s.initials,s.color,56,s.avatarUrl)}
     </div>
+    ${comunicadoBannerHtml()}
 
     ${essenciaBannerHtml()}
     ${acessoRapidoHtml()}
@@ -8685,6 +8717,7 @@ function renderInicio(){
       </div>
       ${initialsAvatar(s.initials,s.color,56,s.avatarUrl)}
     </div>
+    ${comunicadoBannerHtml()}
     <div class="stat-row">
       <div class="stat-card clickable" data-goto="dashboard"><div class="label">Progresso geral</div><div class="value shared">${overall}%</div></div>
       <div class="stat-card clickable" data-goto="metas"><div class="label">Próxima meta</div><div class="value" style="font-size:14px">${nextTask? nextTask.tarefa : 'Tudo em dia'}</div></div>
@@ -13297,6 +13330,19 @@ function renderConteudo(){
   document.getElementById('view-conteudo').innerHTML = `
     <div class="staff-banner">${icon('lock')} Acesso restrito — visível apenas para a equipe interna. O que for publicado aqui aparece na hora em Aulas e Materiais, para todos os alunos.</div>
 
+    <h2 class="section-title">${icon('bell')} Comunicado no Início</h2>
+    <p class="section-sub" style="margin-top:-6px">Um recado só, em destaque, logo abaixo da saudação na tela de Início de todo aluno — atualize quando quiser (ex.: "Atualizamos a aula 1 do módulo 1", "Boa semana a todos!", "Feliz Natal 🎄"). Desligue a chave pra tirar do ar sem perder o texto.</p>
+    <div class="ps-section">
+      <textarea class="ps-input" id="comunicado-texto" placeholder="Escreva aqui o recado para os alunos...">${escapeHtml(COMUNICADO_ALUNO.texto||'')}</textarea>
+      <label style="display:flex;align-items:center;gap:6px;margin-top:10px">
+        <input type="checkbox" id="comunicado-ativo" ${COMUNICADO_ALUNO.ativo?'checked':''}> Mostrar este recado para os alunos agora
+      </label>
+      <div class="actions" style="margin-top:12px">
+        <button class="btn-accent" id="comunicado-save-btn">${icon('upload')} Salvar comunicado</button>
+        ${COMUNICADO_ALUNO.updatedAt? `<span style="font-size:12px;color:var(--text-mute);margin-left:10px">Atualizado em ${new Date(COMUNICADO_ALUNO.updatedAt).toLocaleDateString('pt-BR')} às ${new Date(COMUNICADO_ALUNO.updatedAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</span>` : ''}
+      </div>
+    </div>
+
     <h2 class="section-title">${icon('newspaper')} Mural — O que está acontecendo no mundo sobre a Infância</h2>
     <p class="section-sub" style="margin-top:-6px">Publique aqui notícias, artigos ou conteúdos curtos sobre infância — aparece na tela de Início de todos os alunos, na ordem do mais novo pro mais antigo. Use "Pausar" para tirar algo do ar sem apagar.</p>
     <div class="table-wrap">
@@ -13442,6 +13488,19 @@ function renderConteudo(){
   bindConteudoCourseEvents();
   bindCursoModuloAdmin();
   bindCursoAulaAdmin();
+  document.getElementById('comunicado-save-btn').addEventListener('click', async ()=>{
+    const texto = document.getElementById('comunicado-texto').value.trim();
+    const ativo = document.getElementById('comunicado-ativo').checked;
+    const btn = document.getElementById('comunicado-save-btn');
+    btn.disabled = true;
+    try{
+      const row = await syncComunicadoUpdate(texto, ativo);
+      COMUNICADO_ALUNO.texto = row.texto||'';
+      COMUNICADO_ALUNO.ativo = !!row.ativo;
+      COMUNICADO_ALUNO.updatedAt = row.updated_at;
+      renderConteudo();
+    }catch(e){ console.error(e); alert('Não foi possível salvar o comunicado. Tente de novo.'); btn.disabled = false; }
+  });
   document.getElementById('add-novidade-btn').addEventListener('click', async ()=>{
     const titulo = document.getElementById('new-novidade-titulo').value.trim();
     const texto = document.getElementById('new-novidade-texto').value.trim();

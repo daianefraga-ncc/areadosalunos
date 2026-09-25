@@ -405,6 +405,27 @@
   .novidade-comment-form{display:flex;gap:8px;margin-top:10px;}
   .novidade-comment-form input{flex:1;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:8px 10px;font-size:13px;font-family:inherit;}
   .novidade-comment-form input:focus{outline:none;border-color:var(--shared);}
+  /* ---- Biblioteca Científica (estudos) ---- */
+  .estudos-list{margin-top:4px;}
+  .topic-row.estudo-row{cursor:pointer;}
+  .estudo-row .topic-status{background:var(--shared);}
+  .estudo-row [data-del-estudo]{margin-left:6px;flex-shrink:0;}
+  .estudo-chat{max-width:680px;}
+  .estudo-chat-header h3{font-size:16px;margin-bottom:2px;}
+  .estudo-chat-header .sub{font-size:12.5px;color:var(--text-mute);}
+  .estudo-msgs{display:flex;flex-direction:column;gap:12px;margin:18px 0;max-height:52vh;overflow-y:auto;padding-right:4px;}
+  .estudo-msg{max-width:88%;border-radius:var(--radius-sm);padding:10px 14px;font-size:13.5px;line-height:1.6;}
+  .estudo-msg.aluno{align-self:flex-end;background:var(--bg-elev);border:1px solid var(--border);}
+  /* Resposta da IA reaproveita as mesmas cores do "modo leitura" das novidades, pra manter a
+     identidade visual de "conteúdo gerado pela IA" consistente entre as duas áreas. */
+  .estudo-msg.ia{align-self:flex-start;background:var(--read-bg);color:var(--read-text);border:1px solid var(--border);}
+  .estudo-msg-autor{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;opacity:.65;margin-bottom:4px;}
+  .estudo-msg-texto{white-space:pre-wrap;}
+  .estudo-empty{color:var(--text-mute);font-size:13px;padding:10px 2px 18px;}
+  .estudo-ask-row{display:flex;gap:10px;align-items:flex-end;}
+  .estudo-ask-row textarea.ps-input{flex:1;min-height:44px;resize:vertical;}
+  .estudo-ask-row .btn-accent{flex-shrink:0;white-space:nowrap;}
+  @media (max-width:560px){ .estudo-ask-row{flex-direction:column;align-items:stretch;} }
   .stat-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:20px;}
   .stat-card{
     background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);
@@ -1303,6 +1324,7 @@
     <button class="nav-item shared" data-view="biblioteca"></button>
 
     <div class="nav-group-label" id="nav-group-individual">Minha Área</div>
+    <button class="nav-item individual" data-view="estudos"></button>
     <button class="nav-item individual" data-view="sessoes"></button>
     <button class="nav-item individual" data-view="metas"></button>
     <a class="nav-item individual" id="nav-prontuarios" href="#" data-config-link="prontuario" target="_blank" rel="noopener">
@@ -1375,6 +1397,7 @@
       <div class="view" id="view-dashboard"></div>
       <div class="view" id="view-painel"></div>
       <div class="view" id="view-biblioteca"></div>
+      <div class="view" id="view-estudos"></div>
       <div class="view" id="view-sessoes"></div>
       <div class="view" id="view-metas"></div>
       <div class="view" id="view-interno"></div>
@@ -1394,6 +1417,16 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- pdf.js: extrai o texto do PDF do artigo direto no navegador do aluno, antes de mandar pra IA (Biblioteca
+     Científica). É um pacote ES module (não tem build clássico "window.pdfjsLib" pronto mais), então carregamos
+     via um bloco de script do tipo module abaixo e penduramos o resultado em window.pdfjsLib pra o resto do
+     app (script clássico) conseguir usar — só é chamado dentro de um clique do aluno, então dá tempo de sobra
+     do módulo carregar antes. -->
+<script type="module">
+  import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.mjs';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs';
+  window.pdfjsLib = pdfjsLib;
+</script>
 <script>
 /* ================= SUPABASE ================= */
 /* >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -1487,6 +1520,7 @@ const NAV_LABELS = {
   agenda:['calendar','Agenda ao Vivo'], materiais:['folder','Materiais'],
   dashboard:['chart','Dashboard'], painel:['compass','Painel Profissional'],
   biblioteca:['biblioteca','Biblioteca de Negócios'],
+  estudos:['book','Biblioteca Científica'],
   sessoes:['video','Minhas Sessões 1:1'], metas:['target','Minhas Metas'],
   interno:['lock','Acompanhamento Interno'],
   conteudo:['upload','Gerenciar Conteúdo'],
@@ -1497,7 +1531,7 @@ const NAV_LABELS = {
   financeiro:['money','Financeiro'],
 };
 const BADGE = {
-  dashboard:'shared', painel:'shared', biblioteca:'shared', sessoes:'individual', metas:'individual', interno:'restrict', conteudo:'restrict', visaogeral:'restrict', vendas:'restrict', clientes:'restrict',
+  dashboard:'shared', painel:'shared', biblioteca:'shared', estudos:'individual', sessoes:'individual', metas:'individual', interno:'restrict', conteudo:'restrict', visaogeral:'restrict', vendas:'restrict', clientes:'restrict',
 };
 const BADGE_TEXT = { shared:'Profissionais NCC', individual:'Minha Área', restrict:'Acesso Restrito' };
 
@@ -6120,11 +6154,25 @@ let NOVIDADES = [];
 /* Comentários de cada novidade, agrupados por novidade_id: { [novidadeId]: [{id, authorId, text, createdAt}] } */
 let NOVIDADE_COMMENTS = {};
 
+/* Biblioteca Científica — artigos que o próprio aluno sobe (o texto do PDF já vem extraído no
+   navegador, via pdf.js) pra estudar, com um chat de perguntas e respostas em português sobre
+   cada artigo (a resposta vem da IA, ver Edge Function "perguntar-estudo"). Cada estudo pertence
+   a um aluno (aluno_id); populado em runtime a partir do Supabase (ver bootstrapData) e filtrado
+   por currentStudentId na hora de renderizar — mesmo padrão usado pros outros dados por aluno. */
+let ESTUDOS = [];
+/* Mensagens de cada estudo (pergunta do aluno / resposta da ia), agrupadas por estudo_id:
+   { [estudoId]: [{id, autor:'aluno'|'ia', texto, createdAt}] } */
+let ESTUDO_MENSAGENS = {};
+
 /* ================= STATE ================= */
 let currentStudentId = null;
 let currentRole = 'aluno';
 let currentView = 'inicio';
 let panelQuadrantId = null;
+/* Qual estudo (Biblioteca Científica) está aberto no modo chat agora; null = mostra a lista de estudos. */
+let estudoChatAbertoId = null;
+/* Arquivo PDF escolhido no formulário de "novo estudo", antes de confirmar o envio. */
+let novoEstudoFile = null;
 let communityFilter = 'todas';
 /* Qual comunidade a equipe interna está olhando agora (Mentorados ou Curso) — só existe pra equipe
    interna, já que um aluno (mentorado ou do curso) só tem acesso à própria comunidade mesmo, sem escolha.
@@ -6561,7 +6609,7 @@ async function bootstrapData(){
   PEOPLE = {};
   profiles.forEach(p=>{ PEOPLE[p.id] = {id:p.id, name:p.name, initials:p.initials, color:p.color, avatarUrl:p.avatar_url||null, role:p.role}; });
 
-  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows},{data:novidadeCommentRows}] = await Promise.all([
+  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows},{data:novidadeCommentRows},{data:estudoRows},{data:estudoMensagemRows}] = await Promise.all([
     sb.from('module_checklist_state').select('*'),
     sb.from('panel_data').select('*'),
     sb.from('panel_overrides').select('*'),
@@ -6579,6 +6627,9 @@ async function bootstrapData(){
     sb.from('novidades').select('*').order('created_at',{ascending:false}).limit(30),
     // Comentários dessas novidades — volume pequeno, carrega tudo de uma vez.
     sb.from('novidade_comments').select('*').order('created_at',{ascending:true}),
+    // Biblioteca Científica: RLS já garante que o aluno só vê os próprios estudos (e a equipe vê de todos).
+    sb.from('estudos').select('id, aluno_id, titulo, nome_arquivo, created_at').order('created_at',{ascending:false}),
+    sb.from('estudo_mensagens').select('*').order('created_at',{ascending:true}),
   ]);
 
   LIVE_SESSIONS.length = 0;
@@ -6634,6 +6685,15 @@ async function bootstrapData(){
   (novidadeCommentRows||[]).forEach(c=>{
     if(!NOVIDADE_COMMENTS[c.novidade_id]) NOVIDADE_COMMENTS[c.novidade_id] = [];
     NOVIDADE_COMMENTS[c.novidade_id].push({id:c.id, authorId:c.author_id, text:c.text, createdAt:c.created_at});
+  });
+
+  ESTUDOS.length = 0;
+  (estudoRows||[]).forEach(e=>ESTUDOS.push({id:e.id, alunoId:e.aluno_id, titulo:e.titulo, nomeArquivo:e.nome_arquivo||'', createdAt:e.created_at}));
+
+  ESTUDO_MENSAGENS = {};
+  (estudoMensagemRows||[]).forEach(m=>{
+    if(!ESTUDO_MENSAGENS[m.estudo_id]) ESTUDO_MENSAGENS[m.estudo_id] = [];
+    ESTUDO_MENSAGENS[m.estudo_id].push({id:m.id, autor:m.autor, texto:m.texto, createdAt:m.created_at});
   });
 
   MEUS_LIKES = new Set((meusLikes||[]).map(l=>l.post_id));
@@ -7045,6 +7105,35 @@ async function syncNovidadeCommentInsert(novidadeId, text){
 }
 function syncNovidadeCommentDelete(id){
   syncNow(sb.from('novidade_comments').delete().eq('id', id));
+}
+/* ---- Biblioteca Científica (estudos) ---- */
+async function syncEstudoInsert(titulo, nomeArquivo, textoExtraido){
+  const { data, error } = await sb.from('estudos')
+    .insert({ aluno_id: currentUser.id, titulo, nome_arquivo: nomeArquivo || null, texto_extraido: textoExtraido })
+    .select('id, aluno_id, titulo, nome_arquivo, created_at').single();
+  if(error) throw error;
+  return data;
+}
+function syncEstudoDelete(id){
+  syncNow(sb.from('estudos').delete().eq('id', id));
+}
+async function syncEstudoMensagemInsert(estudoId, autor, texto){
+  const { data, error } = await sb.from('estudo_mensagens').insert({ estudo_id: estudoId, autor, texto }).select().single();
+  if(error) throw error;
+  return data;
+}
+/* Chama a Edge Function que pergunta pra IA (conta OpenAI da própria Daiane) com base só no texto
+   do artigo — a função não grava nada, quem grava a pergunta e a resposta é o código abaixo, no
+   mesmo padrão usado no resto da plataforma (ver perguntarEstudo()). */
+async function chamarIaEstudo(estudoId, pergunta){
+  const { data, error } = await sb.functions.invoke('perguntar-estudo', { body: { estudoId, pergunta } });
+  if(error){
+    let msg = 'Não foi possível consultar a IA agora. Tente de novo em instantes.';
+    try{ const body = await error.context.json(); if(body?.error) msg = body.error; }catch(e){}
+    throw new Error(msg);
+  }
+  if(data?.error) throw new Error(data.error);
+  return data.resposta;
 }
 /* ---- Registro de Sessões 1:1 (Vendas) — só equipe interna, importado da planilha de vendas ---- */
 function mapAnaliseRow(r){
@@ -7622,8 +7711,9 @@ function setRole(role){
     const el = document.querySelector(`.nav-item[data-view="${v}"]`);
     if(el) el.style.display = (role==='aluno' && !isCursoView) ? 'flex' : 'none';
   });
-  /* Dashboard (progresso no Método, item a item) é liberado também pro aluno do Curso Gravado. */
-  ['inicio','aulas','comunidade','dashboard'].forEach(v=>{
+  /* Dashboard (progresso no Método, item a item) e a Biblioteca Científica (estudar artigos) são
+     liberados também pro aluno do Curso Gravado — não são exclusivos da mentoria individual. */
+  ['inicio','aulas','comunidade','dashboard','estudos'].forEach(v=>{
     const el = document.querySelector(`.nav-item[data-view="${v}"]`);
     if(el) el.style.display = role==='aluno' ? 'flex' : 'none';
   });
@@ -7659,7 +7749,7 @@ function setRole(role){
   updateNotifBadge();
   if(role==='aluno' && ['interno','conteudo','visaogeral','vendas','clientes','financeiro'].includes(currentView)){ goTo('inicio'); }
   if(role==='aluno' && isCursoView && ['ranking','painel','biblioteca','sessoes','metas'].includes(currentView)){ goTo('inicio'); }
-  if(role==='staff' && ['inicio','aulas','comunidade','ranking','dashboard','painel','biblioteca','sessoes','metas'].includes(currentView)){ goTo('visaogeral'); }
+  if(role==='staff' && ['inicio','aulas','comunidade','ranking','dashboard','painel','biblioteca','estudos','sessoes','metas'].includes(currentView)){ goTo('visaogeral'); }
 }
 
 function renderProfile(){
@@ -7727,9 +7817,10 @@ function goTo(view){
 function renderCurrentView(){
   const map = {inicio:renderInicio, aulas:renderAulas, comunidade:renderComunidade, ranking:renderRanking, agenda:renderAgenda,
                materiais:renderMateriais, dashboard:renderDashboard, painel:renderPainel, biblioteca:renderBiblioteca,
+               estudos:renderEstudos,
                sessoes:renderSessoes, metas:renderMetas, interno:renderInterno, conteudo:renderConteudo, visaogeral:renderVisaoGeral,
                vendas:renderVendas, analise:renderAnalise, clientes:renderClientes, financeiro:renderFinanceiro};
-  const NEEDS_STUDENT = ['inicio','dashboard','painel','sessoes','metas','interno'];
+  const NEEDS_STUDENT = ['inicio','dashboard','painel','sessoes','metas','interno','estudos'];
   if(NEEDS_STUDENT.includes(currentView) && !getStudent(currentStudentId)){
     document.getElementById('view-'+currentView).innerHTML = '<div class="empty-state">Nenhum mentorado cadastrado ainda. Assim que um aluno criar a conta, os dados aparecerão aqui.</div>';
     return;
@@ -7753,6 +7844,7 @@ const BACKUP_TABLES = [
   'courses','course_materials','course_progress','materials',
   'community_posts','community_comments','community_likes',
   'novidades','novidade_comments',
+  'estudos','estudo_mensagens',
   'live_sessions','live_session_watched',
   'venda_sessoes','contatos','registro_clientes',
   'fin_categorias','fin_contas','fin_formas','fin_lancamentos',
@@ -8109,6 +8201,193 @@ function openNovidadesMural(detailId){
     });
   });
 }
+
+/* ================= VIEW: BIBLIOTECA CIENTÍFICA (estudos do próprio aluno) =================
+   O aluno sobe um artigo em PDF (geralmente em inglês), a gente extrai o texto direto no navegador
+   (pdf.js — o PDF em si nunca é enviado nem guardado em lugar nenhum, só o texto) e ele conversa em
+   português sobre o conteúdo com a IA, que responde só com base no que está escrito no artigo (ver
+   Edge Function "perguntar-estudo"). Feature só do aluno — não aparece pra equipe interna. */
+
+/* Extrai o texto de todas as páginas de um PDF, concatenado, direto no navegador via pdf.js. */
+async function extrairTextoPdf(file){
+  if(!window.pdfjsLib) throw new Error('O leitor de PDF ainda não carregou. Recarregue a página e tente de novo.');
+  const buf = await file.arrayBuffer();
+  const pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
+  let texto = '';
+  for(let i=1; i<=pdf.numPages; i++){
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    texto += content.items.map(it=>it.str).join(' ') + '\n\n';
+  }
+  texto = texto.replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim();
+  if(!texto) throw new Error('Não conseguimos ler texto neste PDF (pode ser uma imagem escaneada, sem texto selecionável). Tente outro arquivo.');
+  return texto;
+}
+
+function renderEstudos(){
+  if(estudoChatAbertoId){
+    const e = ESTUDOS.find(x=>x.id==estudoChatAbertoId);
+    if(e){ renderEstudoChatView(e); return; }
+    estudoChatAbertoId = null;
+  }
+  renderEstudoListView();
+}
+
+function renderEstudoListView(){
+  const meus = ESTUDOS.filter(e=>e.alunoId===currentUser.id).slice().sort((a,b)=> a.createdAt<b.createdAt?1:-1);
+  document.getElementById('view-estudos').innerHTML = `
+    <p class="section-sub">Suba um artigo científico em PDF (pode estar em inglês ou em qualquer idioma) e converse em português sobre o conteúdo — a IA responde só com base no que está escrito no artigo.</p>
+    <div class="add-form">
+      <div class="field full"><label>Título do artigo</label><input class="ps-input" type="text" id="novo-estudo-titulo" placeholder="Ex.: Sleep and emotional regulation in early childhood" maxlength="200"></div>
+      <div class="field full">
+        <label>Arquivo PDF</label>
+        <input type="file" accept="application/pdf" id="novo-estudo-file" style="display:none">
+        <button class="btn-outline" type="button" id="novo-estudo-file-btn">${icon('upload')} Selecionar PDF</button>
+        <span id="novo-estudo-file-name" style="font-size:12px;color:var(--text-dim);margin-left:8px">${novoEstudoFile? escapeHtml(novoEstudoFile.name) : 'Nenhum arquivo selecionado'}</span>
+      </div>
+      <p class="field-error" id="novo-estudo-error" style="display:none"></p>
+      <div class="actions"><button class="btn-accent" id="add-estudo-btn">${icon('plus')} Adicionar artigo</button></div>
+    </div>
+    <div class="estudos-list">
+      ${meus.map(e=>`
+        <div class="topic-row estudo-row" data-open-estudo="${e.id}">
+          <span class="topic-status filled"></span>
+          <div class="ti">
+            <div class="title">${escapeHtml(e.titulo)}</div>
+            <div class="desc">${escapeHtml(e.nomeArquivo||'Artigo em PDF')} · adicionado em ${formatDateObjBR(new Date(e.createdAt))}</div>
+          </div>
+          <button type="button" class="btn-mini danger" data-del-estudo="${e.id}" title="Excluir artigo">${icon('trash')}</button>
+        </div>
+      `).join('') || `<div class="empty-state">Nenhum artigo adicionado ainda. Suba um PDF acima para começar a estudar.</div>`}
+    </div>
+  `;
+  bindRenderEstudosList();
+}
+
+function bindRenderEstudosList(){
+  const fileBtn = document.getElementById('novo-estudo-file-btn');
+  const fileInput = document.getElementById('novo-estudo-file');
+  if(fileBtn && fileInput){
+    fileBtn.addEventListener('click', ()=> fileInput.click());
+    fileInput.addEventListener('change', ()=>{
+      novoEstudoFile = fileInput.files[0] || null;
+      document.getElementById('novo-estudo-file-name').textContent = novoEstudoFile? novoEstudoFile.name : 'Nenhum arquivo selecionado';
+    });
+  }
+  const addBtn = document.getElementById('add-estudo-btn');
+  if(addBtn) addBtn.addEventListener('click', onAddEstudoClick);
+  document.querySelectorAll('#view-estudos [data-open-estudo]').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      estudoChatAbertoId = row.dataset.openEstudo;
+      renderEstudos();
+    });
+  });
+  document.querySelectorAll('#view-estudos [data-del-estudo]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      if(!confirmDelete('Excluir este artigo e toda a conversa sobre ele?')) return;
+      const id = btn.dataset.delEstudo;
+      const idx = ESTUDOS.findIndex(x=>x.id==id);
+      if(idx>-1) ESTUDOS.splice(idx,1);
+      delete ESTUDO_MENSAGENS[id];
+      syncEstudoDelete(id);
+      renderEstudoListView();
+    });
+  });
+}
+
+async function onAddEstudoClick(){
+  const titulo = (document.getElementById('novo-estudo-titulo').value||'').trim();
+  const errorEl = document.getElementById('novo-estudo-error');
+  errorEl.style.display = 'none';
+  if(!titulo){ errorEl.textContent = 'Escreva um título para o artigo.'; errorEl.style.display='block'; return; }
+  if(!novoEstudoFile){ errorEl.textContent = 'Selecione o arquivo PDF do artigo.'; errorEl.style.display='block'; return; }
+  const btn = document.getElementById('add-estudo-btn');
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = 'Lendo o PDF...';
+  try{
+    const textoExtraido = await extrairTextoPdf(novoEstudoFile);
+    btn.innerHTML = 'Salvando...';
+    const nomeArquivo = novoEstudoFile.name;
+    const row = await syncEstudoInsert(titulo, nomeArquivo, textoExtraido);
+    ESTUDOS.push({ id:row.id, alunoId:row.aluno_id, titulo:row.titulo, nomeArquivo:row.nome_arquivo||'', createdAt:row.created_at });
+    novoEstudoFile = null;
+    renderEstudoListView();
+  }catch(e){
+    console.error('adicionar estudo', e);
+    errorEl.textContent = e.message || 'Não foi possível adicionar o artigo. Tente de novo.';
+    errorEl.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+}
+
+function renderEstudoChatView(e){
+  const msgs = ESTUDO_MENSAGENS[e.id] || [];
+  document.getElementById('view-estudos').innerHTML = `
+    <div class="back-row"><button type="button" class="back-btn" id="estudo-back">${icon('back')} Voltar aos artigos</button></div>
+    <div class="estudo-chat">
+      <div class="estudo-chat-header">
+        <h3>${escapeHtml(e.titulo)}</h3>
+        <div class="sub">${escapeHtml(e.nomeArquivo||'Artigo em PDF')} — faça perguntas em português sobre o conteúdo do artigo.</div>
+      </div>
+      <div class="estudo-msgs" id="estudo-msgs">
+        ${msgs.length? msgs.map(m=>`
+          <div class="estudo-msg ${m.autor==='ia'?'ia':'aluno'}">
+            <div class="estudo-msg-autor">${m.autor==='ia'?'IA':'Você'}</div>
+            <div class="estudo-msg-texto">${linkify(m.texto)}</div>
+          </div>
+        `).join('') : `<div class="estudo-empty">Ainda não há perguntas sobre este artigo. Pergunte algo abaixo — por exemplo, "qual foi o principal achado do estudo?" ou "que método os autores usaram?".</div>`}
+      </div>
+      <div class="estudo-ask-row">
+        <textarea class="ps-input" id="estudo-pergunta-input" rows="2" placeholder="Escreva sua pergunta em português..."></textarea>
+        <button class="btn-accent" id="estudo-send-btn" type="button">${icon('next','tiny')} Perguntar</button>
+      </div>
+      <p class="field-error" id="estudo-pergunta-error" style="display:none"></p>
+    </div>
+  `;
+  document.getElementById('estudo-back').addEventListener('click', ()=>{ estudoChatAbertoId = null; renderEstudos(); });
+  const msgsEl = document.getElementById('estudo-msgs');
+  if(msgsEl) msgsEl.scrollTop = msgsEl.scrollHeight;
+  document.getElementById('estudo-send-btn').addEventListener('click', ()=>enviarPerguntaEstudo(e.id));
+  document.getElementById('estudo-pergunta-input').addEventListener('keydown', (ev)=>{
+    if(ev.key==='Enter' && !ev.shiftKey){ ev.preventDefault(); enviarPerguntaEstudo(e.id); }
+  });
+}
+
+async function enviarPerguntaEstudo(estudoId){
+  const input = document.getElementById('estudo-pergunta-input');
+  const pergunta = (input.value||'').trim();
+  if(!pergunta) return;
+  const btn = document.getElementById('estudo-send-btn');
+  const errorEl = document.getElementById('estudo-pergunta-error');
+  errorEl.style.display = 'none';
+  btn.disabled = true;
+  input.disabled = true;
+  const originalBtn = btn.innerHTML;
+  btn.innerHTML = 'Perguntando...';
+  try{
+    const rowPergunta = await syncEstudoMensagemInsert(estudoId, 'aluno', pergunta);
+    if(!ESTUDO_MENSAGENS[estudoId]) ESTUDO_MENSAGENS[estudoId] = [];
+    ESTUDO_MENSAGENS[estudoId].push({id:rowPergunta.id, autor:'aluno', texto:pergunta, createdAt:rowPergunta.created_at});
+    input.value = '';
+    const e = ESTUDOS.find(x=>x.id==estudoId);
+    renderEstudoChatView(e);
+    const resposta = await chamarIaEstudo(estudoId, pergunta);
+    const rowResposta = await syncEstudoMensagemInsert(estudoId, 'ia', resposta);
+    ESTUDO_MENSAGENS[estudoId].push({id:rowResposta.id, autor:'ia', texto:resposta, createdAt:rowResposta.created_at});
+    renderEstudoChatView(e);
+  }catch(e){
+    console.error('perguntar estudo', e);
+    errorEl.textContent = e.message || 'Não foi possível consultar a IA agora. Tente de novo em instantes.';
+    errorEl.style.display = 'block';
+    btn.disabled = false;
+    input.disabled = false;
+    btn.innerHTML = originalBtn;
+  }
+}
+
 /* Início do aluno do Curso Gravado (Método): sem indicadores nem metas — só a saudação, o banner do
    CONCEC e as últimas interações da comunidade do curso. */
 function renderInicioCurso(s){

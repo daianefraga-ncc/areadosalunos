@@ -410,10 +410,17 @@
   .topic-row.estudo-row{cursor:pointer;}
   .estudo-row .topic-status{background:var(--shared);}
   .estudo-row [data-del-estudo]{margin-left:6px;flex-shrink:0;}
-  .estudo-chat{max-width:680px;}
+  /* Layout em duas colunas: o PDF do artigo do lado esquerdo, a conversa do lado direito — pra
+     o aluno poder ler o artigo e perguntar sobre ele sem trocar de tela. */
+  .estudo-workspace{display:flex;gap:20px;align-items:flex-start;}
+  .estudo-pdf-pane{flex:1 1 44%;min-width:0;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;height:min(78vh,860px);position:sticky;top:20px;}
+  .estudo-pdf-pane iframe{width:100%;height:100%;border:0;display:block;}
+  .estudo-pdf-missing{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;height:100%;color:var(--text-mute);font-size:12.5px;text-align:center;padding:24px;}
+  .estudo-pdf-missing .icon{width:26px;height:26px;opacity:.6;}
+  .estudo-chat{flex:1 1 56%;min-width:0;}
   .estudo-chat-header h3{font-size:16px;margin-bottom:2px;}
   .estudo-chat-header .sub{font-size:12.5px;color:var(--text-mute);}
-  .estudo-msgs{display:flex;flex-direction:column;gap:12px;margin:18px 0;max-height:52vh;overflow-y:auto;padding-right:4px;}
+  .estudo-msgs{display:flex;flex-direction:column;gap:12px;margin:18px 0;max-height:44vh;overflow-y:auto;padding-right:4px;}
   .estudo-msg{max-width:88%;border-radius:var(--radius-sm);padding:10px 14px;font-size:13.5px;line-height:1.6;}
   .estudo-msg.aluno{align-self:flex-end;background:var(--bg-elev);border:1px solid var(--border);}
   /* Resposta da IA reaproveita as mesmas cores do "modo leitura" das novidades, pra manter a
@@ -422,9 +429,16 @@
   .estudo-msg-autor{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;opacity:.65;margin-bottom:4px;}
   .estudo-msg-texto{white-space:pre-wrap;}
   .estudo-empty{color:var(--text-mute);font-size:13px;padding:10px 2px 18px;}
+  .estudo-suggestions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+  .estudo-suggestion-chip{font-size:11.5px;padding:7px 12px;border-radius:20px;background:var(--bg-elev);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;text-align:left;line-height:1.3;}
+  .estudo-suggestion-chip:hover{border-color:var(--shared);color:var(--text);}
   .estudo-ask-row{display:flex;gap:10px;align-items:flex-end;}
   .estudo-ask-row textarea.ps-input{flex:1;min-height:44px;resize:vertical;}
   .estudo-ask-row .btn-accent{flex-shrink:0;white-space:nowrap;}
+  @media (max-width:900px){
+    .estudo-workspace{flex-direction:column;}
+    .estudo-pdf-pane{width:100%;height:60vh;position:static;}
+  }
   @media (max-width:560px){ .estudo-ask-row{flex-direction:column;align-items:stretch;} }
   .stat-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:20px;}
   .stat-card{
@@ -6628,7 +6642,7 @@ async function bootstrapData(){
     // Comentários dessas novidades — volume pequeno, carrega tudo de uma vez.
     sb.from('novidade_comments').select('*').order('created_at',{ascending:true}),
     // Biblioteca Científica: RLS já garante que o aluno só vê os próprios estudos (e a equipe vê de todos).
-    sb.from('estudos').select('id, aluno_id, titulo, nome_arquivo, created_at').order('created_at',{ascending:false}),
+    sb.from('estudos').select('id, aluno_id, titulo, nome_arquivo, arquivo_path, created_at').order('created_at',{ascending:false}),
     sb.from('estudo_mensagens').select('*').order('created_at',{ascending:true}),
   ]);
 
@@ -6688,7 +6702,7 @@ async function bootstrapData(){
   });
 
   ESTUDOS.length = 0;
-  (estudoRows||[]).forEach(e=>ESTUDOS.push({id:e.id, alunoId:e.aluno_id, titulo:e.titulo, nomeArquivo:e.nome_arquivo||'', createdAt:e.created_at}));
+  (estudoRows||[]).forEach(e=>ESTUDOS.push({id:e.id, alunoId:e.aluno_id, titulo:e.titulo, nomeArquivo:e.nome_arquivo||'', arquivoPath:e.arquivo_path||null, createdAt:e.created_at}));
 
   ESTUDO_MENSAGENS = {};
   (estudoMensagemRows||[]).forEach(m=>{
@@ -7114,8 +7128,26 @@ async function syncEstudoInsert(titulo, nomeArquivo, textoExtraido){
   if(error) throw error;
   return data;
 }
-function syncEstudoDelete(id){
+function syncEstudoDelete(id, arquivoPath){
   syncNow(sb.from('estudos').delete().eq('id', id));
+  if(arquivoPath) syncNow(sb.storage.from('estudos-pdfs').remove([arquivoPath]));
+}
+/* Sobe o PDF em si (bucket privado "estudos-pdfs", uma pasta por aluno) só pra poder mostrar o
+   artigo do lado da conversa — quem realmente alimenta a IA é o texto já extraído, guardado em
+   texto_extraido. Upload best-effort: se falhar, o estudo continua funcionando normalmente, só
+   sem a pré-visualização do PDF. */
+async function syncEstudoUploadPdf(estudoId, file){
+  const path = `${currentUser.id}/${estudoId}.pdf`;
+  const { error } = await sb.storage.from('estudos-pdfs').upload(path, file, { upsert:true, cacheControl:'3600', contentType:'application/pdf' });
+  if(error) throw error;
+  syncNow(sb.from('estudos').update({ arquivo_path: path }).eq('id', estudoId));
+  return path;
+}
+async function getEstudoPdfUrl(arquivoPath){
+  if(!arquivoPath) return null;
+  const { data, error } = await sb.storage.from('estudos-pdfs').createSignedUrl(arquivoPath, 3600);
+  if(error){ console.error('signed url estudo', error); return null; }
+  return data.signedUrl;
 }
 async function syncEstudoMensagemInsert(estudoId, autor, texto){
   const { data, error } = await sb.from('estudo_mensagens').insert({ estudo_id: estudoId, autor, texto }).select().single();
@@ -8288,9 +8320,10 @@ function bindRenderEstudosList(){
       if(!confirmDelete('Excluir este artigo e toda a conversa sobre ele?')) return;
       const id = btn.dataset.delEstudo;
       const idx = ESTUDOS.findIndex(x=>x.id==id);
+      const arquivoPath = idx>-1 ? ESTUDOS[idx].arquivoPath : null;
       if(idx>-1) ESTUDOS.splice(idx,1);
       delete ESTUDO_MENSAGENS[id];
-      syncEstudoDelete(id);
+      syncEstudoDelete(id, arquivoPath);
       renderEstudoListView();
     });
   });
@@ -8311,9 +8344,19 @@ async function onAddEstudoClick(){
     btn.innerHTML = 'Salvando...';
     const nomeArquivo = novoEstudoFile.name;
     const row = await syncEstudoInsert(titulo, nomeArquivo, textoExtraido);
-    ESTUDOS.push({ id:row.id, alunoId:row.aluno_id, titulo:row.titulo, nomeArquivo:row.nome_arquivo||'', createdAt:row.created_at });
+    const estudoNovo = { id:row.id, alunoId:row.aluno_id, titulo:row.titulo, nomeArquivo:row.nome_arquivo||'', arquivoPath:null, createdAt:row.created_at };
+    ESTUDOS.push(estudoNovo);
+    const arquivoParaUpload = novoEstudoFile;
     novoEstudoFile = null;
     renderEstudoListView();
+    // Sobe o PDF em si depois de já ter mostrado o artigo na lista — é só pra pré-visualização,
+    // então não trava o fluxo principal (a conversa já funciona com o texto extraído).
+    try{
+      const path = await syncEstudoUploadPdf(row.id, arquivoParaUpload);
+      estudoNovo.arquivoPath = path;
+    }catch(upErr){
+      console.error('upload pdf estudo', upErr);
+    }
   }catch(e){
     console.error('adicionar estudo', e);
     errorEl.textContent = e.message || 'Não foi possível adicionar o artigo. Tente de novo.';
@@ -8323,28 +8366,49 @@ async function onAddEstudoClick(){
   }
 }
 
+/* Perguntas prontas pra facilitar a vida do aluno — genéricas o bastante pra servir qualquer
+   artigo científico, sem precisar chamar a IA só pra sugerir o que perguntar. */
+const ESTUDO_SUGESTOES = [
+  'Resuma os principais achados do estudo',
+  'Qual foi o método usado pelos pesquisadores?',
+  'Quais as limitações apontadas pelos autores?',
+  'Isso é associação/correlação ou evidência de causalidade?',
+  'Como posso aplicar isso na prática clínica?',
+];
+function estudoPdfPaneHtml(e){
+  if(!e.arquivoPath){
+    return `<div class="estudo-pdf-missing">${icon('folder')}<span>Pré-visualização do PDF não disponível para este artigo.</span></div>`;
+  }
+  return `<div class="estudo-pdf-missing">${icon('folder')}<span>Carregando pré-visualização do PDF...</span></div>`;
+}
 function renderEstudoChatView(e){
   const msgs = ESTUDO_MENSAGENS[e.id] || [];
   document.getElementById('view-estudos').innerHTML = `
     <div class="back-row"><button type="button" class="back-btn" id="estudo-back">${icon('back')} Voltar aos artigos</button></div>
-    <div class="estudo-chat">
-      <div class="estudo-chat-header">
-        <h3>${escapeHtml(e.titulo)}</h3>
-        <div class="sub">${escapeHtml(e.nomeArquivo||'Artigo em PDF')} — faça perguntas em português sobre o conteúdo do artigo.</div>
+    <div class="estudo-workspace">
+      <div class="estudo-pdf-pane" id="estudo-pdf-pane">${estudoPdfPaneHtml(e)}</div>
+      <div class="estudo-chat">
+        <div class="estudo-chat-header">
+          <h3>${escapeHtml(e.titulo)}</h3>
+          <div class="sub">${escapeHtml(e.nomeArquivo||'Artigo em PDF')} — faça perguntas em português sobre o conteúdo do artigo.</div>
+        </div>
+        <div class="estudo-msgs" id="estudo-msgs">
+          ${msgs.length? msgs.map(m=>`
+            <div class="estudo-msg ${m.autor==='ia'?'ia':'aluno'}">
+              <div class="estudo-msg-autor">${m.autor==='ia'?'IA':'Você'}</div>
+              <div class="estudo-msg-texto">${linkify(m.texto)}</div>
+            </div>
+          `).join('') : `<div class="estudo-empty">Ainda não há perguntas sobre este artigo. Pergunte algo abaixo, ou use uma das sugestões.</div>`}
+        </div>
+        <div class="estudo-suggestions">
+          ${ESTUDO_SUGESTOES.map(s=>`<button type="button" class="estudo-suggestion-chip" data-estudo-sugestao="${escapeAttr(s)}">${escapeHtml(s)}</button>`).join('')}
+        </div>
+        <div class="estudo-ask-row">
+          <textarea class="ps-input" id="estudo-pergunta-input" rows="2" placeholder="Escreva sua pergunta em português..."></textarea>
+          <button class="btn-accent" id="estudo-send-btn" type="button">${icon('next','tiny')} Perguntar</button>
+        </div>
+        <p class="field-error" id="estudo-pergunta-error" style="display:none"></p>
       </div>
-      <div class="estudo-msgs" id="estudo-msgs">
-        ${msgs.length? msgs.map(m=>`
-          <div class="estudo-msg ${m.autor==='ia'?'ia':'aluno'}">
-            <div class="estudo-msg-autor">${m.autor==='ia'?'IA':'Você'}</div>
-            <div class="estudo-msg-texto">${linkify(m.texto)}</div>
-          </div>
-        `).join('') : `<div class="estudo-empty">Ainda não há perguntas sobre este artigo. Pergunte algo abaixo — por exemplo, "qual foi o principal achado do estudo?" ou "que método os autores usaram?".</div>`}
-      </div>
-      <div class="estudo-ask-row">
-        <textarea class="ps-input" id="estudo-pergunta-input" rows="2" placeholder="Escreva sua pergunta em português..."></textarea>
-        <button class="btn-accent" id="estudo-send-btn" type="button">${icon('next','tiny')} Perguntar</button>
-      </div>
-      <p class="field-error" id="estudo-pergunta-error" style="display:none"></p>
     </div>
   `;
   document.getElementById('estudo-back').addEventListener('click', ()=>{ estudoChatAbertoId = null; renderEstudos(); });
@@ -8354,6 +8418,24 @@ function renderEstudoChatView(e){
   document.getElementById('estudo-pergunta-input').addEventListener('keydown', (ev)=>{
     if(ev.key==='Enter' && !ev.shiftKey){ ev.preventDefault(); enviarPerguntaEstudo(e.id); }
   });
+  document.querySelectorAll('#view-estudos [data-estudo-sugestao]').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.getElementById('estudo-pergunta-input').value = chip.dataset.estudoSugestao;
+      enviarPerguntaEstudo(e.id);
+    });
+  });
+  // Busca a URL assinada do PDF à parte (não trava o resto da tela) — se o aluno já tiver saído
+  // desse estudo quando a URL voltar, não mexe mais no DOM.
+  if(e.arquivoPath){
+    getEstudoPdfUrl(e.arquivoPath).then(url=>{
+      if(estudoChatAbertoId !== e.id) return;
+      const pane = document.getElementById('estudo-pdf-pane');
+      if(!pane) return;
+      pane.innerHTML = url
+        ? `<iframe src="${escapeAttr(url)}" title="PDF do artigo"></iframe>`
+        : `<div class="estudo-pdf-missing">${icon('folder')}<span>Não foi possível carregar a pré-visualização do PDF.</span></div>`;
+    });
+  }
 }
 
 async function enviarPerguntaEstudo(estudoId){

@@ -8900,7 +8900,8 @@ async function submitWispform(s, flat){
 }
 
 /* ================= VIEW: AULAS ================= */
-function courseTileHtml(c){
+function courseTileHtml(c, opts){
+  const hideCat = opts && opts.hideCat;
   const s = getStudent(currentStudentId);
   const pct = s ? (s.courseProgress[c.id] || 0) : 0;
   const locked = isLessonLocked(c.id, s);
@@ -8915,7 +8916,7 @@ function courseTileHtml(c){
         <div class="progress-mini"><div class="fill" style="width:${locked?0:pct}%"></div></div>
       </div>
       <div class="course-info">
-        <div class="cat">${c.cat}</div>
+        ${hideCat? '' : `<div class="cat">${c.cat}</div>`}
         <div class="title">${c.title}</div>
         <div class="meta">${locked? `Assista ${MIN_WATCH_PCT}% da aula anterior e marque como assistida para liberar` : c.duration}</div>
       </div>
@@ -9038,7 +9039,7 @@ function openCursoModuloModal(moduloId){
         ${modulo.subtitulo? `<div class="modulo-detail-sub">${escapeHtml(modulo.subtitulo)}</div>` : ''}
       </div>
       <div class="modulo-detail-list">
-        ${aulas.length? aulas.map(c=>courseTileHtml(c)).join('') : `<p class="modulo-empty">Nenhuma aula publicada neste módulo ainda.</p>`}
+        ${aulas.length? aulas.map(c=>courseTileHtml(c,{hideCat:true})).join('') : `<p class="modulo-empty">Nenhuma aula publicada neste módulo ainda.</p>`}
       </div>
       <div class="modal-actions"><button class="btn-outline" id="modal-close-2">Fechar</button></div>
     </div>`;

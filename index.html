@@ -619,12 +619,13 @@
   .aniv-banner strong{color:var(--accent-2);}
   /* Recado único do Início (comunicado_aluno) — logo abaixo da saudação, antes dos cartões de progresso. */
   .comunicado-banner{
-    display:flex;align-items:flex-start;gap:12px;
+    display:flex;align-items:center;justify-content:center;gap:12px;text-align:center;
     background:var(--bg-card);border:1px solid var(--shared);border-left:4px solid var(--shared);border-radius:var(--radius);
     padding:14px 16px;margin:16px 0;font-size:13.5px;color:var(--text);line-height:1.55;
   }
-  .comunicado-banner .icon{color:var(--shared);flex-shrink:0;margin-top:1px;}
+  .comunicado-banner .icon{color:var(--shared);flex-shrink:0;}
   .comunicado-banner a{color:var(--shared);}
+  .comunicado-banner > div{font-weight:700;}
   /* Status do "Exportar backup" (Visão Geral) */
   .backup-status{margin-top:10px;font-size:12.5px;color:var(--text-dim);line-height:1.6;}
   .backup-status.ok{color:var(--success);}

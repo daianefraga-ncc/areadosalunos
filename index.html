@@ -8240,6 +8240,21 @@ function openNovidadesMural(detailId){
    português sobre o conteúdo com a IA, que responde só com base no que está escrito no artigo (ver
    Edge Function "perguntar-estudo"). Feature só do aluno — não aparece pra equipe interna. */
 
+/* A IA às vezes destaca trechos da resposta com **negrito** e *itálico* (markdown simples) — sem
+   isso, os asteriscos apareciam soltos no texto em vez de virar destaque de verdade. */
+function formatEstudoTexto(text){
+  let escaped = escapeHtml(text);
+  escaped = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  escaped = escaped.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+  escaped = escaped.replace(/\n/g, '<br>');
+  escaped = escaped.replace(/(https?:\/\/[^\s<]+)/g, (url)=>{
+    const m = url.match(/[).,;:!?]+$/);
+    const trail = m ? m[0] : '';
+    const clean = trail ? url.slice(0, -trail.length) : url;
+    return `<a href="${clean}" target="_blank" rel="noopener">${clean}</a>${trail}`;
+  });
+  return escaped;
+}
 /* Extrai o texto de todas as páginas de um PDF, concatenado, direto no navegador via pdf.js. */
 async function extrairTextoPdf(file){
   if(!window.pdfjsLib) throw new Error('O leitor de PDF ainda não carregou. Recarregue a página e tente de novo.');
@@ -8396,7 +8411,7 @@ function renderEstudoChatView(e){
           ${msgs.length? msgs.map(m=>`
             <div class="estudo-msg ${m.autor==='ia'?'ia':'aluno'}">
               <div class="estudo-msg-autor">${m.autor==='ia'?'IA':'Você'}</div>
-              <div class="estudo-msg-texto">${linkify(m.texto)}</div>
+              <div class="estudo-msg-texto">${formatEstudoTexto(m.texto)}</div>
             </div>
           `).join('') : `<div class="estudo-empty">Ainda não há perguntas sobre este artigo. Pergunte algo abaixo, ou use uma das sugestões.</div>`}
         </div>

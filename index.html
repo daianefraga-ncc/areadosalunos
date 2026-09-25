@@ -513,9 +513,9 @@
     position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.55);color:#fff;font-size:10px;
     text-transform:uppercase;letter-spacing:.4px;padding:3px 8px;border-radius:20px;
   }
-  .modulo-card-title{padding:10px 12px 12px;font-size:12.5px;font-weight:700;line-height:1.3;}
   .curso-block-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
   .curso-block-h .section-sub-inline{font-size:12.5px;color:var(--text-mute);font-weight:400;}
+  .curso-block-progresso{font-size:12.5px;color:var(--text-mute);margin:-4px 0 12px;}
   .modulo-detail-h{margin-bottom:14px;}
   .modulo-detail-h .modulo-detail-sub{font-size:13px;color:var(--text-mute);margin-top:4px;}
   .modulo-detail-list{display:flex;flex-wrap:wrap;gap:14px;}
@@ -1744,11 +1744,14 @@ let COURSES = []; // populado em runtime a partir do Supabase (ver bootstrapData
 /* Os 3 "cursos" além do Método (que continua como sempre foi, com os MODULES fixos acima). Cada aula
    (courses.curso_id) pertence a um destes — 'formacao' só aparece pra quem tem 'formacao' no conjunto de
    programas do aluno (tier ou extra_programs), 'pgncc' só pra quem tem 'pgncc', e 'formacao_pgncc' é o
-   conteúdo compartilhado entre os dois grupos. Ver studentProgramSet()/cursoVisibleTo() mais abaixo. */
+   conteúdo compartilhado entre os dois grupos. Ver studentProgramSet()/cursoVisibleTo() mais abaixo.
+   'formacao_pgncc' continua existindo aqui (e na área da equipe, em Conteúdo) só pra não perder o que já
+   foi cadastrado nele — mas não aparece mais em Aulas pro aluno (mostraParaAluno:false), a pedido da
+   Daiane: ficava poluído ter um 3º bloco além de Formação e Pós-Graduação. */
 const CURSOS = [
-  {id:'formacao', titulo:'Formação em Neurociência do Comportamento da Criança', programs:['formacao']},
-  {id:'pgncc', titulo:'Pós-Graduação em Neurociência do Comportamento da Criança', programs:['pgncc']},
-  {id:'formacao_pgncc', titulo:'Conteúdo Formação + Pós-Graduação', programs:['formacao','pgncc']},
+  {id:'formacao', titulo:'Formação em Neurociência do Comportamento da Criança', programs:['formacao'], mostraParaAluno:true},
+  {id:'pgncc', titulo:'Pós-Graduação em Neurociência do Comportamento da Criança', programs:['pgncc'], mostraParaAluno:true},
+  {id:'formacao_pgncc', titulo:'Conteúdo Formação + Pós-Graduação', programs:['formacao','pgncc'], mostraParaAluno:false},
 ];
 function getCurso(id){ return CURSOS.find(c=>c.id===id); }
 /* Conjunto de programas de um aluno: o tier principal (quando é 'formacao' ou 'pgncc') + qualquer
@@ -1764,7 +1767,7 @@ function cursoVisibleTo(curso, student){
   const set = studentProgramSet(student);
   return curso.programs.some(p=>set.has(p));
 }
-function cursosVisiveisPara(student){ return CURSOS.filter(c=>cursoVisibleTo(c, student)); }
+function cursosVisiveisPara(student){ return CURSOS.filter(c=>c.mostraParaAluno!==false && cursoVisibleTo(c, student)); }
 /* Aula (courses) específica: 'metodo' continua liberada pra todo mundo (como sempre foi); Formação/Pós
    só pra quem tem acesso àquele curso. Usada tanto pra filtrar listas quanto como trava de segurança
    dentro de openCourseModal — pra ninguém abrir pelo link direto uma aula de um programa que não tem. */
@@ -8919,19 +8922,28 @@ function isLessonLocked(courseId, student){
 function moduloCardHtml(modulo, idx){
   const style = modulo.capaUrl ? `background-image:url('${escapeAttr(modulo.capaUrl)}');` : '';
   return `
-    <button type="button" class="modulo-card" data-modulo-id="${modulo.id}">
+    <button type="button" class="modulo-card" data-modulo-id="${modulo.id}" title="${escapeAttr(modulo.nome)}">
       <div class="modulo-card-cover ${modulo.capaUrl?'has-cover':''}" style="${style}">
         ${!modulo.capaUrl? icon('film','modulo-card-placeholder') : ''}
         <div class="modulo-card-badge">Módulo ${idx+1}</div>
       </div>
-      <div class="modulo-card-title">${escapeHtml(modulo.nome)}</div>
     </button>`;
 }
-function cursoBlockHtml(curso, i){
+/* "Acompanhar seu desempenho": quantas aulas desse curso o aluno já concluiu, sobre o total publicado —
+   mostrado como texto simples logo abaixo do título do curso, sem precisar abrir nada. */
+function cursoProgressoHtml(curso, s){
+  const aulas = COURSES.filter(c=>c.cursoId===curso.id);
+  if(!aulas.length || !s) return '';
+  const feitas = aulas.filter(c=>(s.courseProgress[c.id]||0)===100).length;
+  const pct = Math.round(feitas/aulas.length*100);
+  return `<p class="curso-block-progresso">${feitas} de ${aulas.length} aula${aulas.length===1?'':'s'} concluída${feitas===1?'':'s'} · ${pct}%</p>`;
+}
+function cursoBlockHtml(curso, i, s){
   const modulos = modulosDoCurso(curso.id);
   return `
     <div class="category-block">
       <h2 class="section-title curso-block-h">${curso.titulo}</h2>
+      ${cursoProgressoHtml(curso, s)}
       ${modulos.length? `
         <div class="row-scroll-wrap">
           <button type="button" class="row-scroll-btn left is-hidden" aria-label="Rolar para a esquerda">${icon('back')}</button>
@@ -8962,7 +8974,7 @@ function renderAulas(){
         </div>
       </div>
     `).join('')}
-    ${cursosExtra.map((curso,i)=>cursoBlockHtml(curso,i)).join('')}
+    ${cursosExtra.map((curso,i)=>cursoBlockHtml(curso,i,s)).join('')}
   `;
   bindCourseTiles();
   bindRowScrollers();
@@ -13131,7 +13143,9 @@ function cursoAdminBlockHtml(curso){
   return `
     <div class="curso-admin-block">
       <h3 class="curso-admin-h">${escapeHtml(curso.titulo)}</h3>
-      <p class="section-sub" style="margin-top:-6px">Crie os módulos (capa em pé, aprox. 400x600px) e depois publique as aulas dentro de cada um. Só quem tem acesso a este programa vê este conteúdo em Aulas.</p>
+      <p class="section-sub" style="margin-top:-6px">${curso.mostraParaAluno===false
+        ? 'Este bloco não aparece mais em Aulas para o aluno (só ficou aqui pra você não perder o que já tinha cadastrado). Se quiser esse conteúdo visível, republique as aulas dentro de um módulo de Formação NCC ou Pós-Graduação NCC — e pode remover os módulos daqui quando terminar.'
+        : 'Crie os módulos (capa em pé, aprox. 400x600px) e depois publique as aulas dentro de cada um. Só quem tem acesso a este programa vê este conteúdo em Aulas.'}</p>
       <div class="curso-modulos-list">
         ${modulos.length? modulos.map((m,i)=>moduloAdminRowHtml(m,i===0,i===modulos.length-1)).join('') : `<p class="modulo-empty">Nenhum módulo criado ainda.</p>`}
       </div>

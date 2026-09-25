@@ -6422,10 +6422,72 @@ function trackYouTubeWatch(iframeId, onProgress){
     });
   }).catch(()=>{ onProgress(100); });
 }
+/* Mesma ideia do trackYouTubeWatch, só que pro player da Panda Video (biblioteca oficial api.v2.js, injetada
+   sob demanda como a do YouTube). O player avisa o progresso pelo evento 'panda_timeupdate' (tempo atual em
+   segundos) e o fim pelo 'panda_ended'; se a API não carregar, também libera o aluno em vez de travá-lo. */
+let _pandaApiPromise = null;
+function loadPandaApi(){
+  if(window.PandaPlayer) return Promise.resolve(window.PandaPlayer);
+  if(_pandaApiPromise) return _pandaApiPromise;
+  _pandaApiPromise = new Promise((resolve, reject)=>{
+    const tag = document.createElement('script');
+    tag.src = 'https://player.pandavideo.com.br/api.v2.js';
+    tag.async = true;
+    tag.onload = ()=>{ window.PandaPlayer ? resolve(window.PandaPlayer) : reject(new Error('PandaPlayer indisponível')); };
+    tag.onerror = reject;
+    document.head.appendChild(tag);
+    setTimeout(()=>reject(new Error('Panda API timeout')), 8000);
+  });
+  return _pandaApiPromise;
+}
+function trackPandaWatch(iframeId, onProgress){
+  loadPandaApi().then(PandaPlayer=>{
+    const el = document.getElementById(iframeId);
+    if(!el) return;
+    const player = new PandaPlayer(iframeId, {
+      onReady: ()=>{
+        player.onEvent(e=>{
+          if(!document.getElementById(iframeId)) return; // modal fechado no meio do vídeo
+          if(e.message==='panda_ended'){ onProgress(100); return; }
+          if(e.message==='panda_timeupdate'){
+            const dur = player.getDuration ? player.getDuration() : 0;
+            const cur = (typeof e.currentTime==='number') ? e.currentTime : (player.getCurrentTime ? player.getCurrentTime() : 0);
+            if(dur>0) onProgress(Math.min(100, cur/dur*100));
+          }
+        });
+      },
+      onError: ()=>{ onProgress(100); },
+    });
+  }).catch(()=>{ onProgress(100); });
+}
 function youtubeId(url){
   if(!url) return null;
   const m = String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([a-zA-Z0-9_-]{11})/);
   return m ? m[1] : null;
+}
+/* Link (ou código <iframe> colado inteiro) de um vídeo hospedado na Panda Video — aceita tanto o link puro
+   quanto o código de incorporação que a Panda mostra no painel, pra não depender da pessoa saber separar
+   só a URL. Qualquer subdomínio de pandavideo.com.br é aceito (o player fica em player-vz-XXXX.tv.pandavideo.com.br). */
+function pandaEmbedUrl(input){
+  if(!input) return null;
+  let str = String(input).trim();
+  const iframeMatch = str.match(/<iframe[^>]*\ssrc=["']([^"']+)["']/i);
+  if(iframeMatch) str = iframeMatch[1];
+  try{
+    const u = new URL(str);
+    if(!/(^|\.)pandavideo\.com\.br$/i.test(u.hostname)) return null;
+    return u.href;
+  }catch(e){ return null; }
+}
+/* Ponto único que decide se um "Link do vídeo" é reproduzível dentro do modal (YouTube ou Panda Video) e
+   devolve a URL pronta pro iframe. Qualquer outro link (ex.: Google Drive, Vimeo sem tratamento específico)
+   continua caindo no botão "Assistir no link", que abre em nova aba. */
+function videoEmbedInfo(link){
+  const yt = youtubeId(link);
+  if(yt) return {provider:'youtube', embedUrl:`https://www.youtube.com/embed/${yt}?enablejsapi=1&origin=${encodeURIComponent(location.origin)}`};
+  const panda = pandaEmbedUrl(link);
+  if(panda) return {provider:'panda', embedUrl:panda};
+  return null;
 }
 function getModule(id){ return MODULES.find(m=>m.id===id); }
 function initialsAvatar(initials,color,size,avatarUrl){
@@ -9098,18 +9160,18 @@ function openCourseModal(id){
   }
   const pct = s ? (s.courseProgress[id]||0) : 0;
   const done = pct===100;
-  const yt = youtubeId(c.videoLink);
+  const embed = videoEmbedInfo(c.videoLink);
   const materiais = c.materiais || [];
   /* Aluno do Curso Gravado só pode marcar a aula como concluída depois de assistir MIN_WATCH_PCT dela —
-     é isso que libera a aula seguinte na sequência. Só dá pra medir isso em vídeo do YouTube embutido
-     (o player avisa o progresso); aula sem vídeo embutido não tem como ser medida, então segue liberada
-     pra marcar direto, como antes. Mentorado nunca é travado por isso. */
-  const exigeWatch = !!(s && s.tier==='curso' && currentRole==='aluno' && yt);
+     é isso que libera a aula seguinte na sequência. Só dá pra medir isso em vídeo embutido do YouTube ou
+     da Panda Video (o player avisa o progresso); aula sem vídeo embutido não tem como ser medida, então
+     segue liberada pra marcar direto, como antes. Mentorado nunca é travado por isso. */
+  const exigeWatch = !!(s && s.tier==='curso' && currentRole==='aluno' && embed);
   let watchPct = s ? (s.courseWatch ? (s.courseWatch[id]||0) : 0) : 0;
   if(done) watchPct = Math.max(watchPct, MIN_WATCH_PCT); // aula já concluída antes dessa regra existir continua concluída
   document.getElementById('modal').innerHTML = `
-    ${yt
-      ? `<div class="modal-yt"><button class="modal-close" id="modal-close">${icon('x')}</button><iframe id="course-yt-frame" src="https://www.youtube.com/embed/${yt}?enablejsapi=1&origin=${encodeURIComponent(location.origin)}" title="${c.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`
+    ${embed
+      ? `<div class="modal-yt"><button class="modal-close" id="modal-close">${icon('x')}</button><iframe id="course-video-frame" src="${escapeAttr(embed.embedUrl)}" title="${escapeAttr(c.title)}" style="border:none" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`
       : `<div class="modal-player" style="--tint1:${c.tint[0]};--tint2:${c.tint[1]}">
           <button class="modal-close" id="modal-close">${icon('x')}</button>
           ${fillIcon('play','play-fill')}
@@ -9120,7 +9182,7 @@ function openCourseModal(id){
       <p class="desc">${linkify(c.desc)} <br><br>${escapeHtml(c.duration)}.</p>
       <div class="modal-actions">
         ${s? `<button class="btn-accent ${done?'done':''}" id="modal-toggle-done">${done? icon('check')+' Concluída' : 'Marcar como assistida'}</button>` : ''}
-        ${(c.videoLink && !yt)? `<a class="btn-outline" href="${c.videoLink}" target="_blank" rel="noopener">${icon('video')} Assistir no link</a>` : ''}
+        ${(c.videoLink && !embed)? `<a class="btn-outline" href="${c.videoLink}" target="_blank" rel="noopener">${icon('video')} Assistir no link</a>` : ''}
         <button class="btn-outline" id="modal-close-2">Fechar</button>
       </div>
       ${exigeWatch? `<div class="watch-gate" id="watch-gate"></div>` : ''}
@@ -9158,14 +9220,16 @@ function openCourseModal(id){
     }
     refreshGate();
     if(exigeWatch){
-      trackYouTubeWatch('course-yt-frame', (p)=>{
+      const onWatchProgress = (p)=>{
         if(p<=watchPct) return;
         watchPct = p;
         if(!s.courseWatch) s.courseWatch = {};
         s.courseWatch[id] = Math.round(p);
         syncCourseWatch(s.id, id, Math.round(p));
         refreshGate();
-      });
+      };
+      if(embed.provider==='panda') trackPandaWatch('course-video-frame', onWatchProgress);
+      else trackYouTubeWatch('course-video-frame', onWatchProgress);
     }
     doneBtn.addEventListener('click',()=>{
       if(doneBtn.disabled) return;
@@ -13059,9 +13123,9 @@ function openEditCourseModal(courseId){
           <input class="ps-input" type="text" id="edit-course-duration" value="${escapeAttr(c.duration)}">
           <label class="ps-label">Descrição</label>
           <textarea class="ps-input" id="edit-course-desc">${escapeAttr(c.desc)}</textarea>
-          <label class="ps-label">Link do vídeo (YouTube)</label>
-          <input class="ps-input" type="text" id="edit-course-link" value="${escapeAttr(c.videoLink||'')}" placeholder="https://www.youtube.com/watch?v=...">
-          <div class="field-error" id="edit-course-link-error" style="display:none">Informe um link válido de vídeo do YouTube.</div>
+          <label class="ps-label">Link do vídeo (YouTube ou Panda Video)</label>
+          <input class="ps-input" type="text" id="edit-course-link" value="${escapeAttr(c.videoLink||'')}" placeholder="https://www.youtube.com/watch?v=... ou o link/código de incorporação da Panda Video">
+          <div class="field-error" id="edit-course-link-error" style="display:none">Informe um link válido de vídeo do YouTube ou da Panda Video.</div>
         </div>
         <div class="ps-section">
           <div class="ps-h">Materiais desta aula (links do Google Drive)</div>
@@ -13109,8 +13173,8 @@ function openEditCourseModal(courseId){
     document.getElementById('edit-course-save').addEventListener('click', async ()=>{
       const title = (c.title||'').trim();
       const videoLink = (c.videoLink||'').trim();
-      if(!title || !youtubeId(videoLink)){
-        document.getElementById('edit-course-link-error').style.display = youtubeId(videoLink) ? 'none' : 'block';
+      if(!title || !videoEmbedInfo(videoLink)){
+        document.getElementById('edit-course-link-error').style.display = videoEmbedInfo(videoLink) ? 'none' : 'block';
         return;
       }
       c.title = title; c.videoLink = videoLink;
@@ -13213,9 +13277,9 @@ function cursoAdminBlockHtml(curso){
         <div class="field"><label>Duração</label><input class="ps-input" id="new-curso-aula-duration-${curso.id}" placeholder="Ex.: 40min"></div>
         <div class="field full"><label>Descrição</label><textarea class="ps-input" id="new-curso-aula-desc-${curso.id}" placeholder="Do que trata esta aula..."></textarea></div>
         <div class="field full">
-          <label>Link do vídeo (YouTube)</label>
-          <input class="ps-input" id="new-curso-aula-link-${curso.id}" placeholder="https://www.youtube.com/watch?v=...">
-          <div class="field-error" id="new-curso-aula-link-error-${curso.id}" style="display:none">Informe um link válido de vídeo do YouTube.</div>
+          <label>Link do vídeo (YouTube ou Panda Video)</label>
+          <input class="ps-input" id="new-curso-aula-link-${curso.id}" placeholder="https://www.youtube.com/watch?v=... ou o link/código de incorporação da Panda Video">
+          <div class="field-error" id="new-curso-aula-link-error-${curso.id}" style="display:none">Informe um link válido de vídeo do YouTube ou da Panda Video.</div>
         </div>
         <div class="actions"><button class="btn-accent" data-add-curso-aula="${curso.id}">${icon('upload')} Publicar aula</button></div>
       </div>` : ''}
@@ -13307,8 +13371,8 @@ function bindCursoAulaAdmin(){
       const desc = document.getElementById(`new-curso-aula-desc-${cursoId}`).value.trim();
       const videoLink = document.getElementById(`new-curso-aula-link-${cursoId}`).value.trim();
       const errEl = document.getElementById(`new-curso-aula-link-error-${cursoId}`);
-      if(!title || !youtubeId(videoLink) || !modulo){
-        errEl.style.display = youtubeId(videoLink) ? 'none' : 'block';
+      if(!title || !videoEmbedInfo(videoLink) || !modulo){
+        errEl.style.display = videoEmbedInfo(videoLink) ? 'none' : 'block';
         return;
       }
       const course = {
@@ -13421,9 +13485,9 @@ function renderConteudo(){
       <div class="field"><label>Duração</label><input class="ps-input" type="text" id="new-course-duration" placeholder="Ex.: 40min · 3 aulas"></div>
       <div class="field full"><label>Descrição</label><textarea class="ps-input" id="new-course-desc" placeholder="Do que trata esta aula..."></textarea></div>
       <div class="field full">
-        <label>Link do vídeo (YouTube)</label>
-        <input class="ps-input" type="text" id="new-course-link" placeholder="https://www.youtube.com/watch?v=...">
-        <div class="field-error" id="new-course-link-error" style="display:none">Informe um link válido de vídeo do YouTube.</div>
+        <label>Link do vídeo (YouTube ou Panda Video)</label>
+        <input class="ps-input" type="text" id="new-course-link" placeholder="https://www.youtube.com/watch?v=... ou o link/código de incorporação da Panda Video">
+        <div class="field-error" id="new-course-link-error" style="display:none">Informe um link válido de vídeo do YouTube ou da Panda Video.</div>
       </div>
       <div class="actions"><button class="btn-accent" id="add-course-btn">${icon('upload')} Publicar aula</button></div>
     </div>
@@ -13569,8 +13633,8 @@ function renderConteudo(){
     const desc = document.getElementById('new-course-desc').value.trim();
     const videoLink = document.getElementById('new-course-link').value.trim();
     const errEl = document.getElementById('new-course-link-error');
-    if(!title || !youtubeId(videoLink)){
-      errEl.style.display = youtubeId(videoLink) ? 'none' : 'block';
+    if(!title || !videoEmbedInfo(videoLink)){
+      errEl.style.display = videoEmbedInfo(videoLink) ? 'none' : 'block';
       return;
     }
     const course = {

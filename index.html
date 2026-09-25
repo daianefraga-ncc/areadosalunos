@@ -495,6 +495,48 @@
   .course-info .cat{font-size:10.5px;color:var(--text-mute);text-transform:uppercase;letter-spacing:.4px;}
   .course-info .title{font-size:13.5px;font-weight:700;margin:3px 0 4px;line-height:1.3;}
   .course-info .meta{font-size:11.5px;color:var(--text-dim);}
+  /* Cartões de módulo (Formação/Pós-Graduação) — capa em pé (retrato, ~400x600), parecido com a página
+     de vendas do curso. Cada cartão abre a lista de aulas daquele módulo (openCursoModuloModal). */
+  .modulo-card{
+    flex:0 0 168px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);
+    overflow:hidden;transition:transform .15s, border-color .15s;text-align:left;
+  }
+  .modulo-card:hover{transform:translateY(-3px);border-color:var(--accent);}
+  .modulo-card-cover{
+    aspect-ratio:2/3;position:relative;display:flex;align-items:flex-end;justify-content:center;
+    background:linear-gradient(135deg,var(--tint1,#3f6a58),var(--tint2,#bec6b1));
+  }
+  .modulo-card-cover.has-cover{background-size:cover;background-position:center;}
+  .modulo-card-cover.has-cover::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,0.55) 100%);}
+  .modulo-card-placeholder{position:relative;width:34px;height:34px;stroke:#fff;opacity:.85;margin:auto;}
+  .modulo-card-badge{
+    position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.55);color:#fff;font-size:10px;
+    text-transform:uppercase;letter-spacing:.4px;padding:3px 8px;border-radius:20px;
+  }
+  .modulo-card-title{padding:10px 12px 12px;font-size:12.5px;font-weight:700;line-height:1.3;}
+  .curso-block-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+  .curso-block-h .section-sub-inline{font-size:12.5px;color:var(--text-mute);font-weight:400;}
+  .modulo-detail-h{margin-bottom:14px;}
+  .modulo-detail-h .modulo-detail-sub{font-size:13px;color:var(--text-mute);margin-top:4px;}
+  .modulo-detail-list{display:flex;flex-wrap:wrap;gap:14px;}
+  .modulo-empty{color:var(--text-mute);font-size:13px;padding:10px 0;}
+  .extra-programs{margin-top:6px;font-size:11px;color:var(--text-mute);display:flex;flex-direction:column;gap:2px;}
+  .extra-programs label{display:flex;align-items:center;gap:5px;cursor:pointer;}
+  .extra-programs input[disabled]{opacity:.5;}
+  /* Admin: blocos de Formação/Pós-Graduação em Conteúdo */
+  .curso-admin-block{margin-bottom:28px;padding-top:6px;border-top:1px solid var(--border);}
+  .curso-admin-h{font-size:15px;font-weight:700;margin:14px 0 2px;}
+  .curso-modulos-list{display:flex;flex-direction:column;gap:8px;margin:10px 0;}
+  .curso-modulo-row{
+    display:flex;align-items:center;gap:12px;background:var(--bg-card);border:1px solid var(--border);
+    border-radius:var(--radius-sm);padding:8px 12px;flex-wrap:wrap;
+  }
+  .cm-cover{position:relative;flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .cm-cover img{width:46px;height:69px;object-fit:cover;border-radius:6px;}
+  .cm-cover-empty{width:46px;height:69px;border-radius:6px;background:var(--bg-hover);display:flex;align-items:center;justify-content:center;}
+  .cm-cover-upload{cursor:pointer;font-size:10px;padding:3px 6px;}
+  .cm-fields{flex:1 1 220px;display:flex;flex-direction:column;gap:6px;min-width:180px;}
+  .cm-count{font-size:11px;color:var(--text-mute);white-space:nowrap;}
 
   .category-block{margin-bottom:8px;}
 
@@ -1698,6 +1740,50 @@ const DIAGNOSTICO_ABERTURA_QUESTIONS = [
 const WISPFORM_SEED_MAP = {};
 
 let COURSES = []; // populado em runtime a partir do Supabase (ver bootstrapData)
+
+/* Os 3 "cursos" além do Método (que continua como sempre foi, com os MODULES fixos acima). Cada aula
+   (courses.curso_id) pertence a um destes — 'formacao' só aparece pra quem tem 'formacao' no conjunto de
+   programas do aluno (tier ou extra_programs), 'pgncc' só pra quem tem 'pgncc', e 'formacao_pgncc' é o
+   conteúdo compartilhado entre os dois grupos. Ver studentProgramSet()/cursoVisibleTo() mais abaixo. */
+const CURSOS = [
+  {id:'formacao', titulo:'Formação em Neurociência do Comportamento da Criança', programs:['formacao']},
+  {id:'pgncc', titulo:'Pós-Graduação em Neurociência do Comportamento da Criança', programs:['pgncc']},
+  {id:'formacao_pgncc', titulo:'Conteúdo Formação + Pós-Graduação', programs:['formacao','pgncc']},
+];
+function getCurso(id){ return CURSOS.find(c=>c.id===id); }
+/* Conjunto de programas de um aluno: o tier principal (quando é 'formacao' ou 'pgncc') + qualquer
+   programa extra (matrícula nos dois ao mesmo tempo). Usado só pra decidir o que aparece em Aulas. */
+function studentProgramSet(student){
+  const set = new Set(student && student.extraPrograms || []);
+  if(student && (student.tier==='formacao' || student.tier==='pgncc')) set.add(student.tier);
+  return set;
+}
+function cursoVisibleTo(curso, student){
+  if(currentRole==='staff') return true;
+  if(!student) return false;
+  const set = studentProgramSet(student);
+  return curso.programs.some(p=>set.has(p));
+}
+function cursosVisiveisPara(student){ return CURSOS.filter(c=>cursoVisibleTo(c, student)); }
+/* Aula (courses) específica: 'metodo' continua liberada pra todo mundo (como sempre foi); Formação/Pós
+   só pra quem tem acesso àquele curso. Usada tanto pra filtrar listas quanto como trava de segurança
+   dentro de openCourseModal — pra ninguém abrir pelo link direto uma aula de um programa que não tem. */
+function courseAccessibleTo(c, student){
+  if(currentRole==='staff') return true;
+  if((c.cursoId||'metodo')==='metodo') return true;
+  const curso = getCurso(c.cursoId);
+  return curso ? cursoVisibleTo(curso, student) : false;
+}
+/* Mesma regra, mas sem o "equipe interna sempre vê tudo" — pra saber o que O ALUNO em si tem direito
+   de ver (ex.: denominador de relatórios), independente de quem está logado gerando o relatório. */
+function courseInStudentScope(c, student){
+  if((c.cursoId||'metodo')==='metodo') return true;
+  const curso = getCurso(c.cursoId);
+  return curso ? curso.programs.some(p=>studentProgramSet(student).has(p)) : false;
+}
+function modulosDoCurso(cursoId){ return CURSO_MODULOS.filter(m=>m.cursoId===cursoId).sort((a,b)=>a.ordem-b.ordem); }
+function getCursoModulo(id){ return CURSO_MODULOS.find(m=>m.id===id); }
+let CURSO_MODULOS = []; // populado em runtime a partir do Supabase (ver bootstrapData) — módulos da Formação/Pós
 
 // Cada tópico tem "sections" que descrevem os campos reais da planilha Painel Profissional
 // (a mesma estrutura que você usa hoje: Dados Sociodemográficos, Dores, Desejos etc. para Persona,
@@ -6568,6 +6654,9 @@ function mapProfileRow(p){
     /* 'mentorado' (acesso completo, como sempre foi) ou 'curso' (aluno do curso gravado — só Aulas e uma
        Comunidade própria, com liberação sequencial das aulas conforme vai assistindo). */
     tier: p.tier || 'mentorado',
+    /* Programas extras além do tier principal — hoje só usado pra Formação/Pós-Graduação: um aluno
+       pode ter tier 'formacao' E também 'pgncc' aqui (matrícula nos dois ao mesmo tempo), por exemplo. */
+    extraPrograms: p.extra_programs || [],
     /* 'Método + Bônus': aluno do curso (tier 'curso') que também participa dos encontros ao vivo da
        mentoria de terça (Plantão de Dúvidas) e sexta (Consultório Simulado). Só muda a Agenda. */
     bonus: !!p.bonus,
@@ -6610,7 +6699,7 @@ async function bootstrapData(){
 
   const me = profiles.find(p=>p.id===currentUser.id);
   currentUserRole = me ? me.role : 'aluno';
-  currentUserProfile = me ? {id:me.id, name:me.name, initials:me.initials, color:me.color, avatarUrl:me.avatar_url||null, tier:me.tier||'mentorado', bonus:!!me.bonus, aulasLiberadas:!!me.aulas_liberadas} : null;
+  currentUserProfile = me ? {id:me.id, name:me.name, initials:me.initials, color:me.color, avatarUrl:me.avatar_url||null, tier:me.tier||'mentorado', extraPrograms:me.extra_programs||[], bonus:!!me.bonus, aulasLiberadas:!!me.aulas_liberadas} : null;
 
   /* Papel 'vendas' (vendedora do time): acesso restrito ao Registro de Sessões 1:1 e nada mais.
      Carrega só essa lista — nenhum dado de aluno, comunidade, aulas, clientes ou financeiro chega ao
@@ -6635,12 +6724,13 @@ async function bootstrapData(){
   PEOPLE = {};
   profiles.forEach(p=>{ PEOPLE[p.id] = {id:p.id, name:p.name, initials:p.initials, color:p.color, avatarUrl:p.avatar_url||null, role:p.role}; });
 
-  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows},{data:novidadeCommentRows},{data:estudoRows},{data:estudoMensagemRows}] = await Promise.all([
+  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:cursoModuloRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows},{data:novidadeCommentRows},{data:estudoRows},{data:estudoMensagemRows}] = await Promise.all([
     sb.from('module_checklist_state').select('*'),
     sb.from('panel_data').select('*'),
     sb.from('panel_overrides').select('*'),
     sb.from('internal_diag_answers').select('*'),
     sb.from('courses').select('*, course_materials(*)').order('mod_id').order('order_index'),
+    sb.from('curso_modulos').select('*').order('curso_id').order('ordem'),
     sb.from('materials').select('*').order('id'),
     sb.from('live_sessions').select('*').order('event_date',{ascending:true}),
     sb.from('live_session_watched').select('live_session_id').eq('student_id', currentUser.id),
@@ -6698,7 +6788,13 @@ async function bootstrapData(){
       tint:[c.tint1 || '#3f6a58', c.tint2 || '#bec6b1'],
       desc:c.description || '', videoLink:c.video_link || '',
       materiais:(c.course_materials||[]).map(m=>({title:m.title, link:m.link, _id:m.id})),
+      cursoId:c.curso_id || 'metodo', moduloId:c.modulo_id || null,
     });
+  });
+
+  CURSO_MODULOS.length = 0;
+  (cursoModuloRows||[]).forEach(m=>{
+    CURSO_MODULOS.push({id:m.id, cursoId:m.curso_id, nome:m.nome, subtitulo:m.subtitulo||'', ordem:m.ordem||0, capaUrl:m.capa_url||null});
   });
 
   MATERIALS.length = 0;
@@ -7087,10 +7183,10 @@ async function syncContatoSyncSession(contatoId, sid, sess){
   return data.id;
 }
 function syncCourseInsert(course){
-  syncNow(sb.from('courses').insert({id:course.id, mod_id:course.modId, cat:course.cat, title:course.title, duration:course.duration, tint1:course.tint[0], tint2:course.tint[1], description:course.desc, video_link:course.videoLink, order_index:course._orderIndex||0}));
+  syncNow(sb.from('courses').insert({id:course.id, mod_id:course.modId||null, cat:course.cat, title:course.title, duration:course.duration, tint1:course.tint[0], tint2:course.tint[1], description:course.desc, video_link:course.videoLink, order_index:course._orderIndex||0, curso_id:course.cursoId||'metodo', modulo_id:course.moduloId||null}));
 }
 async function syncCourseUpdate(course){
-  const { error } = await sb.from('courses').update({mod_id:course.modId, cat:course.cat, title:course.title, duration:course.duration, description:course.desc, video_link:course.videoLink}).eq('id', course.id);
+  const { error } = await sb.from('courses').update({mod_id:course.modId||null, cat:course.cat, title:course.title, duration:course.duration, description:course.desc, video_link:course.videoLink, curso_id:course.cursoId||'metodo', modulo_id:course.moduloId||null}).eq('id', course.id);
   if(error) throw error;
   await sb.from('course_materials').delete().eq('course_id', course.id);
   if(course.materiais.length){
@@ -7103,6 +7199,45 @@ function syncCourseDelete(courseId){
 }
 function syncCourseOrder(courses){
   syncNow(Promise.all(courses.map((c,i)=>sb.from('courses').update({order_index:i}).eq('id',c.id))));
+}
+/* ---- Módulos da Formação/Pós-Graduação (curso_modulos) ---- */
+function syncCursoModuloInsert(modulo){
+  syncNow(sb.from('curso_modulos').insert({id:modulo.id, curso_id:modulo.cursoId, nome:modulo.nome, subtitulo:modulo.subtitulo||null, ordem:modulo.ordem||0, capa_url:modulo.capaUrl||null}));
+}
+function syncCursoModuloUpdate(modulo){
+  syncNow(sb.from('curso_modulos').update({nome:modulo.nome, subtitulo:modulo.subtitulo||null, capa_url:modulo.capaUrl||null}).eq('id', modulo.id));
+}
+function syncCursoModuloDelete(moduloId){
+  syncNow(sb.from('curso_modulos').delete().eq('id', moduloId));
+}
+function syncCursoModuloOrder(modulos){
+  syncNow(Promise.all(modulos.map((m,i)=>sb.from('curso_modulos').update({ordem:i}).eq('id',m.id))));
+}
+/* Capa do módulo (Formação/Pós) — reaproveita o mesmo redimensionamento usado nas fotos de perfil,
+   só que em formato retrato (aprox. 400x600) em vez de quadrado. */
+const CURSO_CAPA_MAX_DIM = 600;
+const CURSO_CAPA_ALVO_BYTES = 180*1024;
+async function uploadCursoCapaFile(file, moduloId){
+  let toUpload = file;
+  try{
+    toUpload = await Promise.race([
+      resizeImageForUpload(file, CURSO_CAPA_ALVO_BYTES, CURSO_CAPA_MAX_DIM),
+      new Promise((_,rej)=> setTimeout(()=>rej(new Error('Tempo esgotado ao processar a imagem.')), 12000))
+    ]);
+  }catch(e){
+    console.error('Falha ao redimensionar capa do módulo, tentando enviar original:', e);
+    toUpload = file;
+  }
+  const ext = (toUpload.name||'').split('.').pop() || 'jpg';
+  const path = `${moduloId}-${Date.now()}.${ext.toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg'}`;
+  const { error: upErr } = await sb.storage.from('curso-capas').upload(path, toUpload, {upsert:true, cacheControl:'31536000', contentType: toUpload.type || undefined});
+  if(upErr) throw upErr;
+  const { data } = sb.storage.from('curso-capas').getPublicUrl(path);
+  return data.publicUrl;
+}
+/* ---- Programas extras do aluno (matrícula em Formação e/ou Pós-Graduação além do tier principal) ---- */
+function syncStudentExtraProgramsUpdate(id, extraPrograms){
+  syncNow(sb.from('profiles').update({extra_programs: extraPrograms}).eq('id', id));
 }
 async function syncMaterialInsert(m){
   const { data, error } = await sb.from('materials').insert({title:m.title, type:m.type, link:m.link}).select().single();
@@ -8527,8 +8662,9 @@ function renderInicio(){
   const overall = overallProgress(s);
   const nextTask = s.checklist.find(t=>t.responsavel==='Mentorado' && t.status!=='Concluída');
   const nextLive = LIVE_SESSIONS.find(l=>l.type==='upcoming' && (l.studentId===s.id || (l.studentId==null && l.audience===(s.tier||'mentorado'))));
-  const inProgress = COURSES.filter(c=>s.courseProgress[c.id]>0 && s.courseProgress[c.id]<100);
-  const continueList = inProgress.length? inProgress : COURSES.filter(c=>s.courseProgress[c.id]===0).slice(0,3);
+  const metodoCourses = COURSES.filter(c=>(c.cursoId||'metodo')==='metodo'); // sugestão de "continuar assistindo" é só do Método
+  const inProgress = metodoCourses.filter(c=>s.courseProgress[c.id]>0 && s.courseProgress[c.id]<100);
+  const continueList = inProgress.length? inProgress : metodoCourses.filter(c=>s.courseProgress[c.id]===0).slice(0,3);
   const crmStats = computeCrmStats(s.id);
   const fatStats = computeFaturamentoStats(s.id);
   const heroPts = STUDENT_POINTS[s.id] || {conquistas:0};
@@ -8756,12 +8892,13 @@ function bindCourseTiles(){
    biblioteca de Aulas quanto pra decidir a ordem de liberação sequencial do aluno do curso (ver
    orderedCourseIds/isLessonLocked mais abaixo) — as duas coisas precisam ser a mesma ordem. */
 function orderedCourseCats(){
-  const orderedCats = MODULES.map(m=>m.name).filter(name=>COURSES.some(c=>c.cat===name));
-  const extraCats = [...new Set(COURSES.map(c=>c.cat))].filter(cat=>!orderedCats.includes(cat));
+  const metodoCourses = COURSES.filter(c=>c.cursoId==='metodo');
+  const orderedCats = MODULES.map(m=>m.name).filter(name=>metodoCourses.some(c=>c.cat===name));
+  const extraCats = [...new Set(metodoCourses.map(c=>c.cat))].filter(cat=>!orderedCats.includes(cat));
   return [...orderedCats, ...extraCats];
 }
 function orderedCourseIds(){
-  return orderedCourseCats().flatMap(cat=>COURSES.filter(c=>c.cat===cat).map(c=>c.id));
+  return orderedCourseCats().flatMap(cat=>COURSES.filter(c=>c.cursoId==='metodo' && c.cat===cat).map(c=>c.id));
 }
 /* Só vale pra aluno do curso gravado (tier 'curso') — a mentoria completa continua com todas as aulas
    sempre abertas, como já era. A primeira aula da sequência nunca fica travada; as seguintes só liberam
@@ -8776,8 +8913,43 @@ function isLessonLocked(courseId, student){
   const prevId = order[idx-1];
   return (student.courseProgress[prevId]||0) !== 100;
 }
+/* Cartão de um módulo de Formação/Pós-Graduação (capa em pé + "Módulo N" + nome) — clicar abre a lista
+   de aulas daquele módulo (openCursoModuloModal). O número do badge é sempre a posição real (ordem),
+   nunca depende do que foi digitado no nome. */
+function moduloCardHtml(modulo, idx){
+  const style = modulo.capaUrl ? `background-image:url('${escapeAttr(modulo.capaUrl)}');` : '';
+  return `
+    <button type="button" class="modulo-card" data-modulo-id="${modulo.id}">
+      <div class="modulo-card-cover ${modulo.capaUrl?'has-cover':''}" style="${style}">
+        ${!modulo.capaUrl? icon('film','modulo-card-placeholder') : ''}
+        <div class="modulo-card-badge">Módulo ${idx+1}</div>
+      </div>
+      <div class="modulo-card-title">${escapeHtml(modulo.nome)}</div>
+    </button>`;
+}
+function cursoBlockHtml(curso, i){
+  const modulos = modulosDoCurso(curso.id);
+  return `
+    <div class="category-block">
+      <h2 class="section-title curso-block-h">${curso.titulo}</h2>
+      ${modulos.length? `
+        <div class="row-scroll-wrap">
+          <button type="button" class="row-scroll-btn left is-hidden" aria-label="Rolar para a esquerda">${icon('back')}</button>
+          <div class="row-scroll" id="row-scroll-curso-${i}">${modulos.map((m,idx)=>moduloCardHtml(m,idx)).join('')}</div>
+          <button type="button" class="row-scroll-btn right is-hidden" aria-label="Rolar para a direita">${icon('back')}</button>
+        </div>
+      ` : `<p class="modulo-empty">Em breve — a equipe ainda está publicando os módulos.</p>`}
+    </div>`;
+}
+function bindCursoModuloCards(){
+  document.querySelectorAll('.modulo-card').forEach(el=>{
+    el.addEventListener('click',()=>openCursoModuloModal(el.dataset.moduloId));
+  });
+}
 function renderAulas(){
+  const s = getStudent(currentStudentId);
   const cats = orderedCourseCats();
+  const cursosExtra = cursosVisiveisPara(s);
   document.getElementById('view-aulas').innerHTML = `
     <p class="section-sub">Biblioteca de aulas do Neurociência do Comportamento da Criança, organizada pelos mesmos módulos do seu Dashboard — assista no seu ritmo.</p>
     ${cats.map((cat,i)=>`
@@ -8785,14 +8957,45 @@ function renderAulas(){
         <h2 class="section-title">${cat}</h2>
         <div class="row-scroll-wrap">
           <button type="button" class="row-scroll-btn left is-hidden" aria-label="Rolar para a esquerda">${icon('back')}</button>
-          <div class="row-scroll" id="row-scroll-${i}">${COURSES.filter(c=>c.cat===cat).map(c=>courseTileHtml(c)).join('')}</div>
+          <div class="row-scroll" id="row-scroll-${i}">${COURSES.filter(c=>c.cursoId==='metodo' && c.cat===cat).map(c=>courseTileHtml(c)).join('')}</div>
           <button type="button" class="row-scroll-btn right is-hidden" aria-label="Rolar para a direita">${icon('back')}</button>
         </div>
       </div>
     `).join('')}
+    ${cursosExtra.map((curso,i)=>cursoBlockHtml(curso,i)).join('')}
   `;
   bindCourseTiles();
   bindRowScrollers();
+  bindCursoModuloCards();
+}
+/* Lista de aulas dentro de um módulo de Formação/Pós-Graduação — abre no mesmo modal usado pra assistir
+   a aula (openCourseModal), só que primeiro mostra a "vitrine" do módulo. Os cliques nos cartões aqui
+   dentro são ligados à parte (não usam bindCourseTiles, pra não duplicar os listeners das aulas do
+   Método que continuam por trás, no fundo da tela). */
+function openCursoModuloModal(moduloId){
+  const modulo = getCursoModulo(moduloId);
+  if(!modulo) return;
+  const aulas = COURSES.filter(c=>c.moduloId===moduloId);
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body">
+      <div class="modulo-detail-h">
+        <div class="cat">${escapeHtml(getCurso(modulo.cursoId)? getCurso(modulo.cursoId).titulo : '')}</div>
+        <h3>${escapeHtml(modulo.nome)}</h3>
+        ${modulo.subtitulo? `<div class="modulo-detail-sub">${escapeHtml(modulo.subtitulo)}</div>` : ''}
+      </div>
+      <div class="modulo-detail-list">
+        ${aulas.length? aulas.map(c=>courseTileHtml(c)).join('') : `<p class="modulo-empty">Nenhuma aula publicada neste módulo ainda.</p>`}
+      </div>
+      <div class="modal-actions"><button class="btn-outline" id="modal-close-2">Fechar</button></div>
+    </div>`;
+  document.getElementById('modal-close-2').addEventListener('click', closeModal);
+  document.querySelectorAll('#modal .course-tile').forEach(el=>{
+    el.addEventListener('click',()=>{
+      if(el.dataset.locked) return;
+      openCourseModal(el.dataset.id);
+    });
+  });
+  document.getElementById('modal-backdrop').classList.add('open');
 }
 /* Setas de navegação + conversão do scroll vertical do mouse em rolagem horizontal — nem todo mouse tem
    scroll lateral, então isso permite navegar pelas fileiras de aulas sem depender só da barra de rolagem. */
@@ -8821,7 +9024,15 @@ function bindRowScrollers(){
 }
 function openCourseModal(id){
   const c = getCourse(id);
+  if(!c) return;
   const s = getStudent(currentStudentId);
+  /* Trava de segurança pra Formação/Pós-Graduação: mesmo que algo tente abrir direto (link antigo em
+     cache, sugestão de "continuar assistindo", etc.), uma aula de um programa que o aluno não tem
+     acesso nunca abre — o Método continua liberado pra todo mundo, como sempre foi. */
+  if(!courseAccessibleTo(c, s)){
+    alert('Você não tem acesso a esta aula.');
+    return;
+  }
   cursoAbertoNoModal = id;
   ensureCourseComments(id); // busca os comentários desta aula na primeira abertura e redesenha ao chegar
   /* Segurança extra: mesmo que algo chame openCourseModal fora do clique no card (ex.: um link "sobre
@@ -10041,7 +10252,7 @@ function checklistLinkedCourse(label, catName){
   if(!topic) return null;
   const topicWords = significantWords(topic);
   if(!topicWords.length) return null;
-  const candidates = COURSES.filter(c=>c.cat===catName);
+  const candidates = COURSES.filter(c=>c.cursoId==='metodo' && c.cat===catName);
   let best=null, bestScore=0;
   candidates.forEach(c=>{
     const titleWords = significantWords(c.title);
@@ -12049,8 +12260,9 @@ function exportAcompanhamentoPDF(s){
   const d = s.diagnostico || {};
   const { comData, semData } = linhaDoTempoAluno(s);
   const modulos = progressoPorModuloAluno(s);
-  const aulasFeitas = COURSES.filter(x=>(s.courseProgress[x.id]||0)===100);
-  const aulasAndamento = COURSES.filter(x=>{ const v=s.courseProgress[x.id]||0; return v>0 && v<100; });
+  const cursosAcessiveisAluno = COURSES.filter(x=>courseInStudentScope(x, s));
+  const aulasFeitas = cursosAcessiveisAluno.filter(x=>(s.courseProgress[x.id]||0)===100);
+  const aulasAndamento = cursosAcessiveisAluno.filter(x=>{ const v=s.courseProgress[x.id]||0; return v>0 && v<100; });
   const tarefas = s.checklist || [];
   const feitas = tarefas.filter(t=>t.status==='Concluída').length;
   const vendas = vendasDoAluno(s.id);
@@ -12255,14 +12467,14 @@ function aulaPickHtml(selecionadas, prefix){
 }
 /* Menu suspenso: escolhe uma aula por vez; as escolhidas viram etiquetas com "x" pra tirar. */
 function aulaPickInnerHtml(sel, prefix){
-  if(!COURSES.length) return `<span style="color:var(--text-mute);font-size:12px">Nenhuma aula cadastrada ainda.</span>`;
+  if(!COURSES.some(c=>c.cursoId==='metodo')) return `<span style="color:var(--text-mute);font-size:12px">Nenhuma aula cadastrada ainda.</span>`;
   const escolhidas = orderedCourseIds().filter(id=>sel.has(id)).map(getCourse).filter(Boolean);
   const cats = orderedCourseCats();
   return `
     ${escolhidas.length? `<div class="pills">${escolhidas.map(c=>`<span class="aula-pill active">${escapeHtml(c.title)} <button type="button" class="aula-pill-x" data-${prefix}-remove="${escapeAttr(c.id)}" title="Remover">×</button></span>`).join('')}</div>` : ''}
     <select class="ps-input" data-${prefix}-select>
       <option value="">${escolhidas.length? 'Adicionar outra aula...' : 'Selecionar aula...'}</option>
-      ${cats.map(cat=>`<optgroup label="${escapeAttr(cat)}">${COURSES.filter(c=>c.cat===cat && !sel.has(c.id)).map(c=>`<option value="${escapeAttr(c.id)}">${escapeHtml(c.title)}</option>`).join('')}</optgroup>`).join('')}
+      ${cats.map(cat=>`<optgroup label="${escapeAttr(cat)}">${COURSES.filter(c=>c.cursoId==='metodo' && c.cat===cat && !sel.has(c.id)).map(c=>`<option value="${escapeAttr(c.id)}">${escapeHtml(c.title)}</option>`).join('')}</optgroup>`).join('')}
     </select>`;
 }
 function bindAulaPick(prefix, set){
@@ -12785,7 +12997,9 @@ function openEditCourseModal(courseId){
           <label class="ps-label">Título da aula</label>
           <input class="ps-input" type="text" id="edit-course-title" value="${escapeAttr(c.title)}">
           <label class="ps-label">Módulo</label>
-          <select class="ps-input" id="edit-course-mod">${MODULES.map(m=>`<option value="${m.id}" ${m.id===c.modId?'selected':''}>${m.name}</option>`).join('')}</select>
+          ${(c.cursoId||'metodo')==='metodo'
+            ? `<select class="ps-input" id="edit-course-mod">${MODULES.map(m=>`<option value="${m.id}" ${m.id===c.modId?'selected':''}>${m.name}</option>`).join('')}</select>`
+            : `<select class="ps-input" id="edit-course-mod">${modulosDoCurso(c.cursoId).map(m=>`<option value="${m.id}" ${m.id===c.moduloId?'selected':''}>${escapeHtml(m.nome)}</option>`).join('')}</select>`}
           <label class="ps-label">Duração</label>
           <input class="ps-input" type="text" id="edit-course-duration" value="${escapeAttr(c.duration)}">
           <label class="ps-label">Descrição</label>
@@ -12814,7 +13028,10 @@ function openEditCourseModal(courseId){
     // Campos principais: salvam em `c` a cada alteração, para que reabrir a lista de
     // materiais (que exige um re-render do modal) nunca perca o que já foi digitado.
     document.getElementById('edit-course-title').addEventListener('input', e=>{ c.title = e.target.value; });
-    document.getElementById('edit-course-mod').addEventListener('change', e=>{ c.modId = e.target.value; c.cat = getModule(c.modId).name; });
+    document.getElementById('edit-course-mod').addEventListener('change', e=>{
+      if((c.cursoId||'metodo')==='metodo'){ c.modId = e.target.value; c.cat = getModule(c.modId).name; }
+      else { c.moduloId = e.target.value; const m = getCursoModulo(c.moduloId); c.cat = m ? m.nome : ''; }
+    });
     document.getElementById('edit-course-duration').addEventListener('input', e=>{ c.duration = e.target.value; });
     document.getElementById('edit-course-desc').addEventListener('input', e=>{ c.desc = e.target.value; });
     document.getElementById('edit-course-link').addEventListener('input', e=>{
@@ -12856,6 +13073,211 @@ function openEditCourseModal(courseId){
   }
   renderModal();
   document.getElementById('modal-backdrop').classList.add('open');
+}
+/* ================= ADMIN: Formação / Pós-Graduação (módulos e aulas por curso) =================
+   Independente da lista/drag-and-drop do Método (que usa mod_id + MODULES) — aqui cada curso
+   (formacao/pgncc/formacao_pgncc) tem seus próprios módulos (curso_modulos, com capa) e as aulas dentro
+   de cada um são reordenadas com setas simples (sem arrastar). Os cliques em "Editar"/"Remover" das aulas
+   reaproveitam data-edit-course/data-del-course, já ligados por bindConteudoCourseEvents(). */
+function moduloAdminRowHtml(modulo, isFirst, isLast){
+  const aulaCount = COURSES.filter(c=>c.moduloId===modulo.id).length;
+  return `
+    <div class="curso-modulo-row" data-modulo-row="${modulo.id}">
+      <div class="cm-cover">
+        ${modulo.capaUrl? `<img src="${escapeAttr(modulo.capaUrl)}" alt="">` : `<div class="cm-cover-empty">${icon('film','tiny')}</div>`}
+        <label class="btn-mini cm-cover-upload">${icon('upload','tiny')} Capa
+          <input type="file" accept="image/*" data-modulo-capa="${modulo.id}" style="display:none">
+        </label>
+      </div>
+      <div class="cm-fields">
+        <input class="ps-input" data-modulo-nome="${modulo.id}" value="${escapeAttr(modulo.nome)}" placeholder="Nome do módulo (ex.: A Formação do Comportamento da Criança)">
+        <input class="ps-input" data-modulo-subtitulo="${modulo.id}" value="${escapeAttr(modulo.subtitulo||'')}" placeholder="Subtítulo (opcional)">
+      </div>
+      <div class="ct-actions">
+        <button class="reorder-btn" data-move-up-modulo="${modulo.id}" ${isFirst?'disabled':''} title="Mover para cima">${icon('up')}</button>
+        <button class="reorder-btn" data-move-down-modulo="${modulo.id}" ${isLast?'disabled':''} title="Mover para baixo">${icon('down')}</button>
+        <span class="cm-count">${aulaCount} aula${aulaCount===1?'':'s'}</span>
+        <button class="btn-mini danger" data-del-modulo="${modulo.id}">${icon('trash')} Remover</button>
+      </div>
+    </div>`;
+}
+function cursoAulaRowHtml(c, isFirst, isLast){
+  return `
+    <div class="course-row" data-curso-aula-row="${c.id}">
+      <div class="ct-title">${escapeHtml(c.title)}<span class="dur">${escapeHtml(c.duration)}${c.materiais&&c.materiais.length? ' · '+c.materiais.length+' material(is)':''}</span></div>
+      <div class="ct-actions">
+        <button class="reorder-btn" data-move-up-curso-aula="${c.id}" ${isFirst?'disabled':''} title="Mover para cima">${icon('up')}</button>
+        <button class="reorder-btn" data-move-down-curso-aula="${c.id}" ${isLast?'disabled':''} title="Mover para baixo">${icon('down')}</button>
+        <button class="btn-mini" data-edit-course="${c.id}">${icon('edit')} Editar</button>
+        <button class="btn-mini danger" data-del-course="${c.id}">${icon('trash')} Remover</button>
+      </div>
+    </div>`;
+}
+function cursoAdminAulasHtml(curso){
+  const modulos = modulosDoCurso(curso.id);
+  if(!modulos.length) return '';
+  const blocks = modulos.map(mod=>{
+    const aulas = COURSES.filter(c=>c.moduloId===mod.id);
+    if(!aulas.length) return '';
+    return `<div class="module-block">
+      <div class="module-block-h">${escapeHtml(mod.nome)}</div>
+      ${aulas.map((c,i)=>cursoAulaRowHtml(c,i===0,i===aulas.length-1)).join('')}
+    </div>`;
+  }).join('');
+  return blocks || `<p class="modulo-empty">Nenhuma aula publicada ainda nos módulos criados.</p>`;
+}
+function cursoAdminBlockHtml(curso){
+  const modulos = modulosDoCurso(curso.id);
+  return `
+    <div class="curso-admin-block">
+      <h3 class="curso-admin-h">${escapeHtml(curso.titulo)}</h3>
+      <p class="section-sub" style="margin-top:-6px">Crie os módulos (capa em pé, aprox. 400x600px) e depois publique as aulas dentro de cada um. Só quem tem acesso a este programa vê este conteúdo em Aulas.</p>
+      <div class="curso-modulos-list">
+        ${modulos.length? modulos.map((m,i)=>moduloAdminRowHtml(m,i===0,i===modulos.length-1)).join('') : `<p class="modulo-empty">Nenhum módulo criado ainda.</p>`}
+      </div>
+      <div class="add-form">
+        <div class="field full"><label>Nome do novo módulo</label><input class="ps-input" id="new-modulo-nome-${curso.id}" placeholder="Ex.: A Formação do Comportamento da Criança"></div>
+        <div class="field full"><label>Subtítulo (opcional)</label><input class="ps-input" id="new-modulo-subtitulo-${curso.id}" placeholder="Uma linha curta sobre o tema deste módulo"></div>
+        <div class="actions"><button class="btn-accent" data-add-modulo="${curso.id}">${icon('upload')} Criar módulo</button></div>
+      </div>
+      <div class="curso-aulas-list">${cursoAdminAulasHtml(curso)}</div>
+      ${modulos.length? `
+      <div class="add-form">
+        <div class="field full"><label>Título da aula</label><input class="ps-input" id="new-curso-aula-title-${curso.id}" placeholder="Ex.: Como identificar o temperamento da criança"></div>
+        <div class="field"><label>Módulo</label>
+          <select class="ps-input" id="new-curso-aula-modulo-${curso.id}">${modulos.map(m=>`<option value="${m.id}">${escapeHtml(m.nome)}</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>Duração</label><input class="ps-input" id="new-curso-aula-duration-${curso.id}" placeholder="Ex.: 40min"></div>
+        <div class="field full"><label>Descrição</label><textarea class="ps-input" id="new-curso-aula-desc-${curso.id}" placeholder="Do que trata esta aula..."></textarea></div>
+        <div class="field full">
+          <label>Link do vídeo (YouTube)</label>
+          <input class="ps-input" id="new-curso-aula-link-${curso.id}" placeholder="https://www.youtube.com/watch?v=...">
+          <div class="field-error" id="new-curso-aula-link-error-${curso.id}" style="display:none">Informe um link válido de vídeo do YouTube.</div>
+        </div>
+        <div class="actions"><button class="btn-accent" data-add-curso-aula="${curso.id}">${icon('upload')} Publicar aula</button></div>
+      </div>` : ''}
+    </div>`;
+}
+function bindCursoModuloAdmin(){
+  document.querySelectorAll('[data-add-modulo]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const cursoId = btn.dataset.addModulo;
+      const nomeEl = document.getElementById(`new-modulo-nome-${cursoId}`);
+      const subEl = document.getElementById(`new-modulo-subtitulo-${cursoId}`);
+      const nome = nomeEl.value.trim();
+      if(!nome) return;
+      const modulo = {id:'cm'+Date.now(), cursoId, nome, subtitulo: subEl.value.trim(), ordem: modulosDoCurso(cursoId).length, capaUrl:null};
+      CURSO_MODULOS.push(modulo);
+      syncCursoModuloInsert(modulo);
+      renderConteudo();
+    });
+  });
+  document.querySelectorAll('[data-modulo-nome]').forEach(inp=>{
+    inp.addEventListener('change',()=>{
+      const m = getCursoModulo(inp.dataset.moduloNome);
+      if(!m) return;
+      m.nome = inp.value.trim() || m.nome;
+      inp.value = m.nome;
+      syncCursoModuloUpdate(m);
+      // O nome do módulo também é a "categoria" mostrada nos cartões das aulas dele — mantém em sincronia.
+      COURSES.filter(c=>c.moduloId===m.id).forEach(c=>{ c.cat = m.nome; syncCourseUpdate(c); });
+    });
+  });
+  document.querySelectorAll('[data-modulo-subtitulo]').forEach(inp=>{
+    inp.addEventListener('change',()=>{
+      const m = getCursoModulo(inp.dataset.moduloSubtitulo);
+      if(!m) return;
+      m.subtitulo = inp.value.trim();
+      syncCursoModuloUpdate(m);
+    });
+  });
+  document.querySelectorAll('[data-modulo-capa]').forEach(inp=>{
+    inp.addEventListener('change', async ()=>{
+      const file = inp.files && inp.files[0];
+      if(!file) return;
+      const m = getCursoModulo(inp.dataset.moduloCapa);
+      if(!m) return;
+      try{
+        m.capaUrl = await uploadCursoCapaFile(file, m.id);
+        syncCursoModuloUpdate(m);
+        renderConteudo();
+      }catch(e){ console.error(e); alert('Não foi possível enviar a capa. Tente novamente.'); }
+    });
+  });
+  document.querySelectorAll('[data-move-up-modulo], [data-move-down-modulo]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const id = btn.dataset.moveUpModulo || btn.dataset.moveDownModulo;
+      const dir = btn.dataset.moveUpModulo ? -1 : 1;
+      const m = getCursoModulo(id);
+      if(!m) return;
+      const list = modulosDoCurso(m.cursoId);
+      const idx = list.findIndex(x=>x.id===id);
+      const j = idx + dir;
+      if(j<0 || j>=list.length) return;
+      [list[idx].ordem, list[j].ordem] = [list[j].ordem, list[idx].ordem];
+      syncCursoModuloOrder(list);
+      renderConteudo();
+    });
+  });
+  document.querySelectorAll('[data-del-modulo]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const m = getCursoModulo(btn.dataset.delModulo);
+      if(!m) return;
+      const temAulas = COURSES.some(c=>c.moduloId===m.id);
+      if(temAulas){ alert('Este módulo ainda tem aulas publicadas — mova ou remova as aulas dele antes de excluir o módulo.'); return; }
+      if(!confirmDelete(`Excluir o módulo "${m.nome}"? Essa ação não pode ser desfeita.`)) return;
+      syncCursoModuloDelete(m.id);
+      const idx = CURSO_MODULOS.findIndex(x=>x.id===m.id);
+      if(idx>-1) CURSO_MODULOS.splice(idx,1);
+      renderConteudo();
+    });
+  });
+}
+function bindCursoAulaAdmin(){
+  document.querySelectorAll('[data-add-curso-aula]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const cursoId = btn.dataset.addCursoAula;
+      const title = document.getElementById(`new-curso-aula-title-${cursoId}`).value.trim();
+      const moduloId = document.getElementById(`new-curso-aula-modulo-${cursoId}`).value;
+      const modulo = getCursoModulo(moduloId);
+      const duration = document.getElementById(`new-curso-aula-duration-${cursoId}`).value.trim() || '—';
+      const desc = document.getElementById(`new-curso-aula-desc-${cursoId}`).value.trim();
+      const videoLink = document.getElementById(`new-curso-aula-link-${cursoId}`).value.trim();
+      const errEl = document.getElementById(`new-curso-aula-link-error-${cursoId}`);
+      if(!title || !youtubeId(videoLink) || !modulo){
+        errEl.style.display = youtubeId(videoLink) ? 'none' : 'block';
+        return;
+      }
+      const course = {
+        id:'c'+Date.now(), modId:null, cat:modulo.nome, title, duration,
+        tint: ['#3f6a58','#bec6b1'],
+        desc: desc || 'Aula publicada pela equipe interna.',
+        videoLink, materiais:[],
+        _orderIndex: COURSES.filter(c=>c.moduloId===moduloId).length,
+        cursoId, moduloId,
+      };
+      COURSES.push(course);
+      syncCourseInsert(course);
+      renderConteudo();
+    });
+  });
+  document.querySelectorAll('[data-move-up-curso-aula], [data-move-down-curso-aula]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const id = btn.dataset.moveUpCursoAula || btn.dataset.moveDownCursoAula;
+      const dir = btn.dataset.moveUpCursoAula ? -1 : 1;
+      const c = COURSES.find(x=>x.id===id);
+      if(!c) return;
+      const list = COURSES.filter(x=>x.moduloId===c.moduloId);
+      const idx = list.findIndex(x=>x.id===id);
+      const j = idx + dir;
+      if(j<0 || j>=list.length) return;
+      const globalIdx = COURSES.findIndex(x=>x.id===id);
+      const globalJ = COURSES.findIndex(x=>x.id===list[j].id);
+      [COURSES[globalIdx], COURSES[globalJ]] = [COURSES[globalJ], COURSES[globalIdx]];
+      syncCourseOrder(COURSES.filter(x=>x.moduloId===c.moduloId));
+      renderConteudo();
+    });
+  });
 }
 function renderConteudo(){
   document.getElementById('view-conteudo').innerHTML = `
@@ -12916,6 +13338,10 @@ function renderConteudo(){
       </div>
       <div class="actions"><button class="btn-accent" id="add-course-btn">${icon('upload')} Publicar aula</button></div>
     </div>
+
+    <h2 class="section-title">${icon('idcard')} Formação e Pós-Graduação</h2>
+    <p class="section-sub" style="margin-top:-6px">Conteúdo exclusivo por programa — cada bloco abaixo só aparece em Aulas para quem tem acesso àquele programa (definido na ficha do aluno, em Visão Geral). "Conteúdo Formação + Pós-Graduação" aparece pros dois grupos ao mesmo tempo.</p>
+    ${CURSOS.map(curso=>cursoAdminBlockHtml(curso)).join('')}
 
     <h2 class="section-title">${icon('folder')} Materiais</h2>
     <div class="table-wrap">
@@ -13000,6 +13426,8 @@ function renderConteudo(){
     </div>
   `;
   bindConteudoCourseEvents();
+  bindCursoModuloAdmin();
+  bindCursoAulaAdmin();
   document.getElementById('add-novidade-btn').addEventListener('click', async ()=>{
     const titulo = document.getElementById('new-novidade-titulo').value.trim();
     const texto = document.getElementById('new-novidade-texto').value.trim();
@@ -13756,11 +14184,16 @@ function nextCourseLessonFor(s){
 }
 function tierSelectHtml(s){
   const atual = s.tier==='curso' ? (s.bonus ? 'curso_bonus' : 'curso') : (s.tier || 'mentorado');
+  const extra = s.extraPrograms || [];
   return `<select class="ps-input" style="padding:6px 8px;font-size:12px" data-tier-select="${s.id}">
     <option value="mentorado" ${atual==='mentorado'?'selected':''}>Mentorado</option>
     <option value="formacao" ${atual==='formacao'?'selected':''}>Aluno Formação</option>
     <option value="pgncc" ${atual==='pgncc'?'selected':''}>Aluno PGNCC</option>
-  </select>`;
+  </select>
+  <div class="extra-programs" title="Marque se este aluno também tem acesso ao conteúdo do outro programa, além da categoria acima (ex.: matriculado nos dois ao mesmo tempo).">
+    <label><input type="checkbox" data-extra-program="${s.id}" data-program="formacao" ${(extra.includes('formacao')||atual==='formacao')?'checked':''} ${atual==='formacao'?'disabled':''}> também Formação</label>
+    <label><input type="checkbox" data-extra-program="${s.id}" data-program="pgncc" ${(extra.includes('pgncc')||atual==='pgncc')?'checked':''} ${atual==='pgncc'?'disabled':''}> também Pós-Graduação</label>
+  </div>`;
 }
 function bindTierSelects(root, afterChange){
   root.querySelectorAll('[data-tier-select]').forEach(sel=>{
@@ -13772,6 +14205,17 @@ function bindTierSelects(root, afterChange){
       s.bonus = v==='curso_bonus';
       syncStudentTierUpdate(s.id, s.tier, s.bonus);
       afterChange();
+    });
+  });
+  root.querySelectorAll('[data-extra-program]').forEach(cb=>{
+    cb.addEventListener('change',()=>{
+      const s = getStudent(cb.dataset.extraProgram);
+      if(!s) return;
+      const prog = cb.dataset.program;
+      const set = new Set(s.extraPrograms||[]);
+      if(cb.checked) set.add(prog); else set.delete(prog);
+      s.extraPrograms = [...set];
+      syncStudentExtraProgramsUpdate(s.id, s.extraPrograms);
     });
   });
 }

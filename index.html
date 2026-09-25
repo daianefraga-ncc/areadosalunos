@@ -1027,6 +1027,13 @@
   .crm-card .ps-remove .icon{width:11px;height:11px;}
   .crm-card-select,.crm-card-input{font-size:11.5px;padding:5px 7px;}
   .crm-card-textarea{font-size:11.5px;padding:5px 7px;resize:vertical;min-height:44px;font-family:inherit;}
+  /* Botões "Área da Criança/Família/Escola/Perfis Neurodivergentes" no card do paciente, e a faixa de
+     contexto ("você está vendo os dados de: fulano") no topo dessas 4 áreas. */
+  .crm-card-nav{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+  .crm-card-nav .btn-mini{padding:5px 7px;}
+  .paciente-context{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;}
+  .paciente-context .pc-info{font-size:13px;display:flex;align-items:center;gap:6px;}
+  .paciente-context .pc-actions{display:flex;gap:8px;flex-wrap:wrap;}
   /* Card recolhido: só o nome, pra gerir o arrastar sem poluir o quadro com Tipo/Meio/WhatsApp. */
   .crm-card-collapsed{cursor:pointer;}
   .crm-card-name-display{flex:1;min-width:0;font-weight:700;font-size:12.5px;padding:6px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;}
@@ -6183,6 +6190,11 @@ let currentStudentId = null;
 let currentRole = 'aluno';
 let currentView = 'inicio';
 let panelQuadrantId = null;
+/* Paciente/acompanhamento (um "lead" de "Meus Acompanhamentos") cujas áreas clínicas estão sendo
+   vistas/preenchidas agora. "Área da Criança", "Área da Família", "Área da Escola" e "Perfis
+   Neurodivergentes" passaram a ter uma ficha própria POR PACIENTE, em vez de uma só compartilhada
+   pelo aluno — ver QUADRANTS_POR_PACIENTE e effectiveTopicId() logo antes de renderPainel(). */
+let activeLeadId = null;
 /* Qual estudo (Biblioteca Científica) está aberto no modo chat agora; null = mostra a lista de estudos. */
 let estudoChatAbertoId = null;
 /* Arquivo PDF escolhido no formulário de "novo estudo", antes de confirmar o envio. */
@@ -7820,6 +7832,7 @@ function renderProfile(){
          só o botão "Equipe Interna" lá em cima é que volta pro modo exclusivo da equipe. */
       currentStudentId = el.dataset.id;
       panelQuadrantId = null;
+      activeLeadId = null;
       document.getElementById('profile-dropdown').classList.remove('open');
       if(currentUserRole==='staff') setRole('aluno');
       else { renderProfile(); renderCurrentView(); }
@@ -7833,7 +7846,7 @@ function goTo(view){
      goTo direto). O banco continua sendo a garantia real — aqui é só para a tela não quebrar. */
   if(currentUserRole==='vendas' && !['vendas','analise'].includes(view)) view = 'vendas';
   currentView = view;
-  if(view==='painel') panelQuadrantId = null;
+  if(view==='painel'){ panelQuadrantId = null; activeLeadId = null; }
   document.querySelectorAll('.nav-item[data-view]').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+view).classList.add('active');
@@ -10167,8 +10180,31 @@ function sectionFilled(section, data){
   if(section.type==='crm') return true;
   return true;
 }
+/* ---- Painel Profissional por paciente ----
+   "Área da Criança", "Área da Família", "Área da Escola" e "Perfis Neurodivergentes" não são mais um
+   formulário único compartilhado pelo aluno: cada paciente ("lead" de "Meus Acompanhamentos") tem a
+   própria ficha nessas 4 áreas. Isso é feito sem mudar a tabela panel_data — o topic_id salvo passa a
+   levar "@<leadId>" no final (ex.: "persona@lead123"), então cada paciente já cai numa linha diferente
+   automaticamente. "Meus Acompanhamentos" e "Gestão de Negócio" continuam como sempre (um registro por
+   aluno, sem paciente). */
+const QUADRANTS_POR_PACIENTE = ['marketing','jornada','escola','neurodivergente'];
+function effectiveTopicId(quadrantId, topicId){
+  return (QUADRANTS_POR_PACIENTE.includes(quadrantId) && activeLeadId) ? (topicId+'@'+activeLeadId) : topicId;
+}
+function getLeadsCrmSection(){
+  const topico = QUADRANTS.find(q=>q.id==='vendas').topics.find(t=>t.id==='diagnosticos-leads');
+  return topico.sections.find(sec=>sec.type==='crm');
+}
+function getLeads(s){
+  const data = getTopicData(s.id, 'diagnosticos-leads');
+  return sectionValue(data, getLeadsCrmSection()).leads || [];
+}
+function getActiveLead(s){
+  if(!activeLeadId) return null;
+  return getLeads(s).find(l=>l.id===activeLeadId) || null;
+}
 function topicFilled(quadrant, topic, idx, s){
-  const data = getTopicData(s.id, topic.id);
+  const data = getTopicData(s.id, effectiveTopicId(quadrant.id, topic.id));
   const sections = topic.sections||[];
   return sections.length>0 && sections.every(sec=>sectionFilled(sec, data));
 }
@@ -10194,6 +10230,16 @@ function renderPainel(){
       <p class="section-sub">Espaço de trabalho do Neurociência do Comportamento da Criança, organizado nos 4 pilares do negócio — visível para você e para a equipe interna.</p>
       <div class="quadrant-grid">
         ${QUADRANTS.map(q=>{
+          /* Os 4 quadrantes por paciente não têm mais um "X/Y preenchidas" único (cada paciente tem a
+             própria ficha) — mostra só um aviso de que o acesso é pelo card do paciente. */
+          if(QUADRANTS_POR_PACIENTE.includes(q.id)){
+            return `<button class="quadrant-card" data-quadrant="${q.id}">
+              <div class="qi">${icon(q.icon)}</div>
+              <div class="title">${q.title}</div>
+              <div class="meta">${q.meta}</div>
+              <div class="frac" style="font-size:11px;color:var(--text-mute);margin-top:6px;">${icon('idcard','tiny')} Por paciente — acesse pelo card em Meus Acompanhamentos</div>
+            </button>`;
+          }
           const filled = quadrantFilledCount(q,s);
           const pct = Math.round(filled/q.topics.length*100);
           return `<button class="quadrant-card" data-quadrant="${q.id}">
@@ -10211,11 +10257,30 @@ function renderPainel(){
     }));
   } else {
     const q = QUADRANTS.find(x=>x.id===panelQuadrantId);
+    /* Quadrantes por paciente exigem um paciente ativo antes de mostrar qualquer coisa — a entrada
+       normal é pelo card do paciente em "Meus Acompanhamentos" (ver crm-card-nav), que já define
+       activeLeadId antes de chegar aqui. Chegando aqui sem paciente (ex.: clique direto no card do
+       quadrante), mostra um aviso em vez de uma ficha "de ninguém". */
+    if(QUADRANTS_POR_PACIENTE.includes(q.id) && !activeLeadId){
+      el.innerHTML = `
+        <div class="back-row"><button class="back-btn" id="panel-back">${icon('back')} Voltar ao Painel Profissional</button></div>
+        <div class="locked-view">
+          <div class="locked-icon">${icon(q.icon)}</div>
+          <h2>Escolha um paciente para continuar</h2>
+          <p>${escapeHtml(q.title)} agora é preenchida paciente por paciente. Abra "Meus Acompanhamentos", escolha (ou cadastre) o paciente e clique no botão "${escapeHtml(q.title)}" no card dele.</p>
+          <button class="btn-accent" id="painel-ir-acompanhamentos" style="margin-top:18px">Ir para Meus Acompanhamentos</button>
+        </div>`;
+      document.getElementById('panel-back').addEventListener('click',()=>{panelQuadrantId=null; renderPainel();});
+      document.getElementById('painel-ir-acompanhamentos').addEventListener('click',()=>{ panelQuadrantId='vendas'; renderPainel(); });
+      return;
+    }
+    const activeLead = QUADRANTS_POR_PACIENTE.includes(q.id) ? getActiveLead(s) : null;
     /* Quadrantes com q.consentNote (ex.: Área da Criança) mostram uma tela de ciência e
-       responsabilidade profissional antes do primeiro acesso aos tópicos — só uma vez: a confirmação
-       fica salva em getTopicData(s.id,'_consent_'+q.id) e não é pedida de novo depois disso. */
+       responsabilidade profissional antes do primeiro acesso aos tópicos — agora uma vez POR PACIENTE
+       (gateKey leva "@"+activeLeadId no final), não é pedida de novo depois disso pra esse paciente,
+       mas volta a pedir pra cada paciente novo. */
     if(q.consentNote){
-      const gateKey = '_consent_'+q.id;
+      const gateKey = '_consent_'+q.id+(activeLeadId? ('@'+activeLeadId) : '');
       const gateData = getTopicData(s.id, gateKey);
       if(!gateData.accepted){
         const cn = q.consentNote;
@@ -10258,6 +10323,15 @@ function renderPainel(){
       <div class="back-row"><button class="back-btn" id="panel-back">${icon('back')} Voltar ao Painel Profissional</button></div>
       <h2 class="section-title">${icon(q.icon)} ${q.title}</h2>
       ${q.hideStatusLine? '' : `<p class="section-sub">${filled}/${q.topics.length} seções preenchidas · módulo "${getModule(q.moduleId).name}" no Dashboard.</p>`}
+      ${activeLead? `
+        <div class="paciente-context">
+          <div class="pc-info">${icon('idcard','tiny')} <strong>${escapeHtml(activeLead.nome||'(sem nome)')}</strong>${activeLead.tipo? ' · '+escapeHtml(activeLead.tipo) : ''}</div>
+          <div class="pc-actions">
+            <button type="button" class="btn-mini" id="paciente-trocar">${icon('back','tiny')} Trocar paciente</button>
+            <button type="button" class="btn-mini" id="paciente-pdf">${icon('download','tiny')} Baixar ficha completa (PDF)</button>
+          </div>
+        </div>
+      ` : ''}
       ${q.topics.map((t,i)=>{
         const f = topicFilled(q,t,i,s);
         return `<button class="topic-row" data-topic="${t.id}">
@@ -10269,6 +10343,10 @@ function renderPainel(){
     `;
     document.getElementById('panel-back').addEventListener('click',()=>{panelQuadrantId=null; renderPainel();});
     document.querySelectorAll('[data-topic]').forEach(elx=>elx.addEventListener('click',()=>openTopicModal(q, elx.dataset.topic)));
+    if(activeLead){
+      document.getElementById('paciente-trocar').addEventListener('click',()=>{ panelQuadrantId='vendas'; renderPainel(); });
+      document.getElementById('paciente-pdf').addEventListener('click',()=>exportFichaCompletaPaciente(s, activeLead));
+    }
   }
 }
 /* ---- Painel Profissional: dados estruturados por seção (fields / list / table / swatches / checklist) ---- */
@@ -10889,7 +10967,13 @@ function renderSectionHTML(section, data){
         ${CRM_TIPOS.map(t=>`<option value="${escapeAttr(t)}" ${lead.tipo===t?'selected':''}>${escapeHtml(t)}</option>`).join('')}
       </select>
       <input class="ps-input crm-card-input" data-fkind="crm-field" data-skey="${section.key}" data-crmid="${lead.id}" data-col="objetivo" value="${escapeAttr(lead.objetivo||'')}" placeholder="Objetivo do acompanhamento">
-      <textarea class="ps-input crm-card-textarea" data-fkind="crm-field" data-skey="${section.key}" data-crmid="${lead.id}" data-col="observacoes" placeholder="Observações e evolução" rows="3">${escapeHtml(lead.observacoes||'')}</textarea>` : ''}
+      <textarea class="ps-input crm-card-textarea" data-fkind="crm-field" data-skey="${section.key}" data-crmid="${lead.id}" data-col="observacoes" placeholder="Observações e evolução" rows="3">${escapeHtml(lead.observacoes||'')}</textarea>
+      <div class="crm-card-nav">
+        <button type="button" class="btn-mini" data-abrir-quadrante-paciente="marketing" data-lead-id="${lead.id}" title="Área da Criança">${icon('child','tiny')}</button>
+        <button type="button" class="btn-mini" data-abrir-quadrante-paciente="jornada" data-lead-id="${lead.id}" title="Área da Família">${icon('familia','tiny')}</button>
+        <button type="button" class="btn-mini" data-abrir-quadrante-paciente="escola" data-lead-id="${lead.id}" title="Área da Escola">${icon('escola','tiny')}</button>
+        <button type="button" class="btn-mini" data-abrir-quadrante-paciente="neurodivergente" data-lead-id="${lead.id}" title="Perfis Neurodivergentes">${icon('neuro','tiny')}</button>
+      </div>` : ''}
     </div>`;
     };
     const board = `<div class="crm-board">
@@ -11246,6 +11330,21 @@ function bindSectionEvents(sections, data, rerender, saveKey){
       rerender();
     });
   });
+  /* Botões "Área da Criança/Família/Escola/Perfis Neurodivergentes" em cada card de paciente — salva
+     qualquer alteração pendente do CRM, fecha o modal (sem perguntar de novo, já salvamos) e abre o
+     quadrante escolhido já focado nesse paciente. */
+  modalEl.querySelectorAll('[data-abrir-quadrante-paciente]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const quadrantId = btn.dataset.abrirQuadrantePaciente;
+      const leadId = btn.dataset.leadId;
+      if(saveKey) syncPanelDataNow(saveKey.sid, saveKey.topicId, data);
+      modalCloseGuard = null;
+      closeModal();
+      activeLeadId = leadId;
+      panelQuadrantId = quadrantId;
+      renderPainel();
+    });
+  });
   modalEl.querySelectorAll('[data-add]').forEach(btn=>{
     btn.addEventListener('click',()=>{
       const skey = btn.dataset.skey;
@@ -11309,7 +11408,10 @@ function openTopicModal(quadrant, topicId){
   const s = getStudent(currentStudentId);
   const topic = quadrant.topics.find(t=>t.id===topicId);
   const idx = quadrant.topics.indexOf(topic);
-  const data = getTopicData(s.id, topic.id);
+  /* Nos 4 quadrantes por paciente, isso já vem com "@<leadId>" no final (ver effectiveTopicId) —
+     fora deles, é igual a topic.id de sempre. */
+  const effTopicId = effectiveTopicId(quadrant.id, topic.id);
+  const data = getTopicData(s.id, effTopicId);
   /* CRM de Leads é uma ferramenta de uso contínuo (arrastar, adicionar, descartar leads o tempo todo) —
      não faz sentido travar os campos atrás de um botão "Editar" (senão o quadro vira só-leitura assim
      que tiver 1 lead). Fica sempre destravado, sem o par Salvar/Editar; em troca, ao fechar o modal
@@ -11338,7 +11440,7 @@ function openTopicModal(quadrant, topicId){
       if(crmSnapshotOf()===crmOpenSnapshot) return true;
       const ok = await showAppConfirm('Você fez movimentações no CRM (arrastar leads, adicionar, editar ou descartar). Deseja salvar antes de sair?', {title:'Salvar alterações do CRM?', confirmLabel:'Salvar e sair', cancelLabel:'Continuar editando'});
       if(!ok) return false;
-      syncPanelDataNow(s.id, topic.id, data);
+      syncPanelDataNow(s.id, effTopicId, data);
       crmOpenSnapshot = crmSnapshotOf();
       return true;
     };
@@ -11347,7 +11449,7 @@ function openTopicModal(quadrant, topicId){
        clicar Salvar), grava imediatamente em vez de confiar só no debounce de 700ms — se o aluno fechar
        o app logo em seguida (comum no celular), um envio ainda pendente no debounce nunca sairia, e o
        que foi digitado pareceria "apagado" na próxima vez que abrir. */
-    modalCloseGuard = ()=>{ syncPanelDataNow(s.id, topic.id, data); return true; };
+    modalCloseGuard = ()=>{ syncPanelDataNow(s.id, effTopicId, data); return true; };
   }
   function renderModal(){
     const filled = topicFilled(quadrant, topic, idx, s);
@@ -11380,7 +11482,7 @@ function openTopicModal(quadrant, topicId){
            trava os campos, mesmo com dados incompletos; se ainda faltar algo, o tópico continua
            "Pendente" lá fora, mas o que foi digitado já fica salvo. */
         editing = false;
-        syncPanelDataNow(s.id, topic.id, data);
+        syncPanelDataNow(s.id, effTopicId, data);
         renderModal();
         renderPainel();
       });
@@ -11390,7 +11492,7 @@ function openTopicModal(quadrant, topicId){
         renderModal();
       });
     }
-    bindSectionEvents(topic.sections||[], data, renderModal, {sid:s.id, topicId:topic.id, quadrantTitle:quadrant.title, topicTitle:topic.title});
+    bindSectionEvents(topic.sections||[], data, renderModal, {sid:s.id, topicId:effTopicId, quadrantTitle:quadrant.title, topicTitle:topic.title});
   }
   renderModal();
   document.getElementById('modal-backdrop').classList.add('open');
@@ -11447,6 +11549,90 @@ function exportTopicPDF(quadrant, topic, data){
         <div><div class="cat">${escapeHtml(quadrant.title)}</div><h1>${escapeHtml(topic.title)}</h1></div>
       </div>
       ${sectionsHtml}
+    </body></html>`);
+  win.document.close();
+  win.onload = ()=>{ win.focus(); win.print(); };
+  setTimeout(()=>{ try{ win.focus(); win.print(); }catch(e){} }, 600);
+}
+/* Mesma lógica de seção de exportTopicPDF, mas também cobre checklist (usado nas 4 áreas clínicas) e
+   só retorna algo quando há conteúdo de verdade preenchido — usado pela ficha completa por paciente
+   abaixo, pra não poluir o PDF com seções em branco. */
+function renderSectionHtmlForPdf(sec, data){
+  const val = sectionValue(data, sec);
+  if(sec.type==='table'){
+    const cols = sec.columns;
+    const rows = val.filter(row=>cols.some(c=>c.key!=='__label' && (row[c.key]||'').trim()!==''));
+    if(!rows.length) return '';
+    return `<h4>${escapeHtml(sec.label)}</h4><table><thead><tr>${cols.map(c=>`<th>${escapeHtml(c.label)}</th>`).join('')}</tr></thead><tbody>
+      ${rows.map(row=>`<tr>${cols.map(c=>{
+        const v = row[c.key]||'';
+        if(c.type==='link' && /^https?:\/\//i.test(v.trim())) return `<td><a href="${escapeAttr(v.trim())}">${escapeHtml(v.trim())}</a></td>`;
+        return `<td>${escapeHtml(v)}</td>`;
+      }).join('')}</tr>`).join('')}
+    </tbody></table>`;
+  }
+  if(sec.type==='list'){
+    const items = val.filter(v=>(v||'').trim()!=='');
+    return items.length? `<h4>${escapeHtml(sec.label)}</h4><ul>${items.map(v=>`<li>${escapeHtml(v)}</li>`).join('')}</ul>` : '';
+  }
+  if(sec.type==='fields'){
+    const filledFields = sec.fields.filter(f=>!f.computed && (val[f.key]||'').trim()!=='');
+    if(!filledFields.length) return '';
+    return `<h4>${escapeHtml(sec.label)}</h4>${filledFields.map(f=>`<p><strong>${escapeHtml(f.label)}:</strong> ${escapeHtml(val[f.key])}</p>`).join('')}`;
+  }
+  if(sec.type==='checklist'){
+    const items = sec.seedItems? val.filter(it=>it.done) : val.filter(it=>(it.text||'').trim()!=='');
+    if(!items.length) return '';
+    return `<h4>${escapeHtml(sec.label)}</h4><ul>${items.map(it=>`<li>${it.done!==undefined? (it.done?'☑ ':'☐ ') : ''}${escapeHtml(it.text)}</li>`).join('')}</ul>`;
+  }
+  return '';
+}
+/* Ficha completa de um paciente: reúne tudo que já foi registrado dele nas 4 áreas clínicas (Criança,
+   Família, Escola, Perfis Neurodivergentes) num único PDF, pra imprimir ou levar ao Prontuário — mesmo
+   padrão de impressão usado no resto do Painel Profissional (exportTopicPDF etc.). Tópicos sem nada
+   preenchido ainda aparecem como "Não preenchido", pra ficar claro o que falta, não só o que já tem. */
+function exportFichaCompletaPaciente(s, lead){
+  const win = window.open('', '_blank');
+  if(!win){ alert('Seu navegador bloqueou a abertura da aba de impressão. Permita pop-ups para este site e tente de novo.'); return; }
+  const quadrantesHtml = QUADRANTS_POR_PACIENTE.map(qid=>{
+    const q = QUADRANTS.find(x=>x.id===qid);
+    const topicosHtml = q.topics.map(topic=>{
+      const data = getTopicData(s.id, topic.id+'@'+lead.id);
+      const secsHtml = (topic.sections||[]).map(sec=>renderSectionHtmlForPdf(sec, data)).join('');
+      return `<div class="pdf-topic"><h3>${escapeHtml(topic.title)}</h3>${secsHtml || '<p class="pdf-empty">Não preenchido.</p>'}</div>`;
+    }).join('');
+    return `<div class="pdf-quadrant"><h2>${escapeHtml(q.title)}</h2>${topicosHtml}</div>`;
+  }).join('');
+  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Ficha — ${escapeHtml(lead.nome||'Paciente')} — Neurociência do Comportamento da Criança</title>
+    <style>
+      @page{ margin:24mm 16mm; }
+      body{ font-family:Arial,Helvetica,sans-serif; color:#1a1a1a; margin:0; padding:0 4mm; }
+      .pdf-header{ display:flex; align-items:center; gap:14px; border-bottom:2px solid #8f6231; padding-bottom:14px; margin-bottom:20px; }
+      .pdf-header img{ display:block; }
+      .pdf-header .cat{ font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#666; }
+      h1{ font-size:20px; margin:0 0 4px; }
+      h2{ font-size:16px; margin:28px 0 8px; padding-bottom:6px; border-bottom:2px solid #8f6231; page-break-before:auto; }
+      h2:first-of-type{ margin-top:0; }
+      h3{ font-size:13px; margin:16px 0 6px; color:#8f6231; }
+      h4{ font-size:11.5px; margin:12px 0 4px; color:#444; }
+      table{ width:100%; border-collapse:collapse; font-size:11.5px; }
+      th,td{ border:1px solid #ccc; padding:6px 8px; text-align:left; vertical-align:top; }
+      th{ background:#f2f2f2; }
+      ul{ margin:0; padding-left:18px; font-size:13px; }
+      li{ margin-bottom:4px; }
+      p{ font-size:13px; }
+      a{ color:#8f6231; }
+      .pdf-empty{ color:#888; font-size:12px; font-style:italic; margin:0 0 6px; }
+      .pdf-topic{ margin-bottom:10px; }
+    </style>
+    </head><body>
+      <div class="pdf-header">
+        <img src="${BRAND_LOGO_DATA_URI}" alt="NCC Plat · Neurociência do Comportamento da Criança" style="height:34px;width:auto;">
+        <div><div class="cat">Ficha completa do paciente</div><h1>${escapeHtml(lead.nome||'(sem nome)')}</h1></div>
+      </div>
+      <p>${lead.tipo? `<strong>Tipo:</strong> ${escapeHtml(lead.tipo)}` : ''}${lead.objetivo? ` &nbsp;·&nbsp; <strong>Objetivo do acompanhamento:</strong> ${escapeHtml(lead.objetivo)}` : ''}</p>
+      ${lead.observacoes? `<p><strong>Observações e evolução (Meus Acompanhamentos):</strong> ${escapeHtml(lead.observacoes)}</p>` : ''}
+      ${quadrantesHtml}
     </body></html>`);
   win.document.close();
   win.onload = ()=>{ win.focus(); win.print(); };
@@ -13794,6 +13980,7 @@ function renderVisaoGeral(){
          o seletor "Ver dados de" no menu de perfil enquanto estiver no modo Equipe Interna. */
       currentStudentId = btn.dataset.openStaff;
       panelQuadrantId = null;
+      activeLeadId = null;
       setRole('aluno');
     });
   });

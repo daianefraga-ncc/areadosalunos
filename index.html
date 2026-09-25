@@ -518,7 +518,9 @@
   .curso-block-progresso{font-size:12.5px;color:var(--text-mute);margin:-4px 0 12px;}
   .modulo-detail-h{margin-bottom:14px;}
   .modulo-detail-h .modulo-detail-sub{font-size:13px;color:var(--text-mute);margin-top:4px;}
-  .modulo-detail-list{display:flex;flex-wrap:wrap;gap:14px;}
+  .modulo-detail-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+  @media (max-width:680px){ .modulo-detail-list{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  @media (max-width:380px){ .modulo-detail-list{grid-template-columns:1fr;} }
   .modulo-empty{color:var(--text-mute);font-size:13px;padding:10px 0;}
   .extra-programs{margin-top:6px;font-size:11px;color:var(--text-mute);display:flex;flex-direction:column;gap:2px;}
   .extra-programs label{display:flex;align-items:center;gap:5px;cursor:pointer;}
@@ -535,6 +537,10 @@
   .cm-cover img{width:46px;height:69px;object-fit:cover;border-radius:6px;}
   .cm-cover-empty{width:46px;height:69px;border-radius:6px;background:var(--bg-hover);display:flex;align-items:center;justify-content:center;}
   .cm-cover-upload{cursor:pointer;font-size:10px;padding:3px 6px;}
+  .ca-cover{position:relative;flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:3px;}
+  .ca-cover img{width:64px;height:40px;object-fit:cover;border-radius:6px;}
+  .ca-cover-empty{width:64px;height:40px;border-radius:6px;background:var(--bg-hover);display:flex;align-items:center;justify-content:center;}
+  .ca-cover-upload{cursor:pointer;font-size:9.5px;padding:2px 5px;}
   .cm-fields{flex:1 1 220px;display:flex;flex-direction:column;gap:6px;min-width:180px;}
   .cm-count{font-size:11px;color:var(--text-mute);white-space:nowrap;}
 
@@ -558,6 +564,7 @@
     border-radius:var(--radius);overflow:hidden;margin:auto;max-height:90vh;overflow-y:auto;
   }
   .modal:has(.form-modal){max-width:680px;}
+  .modal:has(.modulo-detail-list){max-width:780px;}
   .modal-player{
     height:220px;background:linear-gradient(135deg,var(--tint1,#3f6a58),var(--tint2,#bec6b1));
     display:flex;align-items:center;justify-content:center;position:relative;
@@ -6806,7 +6813,7 @@ async function bootstrapData(){
       tint:[c.tint1 || '#3f6a58', c.tint2 || '#bec6b1'],
       desc:c.description || '', videoLink:c.video_link || '',
       materiais:(c.course_materials||[]).map(m=>({title:m.title, link:m.link, _id:m.id})),
-      cursoId:c.curso_id || 'metodo', moduloId:c.modulo_id || null,
+      cursoId:c.curso_id || 'metodo', moduloId:c.modulo_id || null, capaUrl:c.capa_url || null,
     });
   });
 
@@ -7206,10 +7213,10 @@ async function syncContatoSyncSession(contatoId, sid, sess){
   return data.id;
 }
 function syncCourseInsert(course){
-  syncNow(sb.from('courses').insert({id:course.id, mod_id:course.modId||null, cat:course.cat, title:course.title, duration:course.duration, tint1:course.tint[0], tint2:course.tint[1], description:course.desc, video_link:course.videoLink, order_index:course._orderIndex||0, curso_id:course.cursoId||'metodo', modulo_id:course.moduloId||null}));
+  syncNow(sb.from('courses').insert({id:course.id, mod_id:course.modId||null, cat:course.cat, title:course.title, duration:course.duration, tint1:course.tint[0], tint2:course.tint[1], description:course.desc, video_link:course.videoLink, order_index:course._orderIndex||0, curso_id:course.cursoId||'metodo', modulo_id:course.moduloId||null, capa_url:course.capaUrl||null}));
 }
 async function syncCourseUpdate(course){
-  const { error } = await sb.from('courses').update({mod_id:course.modId||null, cat:course.cat, title:course.title, duration:course.duration, description:course.desc, video_link:course.videoLink, curso_id:course.cursoId||'metodo', modulo_id:course.moduloId||null}).eq('id', course.id);
+  const { error } = await sb.from('courses').update({mod_id:course.modId||null, cat:course.cat, title:course.title, duration:course.duration, description:course.desc, video_link:course.videoLink, curso_id:course.cursoId||'metodo', modulo_id:course.moduloId||null, capa_url:course.capaUrl||null}).eq('id', course.id);
   if(error) throw error;
   await sb.from('course_materials').delete().eq('course_id', course.id);
   if(course.materiais.length){
@@ -8898,10 +8905,11 @@ function courseTileHtml(c){
   const pct = s ? (s.courseProgress[c.id] || 0) : 0;
   const locked = isLessonLocked(c.id, s);
   const yt = youtubeId(c.videoLink);
-  const coverStyle = yt ? `background-image:url('https://img.youtube.com/vi/${yt}/hqdefault.jpg');` : '';
+  const coverUrl = c.capaUrl || (yt ? `https://img.youtube.com/vi/${yt}/hqdefault.jpg` : '');
+  const coverStyle = coverUrl ? `background-image:url('${escapeAttr(coverUrl)}');` : '';
   return `
     <button class="course-tile ${locked?'is-locked':''}" data-id="${c.id}" ${locked?'data-locked="1"':''}>
-      <div class="course-thumb ${yt?'has-cover':''}" style="--tint1:${c.tint[0]};--tint2:${c.tint[1]};${coverStyle}">
+      <div class="course-thumb ${coverUrl?'has-cover':''}" style="--tint1:${c.tint[0]};--tint2:${c.tint[1]};${coverStyle}">
         <div class="play-badge">${locked? icon('lock') : fillIcon('play','play-fill')}</div>
         ${!locked && pct===100? `<div class="done-badge">${icon('check')}</div>`:''}
         <div class="progress-mini"><div class="fill" style="width:${locked?0:pct}%"></div></div>
@@ -13150,6 +13158,12 @@ function moduloAdminRowHtml(modulo, isFirst, isLast){
 function cursoAulaRowHtml(c, isFirst, isLast){
   return `
     <div class="course-row" data-curso-aula-row="${c.id}">
+      <div class="ca-cover">
+        ${c.capaUrl? `<img src="${escapeAttr(c.capaUrl)}" alt="">` : `<div class="ca-cover-empty">${icon('film','tiny')}</div>`}
+        <label class="btn-mini ca-cover-upload">${icon('upload','tiny')} Capa
+          <input type="file" accept="image/*" data-curso-aula-capa="${c.id}" style="display:none">
+        </label>
+      </div>
       <div class="ct-title">${escapeHtml(c.title)}<span class="dur">${escapeHtml(c.duration)}${c.materiais&&c.materiais.length? ' · '+c.materiais.length+' material(is)':''}</span></div>
       <div class="ct-actions">
         <button class="reorder-btn" data-move-up-curso-aula="${c.id}" ${isFirst?'disabled':''} title="Mover para cima">${icon('up')}</button>
@@ -13302,11 +13316,24 @@ function bindCursoAulaAdmin(){
         desc: desc || 'Aula publicada pela equipe interna.',
         videoLink, materiais:[],
         _orderIndex: COURSES.filter(c=>c.moduloId===moduloId).length,
-        cursoId, moduloId,
+        cursoId, moduloId, capaUrl:null,
       };
       COURSES.push(course);
       syncCourseInsert(course);
       renderConteudo();
+    });
+  });
+  document.querySelectorAll('[data-curso-aula-capa]').forEach(inp=>{
+    inp.addEventListener('change', async ()=>{
+      const file = inp.files && inp.files[0];
+      if(!file) return;
+      const c = COURSES.find(x=>x.id===inp.dataset.cursoAulaCapa);
+      if(!c) return;
+      try{
+        c.capaUrl = await uploadCursoCapaFile(file, 'aula-'+c.id);
+        await syncCourseUpdate(c);
+        renderConteudo();
+      }catch(e){ console.error(e); alert('Não foi possível enviar a capa. Tente novamente.'); }
     });
   });
   document.querySelectorAll('[data-move-up-curso-aula], [data-move-down-curso-aula]').forEach(btn=>{

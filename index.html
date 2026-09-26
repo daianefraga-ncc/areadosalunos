@@ -654,6 +654,9 @@
   .palestra-fala{background:var(--bg-card);border:1px dashed var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;line-height:1.6;white-space:pre-wrap;margin-top:4px;}
   .palestra-fala.empty{color:var(--text-dim);font-style:italic;}
   .palestra-fala-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px;}
+  .palestra-material-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .palestra-material-name{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-dim);}
+  .palestra-material-empty{font-size:12px;color:var(--text-mute);}
   .palestra-list-row{cursor:pointer;}
   .palestra-list-row .desc{color:var(--text-dim);}
   /* Status do "Exportar backup" (Visão Geral) */
@@ -1201,6 +1204,7 @@
   .diag-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:22px;}
   .diag-panel .ps-section:first-of-type .ps-h{margin-top:0;}
   .field-error{color:var(--danger);font-size:11.5px;margin:-6px 0 10px;}
+  .field-hint{color:var(--text-dim);font-size:11.5px;margin:4px 0 0;line-height:1.5;}
   .stage-tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.2px;white-space:nowrap;text-transform:uppercase;}
   .stage-tag.abertura{background:rgba(155,164,186,0.15);color:var(--stage-abertura);}
   .stage-tag.ser{background:rgba(130,137,102,0.15);color:var(--stage-ser);}
@@ -7475,7 +7479,7 @@ function evidenciaLabel(v){ const o = EVIDENCIA_OPCOES.find(x=>x.value===(v||'')
 let _palestraIdSeq = 0;
 function novoPalestraId(prefixo){ return prefixo + Date.now().toString(36) + '_' + (_palestraIdSeq++); }
 function novoPalestraSlide(titulo){
-  return { id:novoPalestraId('sl'), titulo: titulo||'', tempo:'', evidencia:'', naTela:'', notas:'', fala:'' };
+  return { id:novoPalestraId('sl'), titulo: titulo||'', tempo:'', evidencia:'', naTela:'', notas:'', fala:'', materialNome:'', materialTexto:'' };
 }
 function novaPalestraSecao(nome, tituloSlide){
   return { id:novoPalestraId('ps'), nome, slides:[novoPalestraSlide(tituloSlide||'')] };
@@ -7511,21 +7515,25 @@ function syncPalestraUpdate(p){
   }).eq('id', p.id));
 }
 function syncPalestraDelete(id){ syncNow(sb.from('palestras').delete().eq('id', id)); }
-/* Chama a Edge Function que escreve a fala de UM slide (conta OpenAI da própria Daiane, mesma usada em
-   "perguntar-estudo") — a IA só reescreve o que o profissional já digitou em "notas", nunca pesquisa
-   nem inventa estudo/autor/dado. A função não grava nada; quem persiste é o código abaixo. */
+/* Chama a Edge Function que prepara UM slide (conta OpenAI da própria Daiane, mesma usada em
+   "perguntar-estudo"). Duas fontes são aceitas: o material anexado (texto extraído de um PDF) e/ou as
+   notas digitadas pelo profissional — nesse caso a IA só reescreve o que está ali, nunca inventa nada.
+   Se nem material nem notas existirem, a IA pesquisa sozinha (API pública do Crossref) e só pode citar
+   estudo real e verificável que a busca realmente retornou. A função não grava nada; quem persiste é o
+   código abaixo. */
 async function chamarIaGerarFala(palestra, secao, slide){
   const { data, error } = await sb.functions.invoke('gerar-fala-palestra', { body: {
     tituloPalestra: palestra.titulo, secaoNome: secao.nome, slideTitulo: slide.titulo,
     tempo: slide.tempo, evidencia: slide.evidencia, naTela: slide.naTela, notas: slide.notas,
+    materialNome: slide.materialNome, materialTexto: slide.materialTexto,
   }});
   if(error){
-    let msg = 'Não foi possível gerar o texto agora. Tente de novo em instantes.';
+    let msg = 'Não foi possível gerar o conteúdo agora. Tente de novo em instantes.';
     try{ const body = await error.context.json(); if(body?.error) msg = body.error; }catch(e){}
     throw new Error(msg);
   }
   if(data?.error) throw new Error(data.error);
-  return data.fala;
+  return { naTela: data.naTela||'', fala: data.fala, referencias: data.referencias||'' };
 }
 /* ---- Registro de Sessões 1:1 (Vendas) — só equipe interna, importado da planilha de vendas ---- */
 function mapAnaliseRow(r){
@@ -8963,6 +8971,15 @@ function palestraSlideEditorHtml(secao, slide, idx, total){
   const isFirst = idx===0, isLast = idx===total-1;
   const gerando = palestraGerandoSlideId === slide.id;
   const temFala = (slide.fala||'').trim()!=='';
+  const materialNome = slide.materialNome||'';
+  const materialTexto = slide.materialTexto||'';
+  const temGrounding = (slide.notas||'').trim()!=='' || materialTexto.trim()!=='';
+  const gerarLabel = temGrounding
+    ? (temFala? 'Gerar de novo com IA' : 'Gerar fala com IA')
+    : (temFala? 'Pesquisar de novo com IA' : 'Pesquisar e gerar com IA');
+  const gerarHint = temGrounding
+    ? 'A IA só usa o material anexado e/ou suas notas — nunca inventa dado, autor ou estudo.'
+    : 'Sem notas nem material, a IA pesquisa referências reais (Crossref) e avisa se não achar nada confiável pra esse slide.';
   return `
     <div class="palestra-slide" data-slide-id="${slide.id}">
       <div class="palestra-slide-h">
@@ -8983,15 +9000,27 @@ function palestraSlideEditorHtml(secao, slide, idx, total){
         <textarea class="ps-input" rows="2" data-palestra-slide-natela="${slide.id}" placeholder="Ex.: tópicos, imagem, dado em destaque...">${escapeHtml(slide.naTela)}</textarea>
       </div>
       <div class="palestra-slide-field">
-        <label>Suas notas e referências (é só com base nisso que a IA escreve a fala — ela nunca pesquisa nem inventa nada)</label>
+        <label>Material de apoio (opcional)</label>
+        <div class="palestra-material-row">
+          <input type="file" accept="application/pdf" data-palestra-slide-material-file="${slide.id}" style="display:none">
+          <button type="button" class="btn-outline btn-mini" data-palestra-slide-material-btn="${slide.id}">${icon('upload','tiny')} ${materialNome? 'Trocar arquivo' : 'Inserir material'}</button>
+          ${materialNome
+            ? `<span class="palestra-material-name">${icon('folder','tiny')} ${escapeHtml(materialNome)}</span><button type="button" class="btn-mini danger" data-palestra-slide-material-del="${slide.id}" title="Remover material">${icon('x','tiny')}</button>`
+            : `<span class="palestra-material-empty">Nenhum arquivo anexado</span>`}
+        </div>
+        <p class="field-hint">Anexe um estudo, dado ou estatística em PDF — a IA usa esse conteúdo (junto com suas notas, se houver) pra escrever a fala e sugerir o "na tela" deste slide, sem inventar nada além do que está aí.</p>
+      </div>
+      <div class="palestra-slide-field">
+        <label>Suas notas e referências (opcional se você já anexou material acima)</label>
         <textarea class="ps-input" rows="3" data-palestra-slide-notas="${slide.id}" placeholder="Escreva aqui o conteúdo, estudos, autores, dados e argumentos que quer usar neste slide...">${escapeHtml(slide.notas)}</textarea>
       </div>
       <div class="palestra-slide-field">
         <label>Fala do slide</label>
         <div class="palestra-fala-actions">
-          <button type="button" class="btn-outline btn-mini" data-palestra-gerar-fala="${slide.id}" ${gerando?'disabled':''}>${icon('edit','tiny')} ${gerando? 'Gerando...' : (temFala? 'Gerar de novo com IA' : 'Gerar fala com IA')}</button>
+          <button type="button" class="btn-outline btn-mini" data-palestra-gerar-fala="${slide.id}" ${gerando?'disabled':''}>${icon('edit','tiny')} ${gerando? 'Gerando...' : gerarLabel}</button>
         </div>
-        <textarea class="ps-input palestra-fala-input" rows="4" data-palestra-slide-fala="${slide.id}" placeholder="Clique em &quot;Gerar fala com IA&quot; depois de escrever suas notas acima, ou escreva sua fala diretamente aqui.">${escapeHtml(slide.fala)}</textarea>
+        <p class="field-hint">${gerarHint}</p>
+        <textarea class="ps-input palestra-fala-input" rows="4" data-palestra-slide-fala="${slide.id}" placeholder="Clique em &quot;Gerar fala com IA&quot; depois de escrever suas notas ou anexar material acima, ou escreva sua fala diretamente aqui.">${escapeHtml(slide.fala)}</textarea>
       </div>
     </div>
   `;
@@ -9152,6 +9181,48 @@ function bindPalestraEditorEvents(p){
     });
   });
 
+  // Material de apoio (opcional, por slide): sobe um PDF, extrai o texto no navegador (mesmo leitor
+  // usado na Biblioteca Científica) e guarda o texto extraído dentro do próprio slide — é isso que a
+  // IA usa (junto com as notas, se houver) em vez de pesquisar sozinha.
+  document.querySelectorAll('#view-palestras [data-palestra-slide-material-btn]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const input = document.querySelector(`#view-palestras [data-palestra-slide-material-file="${btn.dataset.palestraSlideMaterialBtn}"]`);
+      if(input) input.click();
+    });
+  });
+  document.querySelectorAll('#view-palestras [data-palestra-slide-material-file]').forEach(input=>{
+    input.addEventListener('change', async ()=>{
+      const file = input.files && input.files[0];
+      if(!file) return;
+      const ctx = palestraFindSlideCtx(p, input.dataset.palestraSlideMaterialFile);
+      if(!ctx) return;
+      const btn = document.querySelector(`#view-palestras [data-palestra-slide-material-btn="${input.dataset.palestraSlideMaterialFile}"]`);
+      const original = btn ? btn.innerHTML : '';
+      if(btn){ btn.disabled = true; btn.innerHTML = 'Lendo arquivo...'; }
+      try{
+        const texto = await extrairTextoPdf(file);
+        ctx.slide.materialNome = file.name;
+        ctx.slide.materialTexto = texto.slice(0, 20000);
+        syncPalestraUpdate(p);
+        renderPalestraEditor(p);
+      }catch(err){
+        console.error('material palestra', err);
+        alert('Não foi possível ler esse arquivo. Envie um PDF.');
+        if(btn){ btn.disabled = false; btn.innerHTML = original; }
+      }
+    });
+  });
+  document.querySelectorAll('#view-palestras [data-palestra-slide-material-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const ctx = palestraFindSlideCtx(p, btn.dataset.palestraSlideMaterialDel);
+      if(!ctx) return;
+      ctx.slide.materialNome = '';
+      ctx.slide.materialTexto = '';
+      syncPalestraUpdate(p);
+      renderPalestraEditor(p);
+    });
+  });
+
   document.querySelectorAll('#view-palestras [data-move-up-slide], #view-palestras [data-move-down-slide]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const id = btn.dataset.moveUpSlide || btn.dataset.moveDownSlide;
@@ -9193,19 +9264,24 @@ async function onGerarFalaClick(p, slideId){
   const ctx = palestraFindSlideCtx(p, slideId);
   if(!ctx) return;
   const { secao, slide } = ctx;
-  if(!(slide.notas||'').trim()){
-    alert('Escreva suas notas e referências deste slide antes de gerar a fala — a IA só organiza o que está escrito ali.');
+  const temGrounding = (slide.notas||'').trim()!=='' || (slide.materialTexto||'').trim()!=='';
+  if(!temGrounding && !confirm('Este slide não tem material anexado nem notas escritas. A IA vai pesquisar sozinha (Crossref) e só vai citar estudo real que a busca encontrar — se não achar nada confiável, ela avisa em vez de inventar. Continuar?')){
     return;
   }
   palestraGerandoSlideId = slideId;
   renderPalestraEditor(p);
   try{
-    const fala = await chamarIaGerarFala(p, secao, slide);
-    slide.fala = fala;
+    const resultado = await chamarIaGerarFala(p, secao, slide);
+    if(resultado.naTela) slide.naTela = resultado.naTela;
+    slide.fala = resultado.fala;
+    if(resultado.referencias){
+      const bloco = `${secao.nome || 'Seção'} · ${slide.titulo || 'Slide'}:\n${resultado.referencias}`;
+      p.referencias = (p.referencias||'').trim() ? `${p.referencias.trim()}\n\n${bloco}` : bloco;
+    }
     syncPalestraUpdate(p);
   }catch(e){
     console.error('gerar fala palestra', e);
-    alert(e.message || 'Não foi possível gerar a fala agora. Tente de novo em instantes.');
+    alert(e.message || 'Não foi possível gerar o conteúdo agora. Tente de novo em instantes.');
   }finally{
     palestraGerandoSlideId = null;
     renderPalestraEditor(p);

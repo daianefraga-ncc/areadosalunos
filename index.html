@@ -8055,6 +8055,21 @@ function openBloqueioMentoradosModal(titulo, texto){
   document.getElementById('modal-backdrop').classList.add('open');
   document.getElementById('bloqueio-fechar').addEventListener('click', closeModal);
 }
+/* Tela de bloqueio (a página inteira, não um modal) pra qualquer área exclusiva de mentorados da
+   Mentoria NCC (Painel Profissional, Montar Palestra, Projeto Acadêmico, Biblioteca de Negócios,
+   Dashboard da Mentoria) — mesmo padrão visual já usado no bloqueio da Agenda ao Vivo. O item continua
+   aparecendo no menu pra todo mundo (com cadeado), e é só ao clicar que aparece esse aviso pra quem não
+   é mentorado, convidando a falar com a equipe sobre o pacote. */
+function renderBloqueioMentorados(viewId, titulo){
+  document.getElementById('view-'+viewId).innerHTML = `
+    <div class="locked-view">
+      <div class="locked-icon">${icon('lock')}</div>
+      <h2>${escapeHtml(titulo)} bloqueado</h2>
+      <p>${escapeHtml(titulo)} é exclusivo para mentorados da Mentoria NCC. Fale com a nossa equipe para conhecer o pacote e migrar seu acesso.</p>
+      <button class="btn-accent" id="bloqueio-mentorados-voltar" style="margin-top:18px">Voltar ao Início</button>
+    </div>`;
+  document.getElementById('bloqueio-mentorados-voltar').addEventListener('click', ()=>goTo('inicio'));
+}
 function isAnswered(p){
   return p.comments.some(c=>{ const a=getPerson(c.authorId); return a && a.role==='staff'; });
 }
@@ -8122,13 +8137,13 @@ function setRole(role){
      troca para o modo "Aluno" (pelo botão aqui em cima, ou clicando em "Abrir" na Visão Geral) —
      exatamente como o aluno vê a própria conta hoje. Para quem realmente é aluno, currentRole nunca sai
      de 'aluno', então esses itens continuam sempre visíveis para ele.
-     Área Coletiva é igual pra qualquer tier. "Painel Profissional e Mentoria" (Painel Profissional,
-     Montar Palestra, Projeto Acadêmico, Biblioteca de Negócios) é exclusivo de quem está na Mentoria
-     NCC (tier 'mentorado') — Curso Gravado, Formação e PGNCC não veem. Em "Minha Área", "Dashboard do
-     Curso" é só do Curso Gravado, "Dashboard da Mentoria" é só da Mentoria, e Metas/Sessões 1:1 são de
-     quem tem mentoria individual (Mentoria, Formação, PGNCC — não o Curso Gravado).
-     getViewingTier() resolve pro tier de quem está sendo visto — a própria conta, ou o mentorado
-     selecionado pela equipe interna. */
+     O índice é igual pra qualquer tier de aluno — nada fica escondido por tier. O que muda é um cadeado
+     ao lado do item quando ele não se aplica àquele tier (ex.: Painel Profissional/Montar
+     Palestra/Projeto Acadêmico/Biblioteca de Negócios/Dashboard da Mentoria pra quem não é da Mentoria
+     NCC) — ao clicar, a própria tela do item mostra o aviso convidando a falar com a equipe sobre o
+     pacote, em vez de simplesmente escondê-lo (mesmo padrão já usado na Agenda ao Vivo e nas
+     Ferramentas NCC pro Curso Gravado). getViewingTier() resolve pro tier de quem está sendo visto — a
+     própria conta, ou o mentorado selecionado pela equipe interna. */
   const viewingTier = getViewingTier();
   const isCursoView = role==='aluno' && viewingTier==='curso';
   const isMentoradoView = role==='aluno' && viewingTier==='mentorado';
@@ -8139,19 +8154,32 @@ function setRole(role){
     if(el) el.style.display = role==='aluno' ? 'flex' : 'none';
   });
   /* Painel Profissional e Mentoria (Painel Profissional, Montar Palestra, Projeto Acadêmico, Biblioteca
-     de Negócios) é exclusivo de quem está na Mentoria NCC (tier 'mentorado') — Curso Gravado, Formação
-     e PGNCC não veem esses itens, mesmo estando no modo "Aluno". */
+     de Negócios) e o Dashboard da Mentoria (Minha Área) aparecem pra qualquer tier de aluno, mas com
+     cadeado pra quem não está na Mentoria NCC (Curso Gravado, Formação, PGNCC) — ao clicar, a própria
+     tela mostra o aviso (ver renderBloqueioMentorados, chamado de dentro de cada renderX). */
   ['painel','palestras','projetoacademico','biblioteca'].forEach(v=>{
     const el = document.querySelector(`.nav-item[data-view="${v}"]`);
-    if(el) el.style.display = isMentoradoView ? 'flex' : 'none';
+    if(!el) return;
+    el.style.display = role==='aluno' ? 'flex' : 'none';
+    const [ic,label] = NAV_LABELS[v];
+    el.innerHTML = (role==='aluno' && !isMentoradoView)
+      ? `${icon(ic)}<span>${label}</span><span style="margin-left:auto;display:flex" title="Disponível apenas para mentorados da Mentoria">${icon('lock','tiny')}</span>`
+      : `${icon(ic)}<span>${label}</span>`;
   });
-  /* Minha Área: "Dashboard do Curso" é só de quem está no Curso Gravado (é o checklist do Método);
-     "Dashboard da Mentoria" é só de quem está na Mentoria; Metas e Sessões 1:1 continuam da mentoria
-     individual (Mentoria, Formação e PGNCC — não tem no Curso Gravado). */
+  /* Minha Área: "Dashboard do Curso" é só de quem está no Curso Gravado (é o checklist do Método, não
+     se aplica a mais ninguém, por isso continua escondido pros outros tiers em vez de cadeado);
+     "Dashboard da Mentoria" segue o mesmo padrão de cadeado do bloco acima; Metas e Sessões 1:1
+     continuam da mentoria individual (Mentoria, Formação e PGNCC — não tem no Curso Gravado). */
   const dashboardCursoBtn = document.querySelector('.nav-item[data-view="dashboard"]');
   if(dashboardCursoBtn) dashboardCursoBtn.style.display = isCursoView ? 'flex' : 'none';
   const dashboardMentoriaBtn = document.querySelector('.nav-item[data-view="dashboardmentoria"]');
-  if(dashboardMentoriaBtn) dashboardMentoriaBtn.style.display = isMentoradoView ? 'flex' : 'none';
+  if(dashboardMentoriaBtn){
+    dashboardMentoriaBtn.style.display = role==='aluno' ? 'flex' : 'none';
+    const [ic,label] = NAV_LABELS.dashboardmentoria;
+    dashboardMentoriaBtn.innerHTML = (role==='aluno' && !isMentoradoView)
+      ? `${icon(ic)}<span>${label}</span><span style="margin-left:auto;display:flex" title="Disponível apenas para mentorados da Mentoria">${icon('lock','tiny')}</span>`
+      : `${icon(ic)}<span>${label}</span>`;
+  }
   ['sessoes','metas'].forEach(v=>{
     const el = document.querySelector(`.nav-item[data-view="${v}"]`);
     if(el) el.style.display = (role==='aluno' && !isCursoView) ? 'flex' : 'none';
@@ -8167,9 +8195,10 @@ function setRole(role){
   const neuroEl = document.getElementById('nav-neurotodasidades');
   if(neuroEl) neuroEl.style.display = role==='aluno' ? 'flex' : 'none';
   /* Os rótulos "Painel Profissional e Mentoria", "Minha Área" e "NCC Integração" só fazem sentido junto
-     dos itens que eles agrupam — some junto com eles (modo Equipe Interna). "Painel Profissional e
-     Mentoria" some também pra quem não é da Mentoria (Curso Gravado, Formação, PGNCC). */
-  document.getElementById('nav-group-metodo').style.display = isMentoradoView ? 'flex' : 'none';
+     dos itens que eles agrupam — some junto com eles (modo Equipe Interna). Como os itens de "Painel
+     Profissional e Mentoria" agora aparecem pra qualquer tier (com cadeado), o rótulo também aparece
+     pra qualquer aluno. */
+  document.getElementById('nav-group-metodo').style.display = role==='aluno' ? 'flex' : 'none';
   document.getElementById('nav-group-individual').style.display = role==='aluno' ? 'flex' : 'none';
   document.getElementById('nav-group-integracao').style.display = role==='aluno' ? 'flex' : 'none';
   /* Aluno do Curso Gravado (Método) continua vendo "Agenda ao Vivo" no menu, mas com um cadeado —
@@ -8192,9 +8221,10 @@ function setRole(role){
   renderProfile();
   updateNotifBadge();
   if(role==='aluno' && ['interno','conteudo','visaogeral','vendas','clientes','financeiro'].includes(currentView)){ goTo('inicio'); }
-  if(role==='aluno' && !isMentoradoView && ['painel','palestras','projetoacademico','biblioteca'].includes(currentView)){ goTo('inicio'); }
+  /* Painel/Palestras/Projeto Acadêmico/Biblioteca/Dashboard da Mentoria NÃO redirecionam mais quem não
+     é mentorado — o item continua clicável (com cadeado) e a própria tela mostra o aviso de bloqueio
+     (renderBloqueioMentorados), então currentView pode ficar nelas mesmo fora da Mentoria. */
   if(role==='aluno' && !isCursoView && currentView==='dashboard'){ goTo('inicio'); }
-  if(role==='aluno' && !isMentoradoView && currentView==='dashboardmentoria'){ goTo('inicio'); }
   if(role==='aluno' && isCursoView && ['sessoes','metas'].includes(currentView)){ goTo('inicio'); }
   if(role==='staff' && ['inicio','aulas','comunidade','ranking','dashboard','dashboardmentoria','painel','palestras','projetoacademico','biblioteca','estudos','sessoes','metas'].includes(currentView)){ goTo('visaogeral'); }
 }
@@ -8911,6 +8941,7 @@ async function enviarPerguntaEstudo(estudoId){
 
 /* ---- Montar Palestra (só Mentoria NCC) ---- */
 function renderPalestras(){
+  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('palestras', 'Montar Palestra'); return; }
   if(palestraAbertaId){
     const p = PALESTRAS.find(x=>x.id==palestraAbertaId);
     if(p){ renderPalestraEditor(p); return; }
@@ -10935,6 +10966,7 @@ const BUSINESS_LIBRARY = [
 /* ================= VIEW: BIBLIOTECA DE NEGÓCIOS =================
    Catálogo de modelos de negócio complementares, organizado por frente estratégica (ver BUSINESS_LIBRARY acima). */
 function renderBiblioteca(){
+  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('biblioteca', 'Biblioteca de Negócios'); return; }
   document.getElementById('view-biblioteca').innerHTML = `
     <p class="section-sub">Modelos de negócio complementares para os profissionais NCC, organizados por frente estratégica.</p>
     ${BUSINESS_LIBRARY.map(f=>`
@@ -11004,6 +11036,7 @@ function renderDashboard(){
    Reservado no menu ("Minha Área") pra separar do Dashboard do Curso Gravado (checklist do Método,
    que não se aplica à mentoria individual) — conteúdo ainda a definir. */
 function renderDashboardMentoria(){
+  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('dashboardmentoria', 'Dashboard da Mentoria'); return; }
   document.getElementById('view-dashboardmentoria').innerHTML = `
     <p class="section-sub">Em breve: um painel de acompanhamento específico pra quem está na Mentoria NCC.</p>
     <div class="empty-state">${icon('chart')} Esta área ainda está em construção. Volte em breve.</div>
@@ -11013,6 +11046,7 @@ function renderDashboardMentoria(){
 /* ================= VIEW: PROJETO ACADÊMICO (Painel Profissional e Mentoria, exclusivo Mentoria NCC) =================
    Reservado no menu pra um futuro acompanhamento de projeto acadêmico do mentorado — conteúdo ainda a definir. */
 function renderProjetoAcademico(){
+  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('projetoacademico', 'Projeto Acadêmico'); return; }
   document.getElementById('view-projetoacademico').innerHTML = `
     <p class="section-sub">Em breve: acompanhamento do seu projeto acadêmico dentro da Mentoria NCC.</p>
     <div class="empty-state">${icon('briefcase')} Esta área ainda está em construção. Volte em breve.</div>
@@ -11212,20 +11246,9 @@ function quadrantFilledCount(q,s){
   return q.topics.filter((t,i)=>topicFilled(q,t,i,s)).length;
 }
 function renderPainel(){
+  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('painel', 'Painel Profissional'); return; }
   const s = getStudent(currentStudentId);
   const el = document.getElementById('view-painel');
-  const viewingTier = getViewingTier();
-  if(currentRole==='aluno' && viewingTier!=='mentorado'){
-    el.innerHTML = `
-      <div class="locked-view">
-        <div class="locked-icon">${icon('lock')}</div>
-        <h2>Painel Profissional bloqueado</h2>
-        <p>O Painel Profissional — o espaço de trabalho nos 4 pilares do negócio — é exclusivo para mentorados da Mentoria. Fale com a equipe e conheça as condições para migrar seu acesso.</p>
-        <button class="btn-accent" id="painel-voltar-dash" style="margin-top:18px">Voltar ao Início</button>
-      </div>`;
-    document.getElementById('painel-voltar-dash').addEventListener('click', ()=>goTo('inicio'));
-    return;
-  }
   if(!panelQuadrantId){
     el.innerHTML = `
       <p class="section-sub">Espaço de trabalho do Neurociência do Comportamento da Criança, organizado nos 4 pilares do negócio — visível para você e para a equipe interna.</p>

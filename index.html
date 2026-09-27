@@ -659,6 +659,16 @@
   .palestra-material-empty{font-size:12px;color:var(--text-mute);}
   .palestra-list-row{cursor:pointer;}
   .palestra-list-row .desc{color:var(--text-dim);}
+  /* Projeto Acadêmico (Dashboard da Mentoria) */
+  .pa-etapas{display:flex;flex-direction:column;gap:12px;}
+  .pa-etapa{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;background:var(--bg-card);}
+  .pa-etapa-h{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+  .pa-etapa-nome{flex:1;min-width:140px;font-weight:600;font-size:13.5px;}
+  .pa-etapa-status{max-width:180px;}
+  .pa-etapa-field{margin-bottom:8px;}
+  .pa-etapa-field label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:4px;}
+  .pa-etapa-field textarea{width:100%;resize:vertical;min-height:44px;}
+  .pa-etapa-field textarea[readonly]{opacity:.75;background:var(--bg);}
   /* Status do "Exportar backup" (Visão Geral) */
   .backup-status{margin-top:10px;font-size:12.5px;color:var(--text-dim);line-height:1.6;}
   .backup-status.ok{color:var(--success);}
@@ -6349,6 +6359,10 @@ let ESTUDO_MENSAGENS = {};
    "gerar-fala-palestra" pra como a IA ajuda a escrever a fala de cada slide, só com base no que o
    profissional já escreveu (nunca inventa estudo/autor/dado). */
 let PALESTRAS = [];
+/* Projeto Acadêmico (Dashboard da Mentoria) — uma linha por mentorado, com as etapas clássicas de um
+   projeto/artigo científico (ver PROJETO_ETAPAS_PADRAO). Tanto o mentorado quanto a equipe interna
+   atualizam: o mentorado marca o andamento e escreve suas notas por etapa, a equipe deixa observações. */
+let PROJETOS_ACADEMICOS = [];
 
 /* ================= STATE ================= */
 let currentStudentId = null;
@@ -6870,7 +6884,7 @@ async function bootstrapData(){
   PEOPLE = {};
   profiles.forEach(p=>{ PEOPLE[p.id] = {id:p.id, name:p.name, initials:p.initials, color:p.color, avatarUrl:p.avatar_url||null, role:p.role}; });
 
-  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:cursoModuloRows},{data:comunicadoRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows},{data:novidadeCommentRows},{data:estudoRows},{data:estudoMensagemRows},{data:palestraRows}] = await Promise.all([
+  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:cursoModuloRows},{data:comunicadoRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows},{data:novidadeCommentRows},{data:estudoRows},{data:estudoMensagemRows},{data:palestraRows},{data:projetoAcademicoRows}] = await Promise.all([
     sb.from('module_checklist_state').select('*'),
     sb.from('panel_data').select('*'),
     sb.from('panel_overrides').select('*'),
@@ -6896,6 +6910,9 @@ async function bootstrapData(){
     sb.from('estudo_mensagens').select('*').order('created_at',{ascending:true}),
     // Montar Palestra: mesma lógica de RLS (o aluno só vê as próprias palestras, a equipe vê de todos).
     sb.from('palestras').select('*').order('updated_at',{ascending:false}),
+    // Projeto Acadêmico (Dashboard da Mentoria): uma linha por mentorado; RLS deixa tanto o próprio
+    // mentorado quanto a equipe interna ver e atualizar (a equipe deixa observações por etapa).
+    sb.from('projetos_academicos').select('*'),
   ]);
 
   LIVE_SESSIONS.length = 0;
@@ -6979,6 +6996,9 @@ async function bootstrapData(){
     duracaoEstimada:p.duracao_estimada||'', conteudo:Array.isArray(p.conteudo)?p.conteudo:[], referencias:p.referencias||'',
     createdAt:p.created_at, updatedAt:p.updated_at,
   }));
+
+  PROJETOS_ACADEMICOS.length = 0;
+  (projetoAcademicoRows||[]).forEach(r=>PROJETOS_ACADEMICOS.push(mapProjetoAcademicoRow(r)));
 
   MEUS_LIKES = new Set((meusLikes||[]).map(l=>l.post_id));
   EU_JA_APRESENTEI = !!(apresentacaoRows && apresentacaoRows.length);
@@ -7553,6 +7573,46 @@ async function chamarIaGerarFala(palestra, secao, slide){
   if(data?.error) throw new Error(data.error);
   return { naTela: data.naTela||'', fala: data.fala, referencias: data.referencias||'' };
 }
+
+/* ---- Projeto Acadêmico (Dashboard da Mentoria, só Mentoria NCC) ----
+   "etapas" é um array fixo com as 5 etapas clássicas de um projeto/artigo científico: [{id, nome,
+   status, notasAluno, notasEquipe}]. status é 'nao_iniciado' | 'em_andamento' | 'concluido'. O
+   mentorado edita status e notasAluno; a equipe interna edita notasEquipe — os dois no mesmo registro. */
+const PROJETO_ETAPAS_PADRAO = ['Definição do tema', 'Revisão de literatura', 'Coleta de dados', 'Escrita', 'Submissão/publicação'];
+const ETAPA_STATUS_OPCOES = [
+  {value:'nao_iniciado', label:'Não iniciado'},
+  {value:'em_andamento', label:'Em andamento'},
+  {value:'concluido', label:'Concluído'},
+];
+function etapaStatusLabel(v){ const o = ETAPA_STATUS_OPCOES.find(x=>x.value===(v||'nao_iniciado')); return o? o.label : 'Não iniciado'; }
+let _projetoAcademicoIdSeq = 0;
+function novoProjetoAcademicoId(prefixo){ return prefixo + Date.now().toString(36) + '_' + (_projetoAcademicoIdSeq++); }
+function novaEtapaProjeto(nome){
+  return { id:novoProjetoAcademicoId('et'), nome, status:'nao_iniciado', notasAluno:'', notasEquipe:'' };
+}
+function projetoAcademicoEsqueletoPadrao(){
+  return PROJETO_ETAPAS_PADRAO.map(nome=>novaEtapaProjeto(nome));
+}
+function mapProjetoAcademicoRow(r){
+  return {
+    id:r.id, alunoId:r.aluno_id, titulo:r.titulo||'', tema:r.tema||'',
+    etapas:Array.isArray(r.etapas) && r.etapas.length? r.etapas : projetoAcademicoEsqueletoPadrao(),
+    createdAt:r.created_at, updatedAt:r.updated_at,
+  };
+}
+async function syncProjetoAcademicoInsert(alunoId){
+  const { data, error } = await sb.from('projetos_academicos')
+    .insert({ aluno_id: alunoId, etapas: projetoAcademicoEsqueletoPadrao() })
+    .select().single();
+  if(error) throw error;
+  return data;
+}
+function syncProjetoAcademicoUpdate(pa){
+  syncNow(sb.from('projetos_academicos').update({
+    titulo:pa.titulo, tema:pa.tema, etapas:pa.etapas, updated_at:new Date().toISOString(),
+  }).eq('id', pa.id));
+}
+
 /* ---- Registro de Sessões 1:1 (Vendas) — só equipe interna, importado da planilha de vendas ---- */
 function mapAnaliseRow(r){
   return {
@@ -8166,12 +8226,13 @@ function setRole(role){
       ? `${icon(ic)}<span>${label}</span><span style="margin-left:auto;display:flex" title="Disponível apenas para mentorados da Mentoria">${icon('lock','tiny')}</span>`
       : `${icon(ic)}<span>${label}</span>`;
   });
-  /* Minha Área: "Dashboard do Curso" é só de quem está no Curso Gravado (é o checklist do Método, não
-     se aplica a mais ninguém, por isso continua escondido pros outros tiers em vez de cadeado);
-     "Dashboard da Mentoria" segue o mesmo padrão de cadeado do bloco acima; Metas e Sessões 1:1
-     continuam da mentoria individual (Mentoria, Formação e PGNCC — não tem no Curso Gravado). */
+  /* Minha Área: "Dashboard do Curso" é o checklist de aulas assistidas e módulos concluídos do Método —
+     como as aulas (Área Coletiva) são iguais pra qualquer tier, esse dashboard também aparece pra
+     qualquer tier de aluno (Curso Gravado, Mentoria, Formação, PGNCC), sem cadeado. "Dashboard da
+     Mentoria" segue o mesmo padrão de cadeado do bloco acima; Metas e Sessões 1:1 continuam da
+     mentoria individual (Mentoria, Formação e PGNCC — não tem no Curso Gravado). */
   const dashboardCursoBtn = document.querySelector('.nav-item[data-view="dashboard"]');
-  if(dashboardCursoBtn) dashboardCursoBtn.style.display = isCursoView ? 'flex' : 'none';
+  if(dashboardCursoBtn) dashboardCursoBtn.style.display = role==='aluno' ? 'flex' : 'none';
   const dashboardMentoriaBtn = document.querySelector('.nav-item[data-view="dashboardmentoria"]');
   if(dashboardMentoriaBtn){
     dashboardMentoriaBtn.style.display = role==='aluno' ? 'flex' : 'none';
@@ -8223,8 +8284,8 @@ function setRole(role){
   if(role==='aluno' && ['interno','conteudo','visaogeral','vendas','clientes','financeiro'].includes(currentView)){ goTo('inicio'); }
   /* Painel/Palestras/Projeto Acadêmico/Biblioteca/Dashboard da Mentoria NÃO redirecionam mais quem não
      é mentorado — o item continua clicável (com cadeado) e a própria tela mostra o aviso de bloqueio
-     (renderBloqueioMentorados), então currentView pode ficar nelas mesmo fora da Mentoria. */
-  if(role==='aluno' && !isCursoView && currentView==='dashboard'){ goTo('inicio'); }
+     (renderBloqueioMentorados), então currentView pode ficar nelas mesmo fora da Mentoria. Dashboard do
+     Curso agora é aberto pra qualquer tier, então também não redireciona mais. */
   if(role==='aluno' && isCursoView && ['sessoes','metas'].includes(currentView)){ goTo('inicio'); }
   if(role==='staff' && ['inicio','aulas','comunidade','ranking','dashboard','dashboardmentoria','painel','palestras','projetoacademico','biblioteca','estudos','sessoes','metas'].includes(currentView)){ goTo('visaogeral'); }
 }
@@ -8325,6 +8386,7 @@ const BACKUP_TABLES = [
   'novidades','novidade_comments',
   'estudos','estudo_mensagens',
   'palestras',
+  'projetos_academicos',
   'live_sessions','live_session_watched',
   'venda_sessoes','contatos','registro_clientes',
   'fin_categorias','fin_contas','fin_formas','fin_lancamentos',
@@ -11035,22 +11097,138 @@ function renderDashboard(){
 /* ================= VIEW: DASHBOARD DA MENTORIA (exclusivo Mentoria NCC) =================
    Reservado no menu ("Minha Área") pra separar do Dashboard do Curso Gravado (checklist do Método,
    que não se aplica à mentoria individual) — conteúdo ainda a definir. */
+/* Dashboard da Mentoria acompanha o TRAJETO (não o consumo de aulas — isso é o Dashboard do Curso):
+   trajeto acadêmico (resumo do Projeto Acadêmico) e trajeto profissional (palestras criadas na
+   Mentoria; progresso no próprio negócio ainda a definir com a Daiane). */
 function renderDashboardMentoria(){
   if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('dashboardmentoria', 'Dashboard da Mentoria'); return; }
+  const s = getStudent(currentStudentId);
+  if(!s) return;
+  const pa = PROJETOS_ACADEMICOS.find(p=>p.alunoId===s.id);
+  const totalEtapas = pa ? pa.etapas.length : PROJETO_ETAPAS_PADRAO.length;
+  const etapasConcluidas = pa ? pa.etapas.filter(e=>e.status==='concluido').length : 0;
+  const minhasPalestras = PALESTRAS.filter(p=>p.alunoId===s.id);
   document.getElementById('view-dashboardmentoria').innerHTML = `
-    <p class="section-sub">Em breve: um painel de acompanhamento específico pra quem está na Mentoria NCC.</p>
-    <div class="empty-state">${icon('chart')} Esta área ainda está em construção. Volte em breve.</div>
+    <p class="section-sub">Acompanhamento do seu trajeto acadêmico e profissional dentro da Mentoria NCC.</p>
+
+    <h2 class="section-title">${icon('briefcase')} Trajeto Acadêmico</h2>
+    <div class="stat-row">
+      <div class="stat-card clickable" id="dm-abrir-projeto">
+        <div style="font-size:22px;font-weight:700;">${etapasConcluidas}/${totalEtapas}</div>
+        <div style="color:var(--text-dim);font-size:12.5px;">etapas concluídas no Projeto Acadêmico</div>
+      </div>
+    </div>
+
+    <h2 class="section-title" style="margin-top:24px">${icon('idcard')} Trajeto Profissional</h2>
+    <div class="stat-row">
+      <div class="stat-card clickable" id="dm-abrir-palestras">
+        <div style="font-size:22px;font-weight:700;">${minhasPalestras.length}</div>
+        <div style="color:var(--text-dim);font-size:12.5px;">palestra${minhasPalestras.length===1?'':'s'} criada${minhasPalestras.length===1?'':'s'} em Montar Palestra</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:15px;font-weight:700;color:var(--text-mute)">Em breve</div>
+        <div style="color:var(--text-dim);font-size:12.5px;">progresso no próprio negócio</div>
+      </div>
+    </div>
   `;
+  document.getElementById('dm-abrir-projeto').addEventListener('click', ()=>goTo('projetoacademico'));
+  document.getElementById('dm-abrir-palestras').addEventListener('click', ()=>goTo('palestras'));
 }
 
 /* ================= VIEW: PROJETO ACADÊMICO (Painel Profissional e Mentoria, exclusivo Mentoria NCC) =================
-   Reservado no menu pra um futuro acompanhamento de projeto acadêmico do mentorado — conteúdo ainda a definir. */
+   Etapas clássicas de um projeto/artigo científico (PROJETO_ETAPAS_PADRAO). O mentorado marca o
+   andamento e escreve suas notas; a equipe interna deixa observações por etapa — os dois no mesmo
+   registro (ver "Projeto Acadêmico" no comentário acima de PROJETO_ETAPAS_PADRAO). */
 function renderProjetoAcademico(){
   if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('projetoacademico', 'Projeto Acadêmico'); return; }
-  document.getElementById('view-projetoacademico').innerHTML = `
-    <p class="section-sub">Em breve: acompanhamento do seu projeto acadêmico dentro da Mentoria NCC.</p>
-    <div class="empty-state">${icon('briefcase')} Esta área ainda está em construção. Volte em breve.</div>
+  const s = getStudent(currentStudentId);
+  const el = document.getElementById('view-projetoacademico');
+  if(!s){ el.innerHTML = '<div class="empty-state">Nenhum mentorado selecionado.</div>'; return; }
+  let pa = PROJETOS_ACADEMICOS.find(p=>p.alunoId===s.id);
+  if(!pa){
+    el.innerHTML = '<div class="empty-state">Carregando o projeto acadêmico...</div>';
+    syncProjetoAcademicoInsert(s.id).then(row=>{
+      PROJETOS_ACADEMICOS.push(mapProjetoAcademicoRow(row));
+      if(currentView==='projetoacademico' && getStudent(currentStudentId)?.id===s.id) renderProjetoAcademico();
+    }).catch(e=>{
+      console.error('criar projeto acadêmico', e);
+      el.innerHTML = '<div class="empty-state">Não foi possível carregar o projeto acadêmico agora. Tente recarregar a página.</div>';
+    });
+    return;
+  }
+  const isStaffView = currentRole==='staff';
+  el.innerHTML = `
+    <p class="section-sub">Etapas do projeto ou artigo científico dentro da Mentoria NCC. ${isStaffView
+      ? 'Você pode deixar observações em cada etapa.'
+      : 'Marque o andamento e escreva suas notas em cada etapa — a equipe também acompanha e pode deixar observações.'}</p>
+    <div class="palestra-header-form">
+      <div class="field full"><label>Título do projeto/artigo (opcional)</label><input class="ps-input" type="text" data-pa-campo="titulo" value="${escapeAttr(pa.titulo)}" ${isStaffView?'readonly':''} placeholder="Ex.: Diferenças cerebrais entre meninos e meninas no desenvolvimento"></div>
+      <div class="field full"><label>Tema/linha de pesquisa (opcional)</label><input class="ps-input" type="text" data-pa-campo="tema" value="${escapeAttr(pa.tema)}" ${isStaffView?'readonly':''} placeholder="Ex.: Neurodesenvolvimento infantil"></div>
+    </div>
+    <div class="pa-etapas">
+      ${pa.etapas.map((et,i)=>projetoAcademicoEtapaHtml(et,i,isStaffView)).join('')}
+    </div>
   `;
+  bindProjetoAcademicoEvents(pa, isStaffView);
+}
+
+function projetoAcademicoEtapaHtml(et, idx, isStaffView){
+  return `
+    <div class="pa-etapa" data-etapa-id="${et.id}">
+      <div class="pa-etapa-h">
+        <span class="cm-count">Etapa ${idx+1}</span>
+        <span class="pa-etapa-nome">${escapeHtml(et.nome)}</span>
+        <select class="ps-input pa-etapa-status" data-pa-etapa-status="${et.id}" ${isStaffView?'disabled':''}>
+          ${ETAPA_STATUS_OPCOES.map(o=>`<option value="${o.value}" ${(et.status||'nao_iniciado')===o.value?'selected':''}>${escapeHtml(o.label)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="pa-etapa-field">
+        <label>Suas notas (mentorado)</label>
+        <textarea class="ps-input" rows="2" data-pa-etapa-notas-aluno="${et.id}" ${isStaffView?'readonly':''} placeholder="Como está o andamento desta etapa?">${escapeHtml(et.notasAluno)}</textarea>
+      </div>
+      <div class="pa-etapa-field">
+        <label>Observação da equipe</label>
+        <textarea class="ps-input" rows="2" data-pa-etapa-notas-equipe="${et.id}" ${isStaffView?'':'readonly'} placeholder="${isStaffView? 'Deixe uma observação pra esse mentorado...' : ''}">${escapeHtml(et.notasEquipe)}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+function bindProjetoAcademicoEvents(pa, isStaffView){
+  document.querySelectorAll('#view-projetoacademico [data-pa-campo]').forEach(inp=>{
+    if(isStaffView) return;
+    inp.addEventListener('change', ()=>{
+      pa[inp.dataset.paCampo] = inp.value;
+      syncProjetoAcademicoUpdate(pa);
+    });
+  });
+  document.querySelectorAll('#view-projetoacademico [data-pa-etapa-status]').forEach(sel=>{
+    if(isStaffView) return;
+    sel.addEventListener('change', ()=>{
+      const et = pa.etapas.find(e=>e.id===sel.dataset.paEtapaStatus);
+      if(!et) return;
+      et.status = sel.value;
+      syncProjetoAcademicoUpdate(pa);
+    });
+  });
+  document.querySelectorAll('#view-projetoacademico [data-pa-etapa-notas-aluno]').forEach(ta=>{
+    if(isStaffView) return;
+    ta.addEventListener('change', ()=>{
+      const et = pa.etapas.find(e=>e.id===ta.dataset.paEtapaNotasAluno);
+      if(!et) return;
+      et.notasAluno = ta.value;
+      syncProjetoAcademicoUpdate(pa);
+    });
+  });
+  document.querySelectorAll('#view-projetoacademico [data-pa-etapa-notas-equipe]').forEach(ta=>{
+    if(!isStaffView) return;
+    ta.addEventListener('change', ()=>{
+      const et = pa.etapas.find(e=>e.id===ta.dataset.paEtapaNotasEquipe);
+      if(!et) return;
+      et.notasEquipe = ta.value;
+      syncProjetoAcademicoUpdate(pa);
+    });
+  });
 }
 
 /* ---- Vincula automaticamente itens "Assistir aula sobre X" do checklist do módulo com as aulas já

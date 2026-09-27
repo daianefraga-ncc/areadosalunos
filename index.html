@@ -11033,29 +11033,19 @@ function renderMateriais(){
 }
 
 const BUSINESS_LIBRARY = [
-  {numero:'01',titulo:'Neurodesenvolvimento',sub:'4 negócios · referências internacionais',itens:[
-    {icon:'family',titulo:'Programa de Intervenção Precoce Mediada pelos Pais',desc:'Ciclos de 12 semanas para crianças de 0 a 5 anos, com base em intervenções NDBI.',quem:'Psicólogo, Fono, TO',valor:'R$ 3.000–6.000 por ciclo'},
-    {icon:'target',titulo:'Treinamento Parental Comportamental para TDAH',desc:'Primeira linha de tratamento para TDAH em crianças pequenas, segundo a Academia Americana de Pediatria.',quem:'Psicólogo',valor:'R$ 1.500–3.500 por programa'},
+  {numero:'01',titulo:'',sub:'',itens:[
     {icon:'compass',titulo:'Navegação do Cuidado Pós-Diagnóstico',desc:'Organiza terapias, escola e prioridades nos primeiros meses após o diagnóstico.',quem:'Todas as formações',valor:'R$ 1.200–3.000 por família'},
-    {icon:'comment',titulo:'Habilidades Sociais para Adolescentes Autistas',desc:'Programa de 14 semanas com adolescentes e pais, baseado no modelo PEERS® (UCLA).',quem:'Psicólogo, Fono',valor:'R$ 500–900/mês'},
-  ]},
-  {numero:'02',titulo:'Vínculo e parentalidade',sub:'4 negócios · referências internacionais',itens:[
-    {icon:'book',titulo:'Parentalidade Baseada em Evidências',desc:'Grupos de 8 semanas baseados nos modelos Triple P e Incredible Years.',quem:'Todas as formações',valor:'R$ 600–1.200 por família'},
-    {icon:'video',titulo:'Vídeo-feedback para Sensibilidade Parental',desc:'Visitas com vídeo da interação entre pais e criança, modelo VIPP-SD (Leiden).',quem:'Psicólogo com formação específica',valor:'R$ 2.000–4.000'},
-    {icon:'heart',titulo:'Prevenção do Burnout Parental',desc:'Grupos de apoio para mães e pais exaustos, com base em pesquisas sobre burnout parental.',quem:'Educativo: todas; clínico: Psicólogo',valor:'R$ 700–1.500'},
+    {icon:'family',titulo:'O Vínculo Seguro',desc:'Orientação a cuidadores para reconhecer os sinais da criança e construir interações mais responsivas nas rotinas diárias.',quem:'Profissionais da infância com formação específica no programa, dentro de sua área de atuação.',valor:'R$ 900–2.400 por acompanhamento familiar de 4 a 6 encontros'},
+    {icon:'heart',titulo:'Prevenção de Burnout Parental',desc:'Grupos de apoio para mães e pais exaustos, com base em pesquisas sobre burnout parental.',quem:'Educativo: todas; clínico: Psicólogo',valor:'R$ 700–1.500'},
     {icon:'briefcase',titulo:'Apoio Corporativo à Parentalidade',desc:'Suporte ao RH das empresas dentro da gestão de riscos psicossociais da NR-1.',quem:'Todas as formações',valor:'R$ 3.000–12.000/mês por empresa'},
-  ]},
-  {numero:'03',titulo:'Tecnologia, telas e IA',sub:'4 negócios · referências internacionais',itens:[
-    {icon:'tablet',titulo:'Plano de Mídia Familiar',desc:'Consultoria para famílias organizarem o uso de telas em casa.',quem:'Todas as formações',valor:'R$ 400–900 por família'},
-    {icon:'gamepad',titulo:'Uso Problemático de Internet e Jogos',desc:'Prevenção com adolescentes e pais do uso problemático de jogos e internet.',quem:'Educativo: todas; clínico: Psicólogo',valor:'R$ 500–1.200'},
     {icon:'sliders',titulo:'Design Adequado à Idade',desc:'Consultoria para apps e jogos cumprirem o ECA Digital.',quem:'Com formação específica',valor:'R$ 15.000–60.000 por projeto'},
-    {icon:'award',titulo:'Certificado NCC',desc:'Avaliação científica de brinquedos, aplicativos e espaços infantis.',quem:'Rede NCC',valor:'R$ 5.000–30.000 por certificação'},
-  ]},
-  {numero:'04',titulo:'Futuro do trabalho',sub:'4 negócios · referências internacionais',itens:[
-    {icon:'neuro',titulo:'Funções Executivas para Estudantes',desc:'Treino de planejamento, organização e autorregulação para estudantes.',quem:'Todas as formações',valor:'R$ 600–1.500/mês'},
+    {icon:'child',titulo:'Transição para a Adolescência',desc:'Acompanhamento de famílias na construção gradual de autonomia, comunicação e novos acordos durante a passagem para a adolescência.',quem:'Profissionais da infância e adolescência com formação específica, dentro de sua área de atuação.',valor:'R$ 900–2.400 por acompanhamento familiar de 4 a 6 encontros'},
     {icon:'pathicon',titulo:'Transição para a Vida Adulta',desc:'Apoio a adolescentes neurodivergentes na transição para escola, trabalho e autonomia.',quem:'Todas as formações',valor:'R$ 800–2.000 por jovem'},
-    {icon:'users',titulo:'Gestores de Jovens Aprendizes',desc:'Neurociência do adolescente aplicada à gestão de jovens aprendizes.',quem:'Todas as formações',valor:'R$ 4.000–15.000 por turma'},
-    {icon:'idcard',titulo:'Profissionais de Apoio em Neurodesenvolvimento',desc:'Formação de acompanhantes e mediadores para neurodesenvolvimento.',quem:'Formadores habilitados',valor:'R$ 1.500–4.000 por aluno'},
+    {icon:'tablet',titulo:'Apoio às Mudanças Tecnológicas no Trabalho',desc:'Consultoria para organizações apoiarem profissionais que cuidam de crianças a adaptar rotinas familiares às mudanças tecnológicas no trabalho.',quem:'Profissionais com experiência em parentalidade e consultoria organizacional, individualmente ou em equipe.',valor:'R$ 3.000–10.000 por projeto institucional, conforme escopo'},
+  ]},
+  {numero:'02',titulo:'Programas NCC',sub:'2 programas · certificação e formação própria',itens:[
+    {icon:'award',titulo:'NCC Trauma Certified',desc:'Formação e avaliação prática para reconhecer possíveis efeitos de experiências adversas na infância e planejar respostas de segurança, apoio e encaminhamento.',quem:'Profissionais da infância elegíveis conforme o regulamento do programa; intervenções clínicas exigem habilitação e formação próprias.',valor:'R$ 1.200–3.500 por participante, incluindo formação e avaliação'},
+    {icon:'neuro',titulo:'NCC Infância Híbrida',desc:'Como uma criança aprende, brinca e se relaciona quando pessoas e sistemas de IA participam da rotina?',quem:'Profissionais da infância com formação no programa, para orientação educacional e familiar dentro de sua área de atuação.',valor:'R$ 900–2.500 por participante, incluindo formação e atividade prática'},
   ]},
 ];
 
@@ -11083,11 +11073,10 @@ function bibliotecaHtml(){
     </div>
 
     <h2 class="section-title">Biblioteca de Negócios</h2>
-    <p class="section-sub">Modelos de negócio complementares para os profissionais NCC, organizados por frente estratégica.</p>
+    <p class="section-sub">Modelos de negócio complementares para os profissionais NCC.</p>
     ${BUSINESS_LIBRARY.map(f=>`
       <div class="category-block">
-        <h2 class="section-title">${f.titulo}</h2>
-        <p class="category-sub">${f.sub}</p>
+        ${f.titulo? `<h2 class="section-title">${f.titulo}</h2><p class="category-sub">${f.sub}</p>` : ''}
         <div class="biz-grid">
           ${f.itens.map(it=>`
             <div class="biz-card">

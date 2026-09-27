@@ -649,6 +649,14 @@
   .pb-check{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-dim);font-weight:400;}
   .pb-duo{display:flex;gap:10px;}
   .pb-duo input{flex:1;min-width:0;}
+  .pb-refs-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+  .pb-refs-item{display:flex;align-items:center;gap:8px;justify-content:space-between;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;}
+  /* Estúdio de Palestras do NCC: só Briefing + geração por IA (sem edição manual de slide) */
+  .palestra-gerar-actions{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 18px;}
+  .palestra-roteiro-resumo{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+  .palestra-roteiro-resumo h3{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .palestra-roteiro-secoes{margin:10px 0 0;padding-left:20px;font-size:12.5px;color:var(--text-dim);}
+  .palestra-roteiro-secoes li{margin-bottom:4px;}
   .palestra-secao{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
   .palestra-secao-h{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
   .palestra-secao-nome{flex:1;min-width:160px;font-weight:700;font-size:14.5px;border:1px solid transparent;background:transparent;padding:6px 8px;border-radius:var(--radius-sm);color:var(--text);}
@@ -6390,8 +6398,12 @@ let novoEstudoFile = null;
 /* Qual palestra (Montar Palestra) está aberta no editor agora; null = mostra a lista de palestras. */
 let palestraAbertaId = null;
 /* Id do slide com "Gerar fala com IA" em andamento agora (mostra "Gerando..." só nesse botão, sem
-   travar o resto do editor) — null quando nenhuma chamada está em curso. */
+   travar o resto do editor) — null quando nenhuma chamada está em curso. Função hoje sem uso na UI
+   (o Estúdio de Palestras do NCC passou a gerar o roteiro inteiro de uma vez, ver "Criar roteiro"),
+   mantida por segurança. */
 let palestraGerandoSlideId = null;
+/* Id da palestra com "Criar roteiro" em andamento agora — null quando nenhuma chamada está em curso. */
+let palestraGerandoRoteiroId = null;
 let communityFilter = 'todas';
 /* Qual comunidade a equipe interna está olhando agora (Mentorados ou Curso) — só existe pra equipe
    interna, já que um aluno (mentorado ou do curso) só tem acesso à própria comunidade mesmo, sem escolha.
@@ -7572,7 +7584,8 @@ function palestraBriefingPadrao(){
     conhecimentoPrevio:'',
     tom:[], tomOutro:'',
     restricoes:'',
-    referenciasNome:'', referenciasTexto:'', referenciasLinks:'',
+    referenciasArquivos:[], /* [{nome, texto}] — quantos PDFs forem necessários, sem limite fixo */
+    referenciasLinks:'',
     logoUrl:'', logoNome:'',
     paletaCores:'', paletaImagemUrl:'', paletaImagemNome:'',
     estiloVisual:'', estiloVisualOutro:'',
@@ -7594,8 +7607,10 @@ async function uploadPalestraBriefingFile(file, subpasta){
   return data.publicUrl;
 }
 async function syncPalestraInsert(titulo){
+  // O roteiro nasce vazio: quem monta as seções e slides agora é a IA, em "Criar roteiro" (Estúdio de
+  // Palestras do NCC), a partir do Briefing e dos PDFs anexados — não há mais edição manual de slides.
   const { data, error } = await sb.from('palestras')
-    .insert({ aluno_id: currentUser.id, titulo, conteudo: palestraEsqueletoPadrao() })
+    .insert({ aluno_id: currentUser.id, titulo, conteudo: [] })
     .select().single();
   if(error) throw error;
   return data;
@@ -9241,12 +9256,14 @@ function palestraBriefingHtml(p){
         <div class="field full">
           <label class="ps-label">Estudos e referências para citar</label>
           <div class="palestra-material-row">
-            <input type="file" accept="application/pdf" data-pb-refs-file style="display:none">
-            <button type="button" class="btn-outline btn-mini" id="pb-refs-btn">${icon('upload','tiny')} ${b.referenciasNome? 'Trocar arquivo' : 'Anexar PDF'}</button>
-            ${b.referenciasNome
-              ? `<span class="palestra-material-name">${icon('folder','tiny')} ${escapeHtml(b.referenciasNome)}</span><button type="button" class="btn-mini danger" id="pb-refs-del" title="Remover material">${icon('x','tiny')}</button>`
-              : `<span class="palestra-material-empty">Nenhum arquivo anexado</span>`}
+            <input type="file" accept="application/pdf" multiple data-pb-refs-file style="display:none">
+            <button type="button" class="btn-outline btn-mini" id="pb-refs-btn">${icon('upload','tiny')} Anexar PDF(s)</button>
+            <span class="palestra-material-empty">${(b.referenciasArquivos||[]).length? '' : 'Nenhum arquivo anexado'}</span>
           </div>
+          ${(b.referenciasArquivos||[]).length ? `<div class="pb-refs-list">${b.referenciasArquivos.map((a,i)=>`
+            <div class="pb-refs-item"><span class="palestra-material-name">${icon('folder','tiny')} ${escapeHtml(a.nome)}</span><button type="button" class="btn-mini danger" data-pb-refs-del="${i}" title="Remover">${icon('x','tiny')}</button></div>
+          `).join('')}</div>` : ''}
+          <p class="field-hint">Anexe quantos estudos ou PDFs forem necessários — a IA só cita o que estiver nesses arquivos, nunca pesquisa por conta própria.</p>
           <textarea class="ps-input" rows="2" data-pb-campo="referenciasLinks" placeholder="Links de estudos ou referências, um por linha (opcional)" style="margin-top:8px">${escapeHtml(b.referenciasLinks)}</textarea>
         </div>
 
@@ -9377,28 +9394,37 @@ function palestraSecaoEditorHtml(secao, idxSecao, totalSecoes){
   `;
 }
 
-function renderPalestraEditor(p){
+/* Depois do Briefing não há mais campos manuais: o roteiro (seções, slides, "na tela" e fala) é
+   inteiramente gerado pela IA em "Criar roteiro", só com base no Briefing e nos PDFs anexados — nunca
+   editado slide a slide à mão. "Criar apresentação" transforma esse roteiro já gerado nos slides
+   visuais (PDF, paisagem) usando a identidade visual do Briefing. */
+function palestraRoteiroResumoHtml(p){
   const secoes = p.conteudo||[];
+  const totalSlides = secoes.reduce((n,s)=>n+(s.slides||[]).length, 0);
+  return `
+    <div class="palestra-roteiro-resumo">
+      <h3>${icon('check')} Roteiro gerado</h3>
+      <p class="section-sub">${escapeHtml(p.titulo||'(sem título)')}${p.duracaoEstimada? ' · '+escapeHtml(p.duracaoEstimada) : ''} — ${secoes.length} seção${secoes.length===1?'':'ões'}, ${totalSlides} slide${totalSlides===1?'':'s'}.</p>
+      <ul class="palestra-roteiro-secoes">
+        ${secoes.map(s=>`<li>${escapeHtml(s.nome)} <span style="color:var(--text-mute)">(${(s.slides||[]).length} slide${(s.slides||[]).length===1?'':'s'})</span></li>`).join('')}
+      </ul>
+    </div>
+  `;
+}
+function renderPalestraEditor(p){
+  const temRoteiro = !!(p.conteudo && p.conteudo.some(s=>(s.slides||[]).length));
+  const gerandoRoteiro = palestraGerandoRoteiroId === p.id;
   document.getElementById('view-palestras').innerHTML = `
     <div class="back-row">
       <button type="button" class="back-btn" id="palestra-back">${icon('back')} Voltar às palestras</button>
-      <button type="button" class="btn-outline" id="palestra-export-btn">${icon('download')} Exportar PDF</button>
+      ${temRoteiro ? `<button type="button" class="btn-outline" id="palestra-export-btn">${icon('download')} Exportar roteiro em PDF</button>` : ''}
     </div>
     ${palestraBriefingHtml(p)}
-    <div class="palestra-header-form">
-      <div class="field full"><label>Título da palestra</label><input class="ps-input" type="text" data-palestra-campo="titulo" value="${escapeAttr(p.titulo)}"></div>
-      <div class="field"><label>Subtítulo (opcional)</label><input class="ps-input" type="text" data-palestra-campo="subtitulo" value="${escapeAttr(p.subtitulo)}"></div>
-      <div class="field"><label>Evento/ocasião (opcional)</label><input class="ps-input" type="text" data-palestra-campo="evento" value="${escapeAttr(p.evento)}" placeholder="Ex.: Simpósio Autismo, Depressão e Saúde Mental em Mulheres"></div>
-      <div class="field"><label>Duração estimada (opcional)</label><input class="ps-input" type="text" data-palestra-campo="duracaoEstimada" value="${escapeAttr(p.duracaoEstimada)}" placeholder="Ex.: ~34-39 min"></div>
+    <div class="palestra-gerar-actions">
+      <button type="button" class="btn-accent" id="palestra-criar-roteiro" ${gerandoRoteiro?'disabled':''}>${icon('edit')} ${gerandoRoteiro? 'Criando roteiro...' : (temRoteiro? 'Criar roteiro de novo' : 'Criar roteiro')}</button>
+      <button type="button" class="btn-outline" id="palestra-criar-apresentacao" ${temRoteiro?'':'disabled'} title="${temRoteiro?'':'Crie o roteiro primeiro'}">${icon('download')} Criar apresentação</button>
     </div>
-    <div class="palestra-secoes">
-      ${secoes.map((sec,i)=>palestraSecaoEditorHtml(sec, i, secoes.length)).join('') || '<div class="empty-state">Nenhuma seção ainda.</div>'}
-    </div>
-    <div class="actions" style="margin:14px 0"><button type="button" class="btn-accent" id="palestra-add-secao-btn">${icon('plus')} Adicionar seção</button></div>
-    <div class="field full">
-      <label>Referências (lista completa, opcional — vai junto no PDF exportado)</label>
-      <textarea class="ps-input" rows="4" data-palestra-campo="referencias" placeholder="Cole aqui a lista de referências completa, se quiser incluir no PDF exportado.">${escapeHtml(p.referencias)}</textarea>
-    </div>
+    ${temRoteiro ? palestraRoteiroResumoHtml(p) : ''}
   `;
   bindPalestraEditorEvents(p);
 }
@@ -9431,36 +9457,43 @@ function bindPalestraBriefingEvents(p){
     });
   });
 
-  // Estudos e referências para citar: mesmo leitor de PDF usado no material de apoio dos slides —
-  // extrai o texto no navegador e guarda; a IA usa isso (nunca inventa estudo além do que está aí).
+  // Estudos e referências para citar: quantos PDFs forem necessários, não só um. Mesmo leitor de PDF
+  // usado no material de apoio dos slides — extrai o texto no navegador e guarda um item por arquivo;
+  // a IA usa só isso (nunca inventa estudo, autor ou dado além do que estiver anexado aqui).
   const pbRefsBtn = document.getElementById('pb-refs-btn');
   const pbRefsFile = document.querySelector('#view-palestras [data-pb-refs-file]');
   if(pbRefsBtn && pbRefsFile){
     pbRefsBtn.addEventListener('click', ()=>pbRefsFile.click());
     pbRefsFile.addEventListener('change', async ()=>{
-      const file = pbRefsFile.files && pbRefsFile.files[0];
-      if(!file) return;
+      const files = Array.from(pbRefsFile.files||[]);
+      if(!files.length) return;
       const original = pbRefsBtn.innerHTML;
-      pbRefsBtn.disabled = true; pbRefsBtn.innerHTML = 'Lendo arquivo...';
-      try{
-        const texto = await extrairTextoPdf(file);
-        p.briefing.referenciasNome = file.name;
-        p.briefing.referenciasTexto = texto.slice(0, 20000);
-        syncPalestraUpdate(p);
-        renderPalestraEditor(p);
-      }catch(err){
-        console.error('referências do briefing', err);
-        alert('Não foi possível ler esse arquivo. Envie um PDF.');
-        pbRefsBtn.disabled = false; pbRefsBtn.innerHTML = original;
+      pbRefsBtn.disabled = true;
+      if(!Array.isArray(p.briefing.referenciasArquivos)) p.briefing.referenciasArquivos = [];
+      const falhas = [];
+      for(const file of files){
+        pbRefsBtn.innerHTML = `Lendo ${escapeHtml(file.name)}...`;
+        try{
+          const texto = await extrairTextoPdf(file);
+          p.briefing.referenciasArquivos.push({ nome:file.name, texto: texto.slice(0, 20000) });
+        }catch(err){
+          console.error('referências do briefing', file.name, err);
+          falhas.push(file.name);
+        }
       }
+      pbRefsFile.value = '';
+      syncPalestraUpdate(p);
+      renderPalestraEditor(p);
+      if(falhas.length) alert('Não foi possível ler: ' + falhas.join(', ') + '. Envie PDFs com texto selecionável (não escaneados como imagem).');
     });
   }
-  const pbRefsDel = document.getElementById('pb-refs-del');
-  if(pbRefsDel) pbRefsDel.addEventListener('click', ()=>{
-    p.briefing.referenciasNome = '';
-    p.briefing.referenciasTexto = '';
-    syncPalestraUpdate(p);
-    renderPalestraEditor(p);
+  document.querySelectorAll('#view-palestras [data-pb-refs-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const idx = parseInt(btn.dataset.pbRefsDel, 10);
+      if(Array.isArray(p.briefing.referenciasArquivos) && idx>-1) p.briefing.referenciasArquivos.splice(idx,1);
+      syncPalestraUpdate(p);
+      renderPalestraEditor(p);
+    });
   });
 
   // Logo, paleta de cores (imagem) e referência visual: upload real pro bucket "palestra-briefing".
@@ -9508,194 +9541,141 @@ function bindPalestraBriefingEvents(p){
 
 function bindPalestraEditorEvents(p){
   document.getElementById('palestra-back').addEventListener('click', ()=>{ palestraAbertaId = null; renderPalestras(); });
-  document.getElementById('palestra-export-btn').addEventListener('click', ()=>exportPalestraPDF(p));
+  const exportBtn = document.getElementById('palestra-export-btn');
+  if(exportBtn) exportBtn.addEventListener('click', ()=>exportPalestraPDF(p));
   bindPalestraBriefingEvents(p);
 
-  document.querySelectorAll('#view-palestras [data-palestra-campo]').forEach(inp=>{
-    inp.addEventListener('change', ()=>{
-      p[inp.dataset.palestraCampo] = inp.value;
-      syncPalestraUpdate(p);
-    });
-  });
-
-  document.getElementById('palestra-add-secao-btn').addEventListener('click', ()=>{
-    p.conteudo.push(novaPalestraSecao('Nova seção',''));
-    syncPalestraUpdate(p);
-    renderPalestraEditor(p);
-  });
-
-  document.querySelectorAll('#view-palestras [data-palestra-secao-nome]').forEach(inp=>{
-    inp.addEventListener('change', ()=>{
-      const secao = (p.conteudo||[]).find(s=>s.id===inp.dataset.palestraSecaoNome);
-      if(!secao) return;
-      secao.nome = inp.value;
-      syncPalestraUpdate(p);
-    });
-  });
-
-  document.querySelectorAll('#view-palestras [data-move-up-secao], #view-palestras [data-move-down-secao]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const id = btn.dataset.moveUpSecao || btn.dataset.moveDownSecao;
-      const dir = btn.dataset.moveUpSecao ? -1 : 1;
-      const idx = (p.conteudo||[]).findIndex(s=>s.id===id);
-      const novoIdx = idx + dir;
-      if(idx<0 || novoIdx<0 || novoIdx>=p.conteudo.length) return;
-      const [sec] = p.conteudo.splice(idx,1);
-      p.conteudo.splice(novoIdx,0,sec);
-      syncPalestraUpdate(p);
-      renderPalestraEditor(p);
-    });
-  });
-
-  document.querySelectorAll('#view-palestras [data-del-secao]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      if(!confirmDelete('Excluir esta seção e todos os slides dela?')) return;
-      const idx = (p.conteudo||[]).findIndex(s=>s.id===btn.dataset.delSecao);
-      if(idx>-1) p.conteudo.splice(idx,1);
-      syncPalestraUpdate(p);
-      renderPalestraEditor(p);
-    });
-  });
-
-  document.querySelectorAll('#view-palestras [data-add-slide]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const secao = (p.conteudo||[]).find(s=>s.id===btn.dataset.addSlide);
-      if(!secao) return;
-      secao.slides.push(novoPalestraSlide(''));
-      syncPalestraUpdate(p);
-      renderPalestraEditor(p);
-    });
-  });
-
-  document.querySelectorAll('#view-palestras [data-palestra-slide-titulo]').forEach(inp=>{
-    inp.addEventListener('change', ()=>{
-      const ctx = palestraFindSlideCtx(p, inp.dataset.palestraSlideTitulo);
-      if(!ctx) return;
-      ctx.slide.titulo = inp.value;
-      syncPalestraUpdate(p);
-    });
-  });
-  document.querySelectorAll('#view-palestras [data-palestra-slide-tempo]').forEach(inp=>{
-    inp.addEventListener('change', ()=>{
-      const ctx = palestraFindSlideCtx(p, inp.dataset.palestraSlideTempo);
-      if(!ctx) return;
-      ctx.slide.tempo = inp.value;
-      syncPalestraUpdate(p);
-    });
-  });
-  document.querySelectorAll('#view-palestras [data-palestra-slide-evidencia]').forEach(sel=>{
-    sel.addEventListener('change', ()=>{
-      const ctx = palestraFindSlideCtx(p, sel.dataset.palestraSlideEvidencia);
-      if(!ctx) return;
-      ctx.slide.evidencia = sel.value;
-      syncPalestraUpdate(p);
-    });
-  });
-  document.querySelectorAll('#view-palestras [data-palestra-slide-natela]').forEach(ta=>{
-    ta.addEventListener('change', ()=>{
-      const ctx = palestraFindSlideCtx(p, ta.dataset.palestraSlideNatela);
-      if(!ctx) return;
-      ctx.slide.naTela = ta.value;
-      syncPalestraUpdate(p);
-    });
-  });
-  document.querySelectorAll('#view-palestras [data-palestra-slide-notas]').forEach(ta=>{
-    ta.addEventListener('change', ()=>{
-      const ctx = palestraFindSlideCtx(p, ta.dataset.palestraSlideNotas);
-      if(!ctx) return;
-      ctx.slide.notas = ta.value;
-      syncPalestraUpdate(p);
-    });
-  });
-  document.querySelectorAll('#view-palestras [data-palestra-slide-fala]').forEach(ta=>{
-    ta.addEventListener('change', ()=>{
-      const ctx = palestraFindSlideCtx(p, ta.dataset.palestraSlideFala);
-      if(!ctx) return;
-      ctx.slide.fala = ta.value;
-      syncPalestraUpdate(p);
-    });
-  });
-
-  // Material de apoio (opcional, por slide): sobe um PDF, extrai o texto no navegador (mesmo leitor
-  // usado na Biblioteca Científica) e guarda o texto extraído dentro do próprio slide — é isso que a
-  // IA usa (junto com as notas, se houver) em vez de pesquisar sozinha.
-  document.querySelectorAll('#view-palestras [data-palestra-slide-material-btn]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const input = document.querySelector(`#view-palestras [data-palestra-slide-material-file="${btn.dataset.palestraSlideMaterialBtn}"]`);
-      if(input) input.click();
-    });
-  });
-  document.querySelectorAll('#view-palestras [data-palestra-slide-material-file]').forEach(input=>{
-    input.addEventListener('change', async ()=>{
-      const file = input.files && input.files[0];
-      if(!file) return;
-      const ctx = palestraFindSlideCtx(p, input.dataset.palestraSlideMaterialFile);
-      if(!ctx) return;
-      const btn = document.querySelector(`#view-palestras [data-palestra-slide-material-btn="${input.dataset.palestraSlideMaterialFile}"]`);
-      const original = btn ? btn.innerHTML : '';
-      if(btn){ btn.disabled = true; btn.innerHTML = 'Lendo arquivo...'; }
-      try{
-        const texto = await extrairTextoPdf(file);
-        ctx.slide.materialNome = file.name;
-        ctx.slide.materialTexto = texto.slice(0, 20000);
-        syncPalestraUpdate(p);
-        renderPalestraEditor(p);
-      }catch(err){
-        console.error('material palestra', err);
-        alert('Não foi possível ler esse arquivo. Envie um PDF.');
-        if(btn){ btn.disabled = false; btn.innerHTML = original; }
-      }
-    });
-  });
-  document.querySelectorAll('#view-palestras [data-palestra-slide-material-del]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const ctx = palestraFindSlideCtx(p, btn.dataset.palestraSlideMaterialDel);
-      if(!ctx) return;
-      ctx.slide.materialNome = '';
-      ctx.slide.materialTexto = '';
-      syncPalestraUpdate(p);
-      renderPalestraEditor(p);
-    });
-  });
-
-  document.querySelectorAll('#view-palestras [data-move-up-slide], #view-palestras [data-move-down-slide]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const id = btn.dataset.moveUpSlide || btn.dataset.moveDownSlide;
-      const dir = btn.dataset.moveUpSlide ? -1 : 1;
-      for(const secao of (p.conteudo||[])){
-        const idx = (secao.slides||[]).findIndex(sl=>sl.id===id);
-        if(idx<0) continue;
-        const novoIdx = idx + dir;
-        if(novoIdx<0 || novoIdx>=secao.slides.length) return;
-        const [sl] = secao.slides.splice(idx,1);
-        secao.slides.splice(novoIdx,0,sl);
-        syncPalestraUpdate(p);
-        renderPalestraEditor(p);
-        return;
-      }
-    });
-  });
-
-  document.querySelectorAll('#view-palestras [data-del-slide]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      if(!confirmDelete('Excluir este slide?')) return;
-      for(const secao of (p.conteudo||[])){
-        const idx = (secao.slides||[]).findIndex(sl=>sl.id===btn.dataset.delSlide);
-        if(idx<0) continue;
-        secao.slides.splice(idx,1);
-        break;
-      }
-      syncPalestraUpdate(p);
-      renderPalestraEditor(p);
-    });
-  });
-
-  document.querySelectorAll('#view-palestras [data-palestra-gerar-fala]').forEach(btn=>{
-    btn.addEventListener('click', ()=>onGerarFalaClick(p, btn.dataset.palestraGerarFala));
-  });
+  document.getElementById('palestra-criar-roteiro').addEventListener('click', ()=>onCriarRoteiroClick(p));
+  const apresentacaoBtn = document.getElementById('palestra-criar-apresentacao');
+  if(apresentacaoBtn && !apresentacaoBtn.disabled) apresentacaoBtn.addEventListener('click', ()=>exportPalestraApresentacaoPDF(p));
 }
 
-async function onGerarFalaClick(p, slideId){
+/* "Criar roteiro": a IA monta as seções e slides inteiros de uma vez (título, tempo, selo de
+   evidência, "na tela" e fala), usando só o Briefing e o texto dos PDFs anexados em "Estudos e
+   referências para citar" — nunca pesquisa por conta própria nem completa com conhecimento geral. */
+async function onCriarRoteiroClick(p){
+  p.briefing = mergePalestraBriefing(p.briefing);
+  const arquivos = (p.briefing.referenciasArquivos||[]).filter(a=>(a.texto||'').trim());
+  if(!arquivos.length){
+    alert('Anexe pelo menos um PDF em "Estudos e referências para citar", no Briefing acima, antes de criar o roteiro — a IA só escreve com base no que estiver anexado ali.');
+    return;
+  }
+  const temRoteiro = !!(p.conteudo && p.conteudo.some(s=>(s.slides||[]).length));
+  if(temRoteiro && !confirm('Isso substitui o roteiro atual desta palestra por um novo, gerado pela IA a partir do Briefing e dos PDFs anexados. Continuar?')) return;
+  palestraGerandoRoteiroId = p.id;
+  renderPalestraEditor(p);
+  try{
+    const resultado = await chamarIaGerarRoteiro(p);
+    p.conteudo = (resultado.secoes||[]).map(s=>({
+      id: novoPalestraId('ps'),
+      nome: s.nome,
+      slides: (s.slides||[]).map(sl=>({
+        id: novoPalestraId('sl'), titulo: sl.titulo, tempo: sl.tempo, evidencia: sl.evidencia,
+        naTela: sl.naTela, notas:'', fala: sl.fala, materialNome:'', materialTexto:'',
+      })),
+    }));
+    if(resultado.titulo) p.titulo = resultado.titulo;
+    if(resultado.subtitulo) p.subtitulo = resultado.subtitulo;
+    if(resultado.evento) p.evento = resultado.evento;
+    if(resultado.duracaoEstimada) p.duracaoEstimada = resultado.duracaoEstimada;
+    if(resultado.referencias) p.referencias = resultado.referencias;
+    syncPalestraUpdate(p);
+  }catch(e){
+    console.error('criar roteiro', e);
+    alert(e.message || 'Não foi possível gerar o roteiro agora. Tente de novo em instantes.');
+  }finally{
+    palestraGerandoRoteiroId = null;
+    renderPalestraEditor(p);
+  }
+}
+async function chamarIaGerarRoteiro(p){
+  const { data, error } = await sb.functions.invoke('gerar-roteiro-palestra', { body: {
+    briefing: p.briefing, referenciasArquivos: p.briefing.referenciasArquivos||[],
+  }});
+  if(error){
+    let msg = 'Não foi possível gerar o roteiro agora. Tente de novo em instantes.';
+    try{ const body = await error.context.json(); if(body?.error) msg = body.error; }catch(e){}
+    throw new Error(msg);
+  }
+  if(data?.error) throw new Error(data.error);
+  return data;
+}
+
+/* "Criar apresentação": transforma o roteiro já gerado nos slides visuais (um por página, formato
+   paisagem, só com o "na tela" de cada slide) usando a logo, a paleta de cores e o estilo visual do
+   Briefing — não chama a IA de novo, é só a formatação do que "Criar roteiro" já produziu. */
+function palestraCoresDaPaleta(str){
+  const encontradas = String(str||'').match(/#(?:[0-9a-fA-F]{3}){1,2}\b/g) || [];
+  return { primaria: encontradas[0] || '#8f6231', secundaria: encontradas[1] || encontradas[0] || '#5a5a5a' };
+}
+const PB_ESTILO_CSS = { 'Minimalista':'apr-minimalista', 'Editorial':'apr-editorial', 'Acadêmica':'apr-academica', 'Expressiva':'apr-expressiva' };
+function palestraNaTelaItensHtml(naTela){
+  const texto = String(naTela||'').trim();
+  if(!texto) return '<p class="apr-vazio">(sem conteúdo definido para a tela)</p>';
+  const partes = texto.includes('·') ? texto.split('·') : texto.split(/\n+/);
+  const limpas = partes.map(t=>t.trim()).filter(Boolean);
+  if(limpas.length>1) return `<ul>${limpas.map(t=>`<li>${escapeHtml(t)}</li>`).join('')}</ul>`;
+  return `<p>${escapeHtml(texto).replace(/\n/g,'<br>')}</p>`;
+}
+function exportPalestraApresentacaoPDF(p){
+  const secoes = p.conteudo||[];
+  if(!secoes.some(s=>(s.slides||[]).length)){ alert('Crie o roteiro primeiro — a apresentação é montada a partir dos slides do roteiro.'); return; }
+  const b = mergePalestraBriefing(p.briefing);
+  const cores = palestraCoresDaPaleta(b.paletaCores);
+  const estiloClasse = PB_ESTILO_CSS[b.estiloVisual] || 'apr-minimalista';
+  const logoSrc = b.logoUrl || BRAND_LOGO_DATA_URI;
+  const win = window.open('', '_blank');
+  if(!win){ alert('Seu navegador bloqueou a abertura da aba de impressão. Permita pop-ups para este site e tente de novo.'); return; }
+  const slidesHtml = [];
+  secoes.forEach(secao=>{
+    (secao.slides||[]).forEach(sl=>{
+      slidesHtml.push(`
+        <section class="apr-slide">
+          <div class="apr-topo">
+            <img src="${logoSrc}" class="apr-logo" alt="">
+            <span class="apr-secao-tag">${escapeHtml(secao.nome)}</span>
+          </div>
+          <h1>${escapeHtml(sl.titulo||'')}</h1>
+          <div class="apr-corpo">${palestraNaTelaItensHtml(sl.naTela)}</div>
+        </section>`);
+    });
+  });
+  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(p.titulo)} — Apresentação</title>
+    <style>
+      @page{ size: landscape; margin:0; }
+      *{ box-sizing:border-box; }
+      body{ font-family:Arial,Helvetica,sans-serif; margin:0; }
+      .apr-slide{ width:100%; min-height:100vh; page-break-after:always; padding:36px 56px; display:flex; flex-direction:column; justify-content:center; position:relative; }
+      .apr-topo{ position:absolute; top:24px; left:56px; right:56px; display:flex; align-items:center; justify-content:space-between; }
+      .apr-logo{ height:26px; width:auto; }
+      .apr-secao-tag{ font-size:11px; text-transform:uppercase; letter-spacing:1px; color:${cores.secundaria}; }
+      h1{ font-size:34px; margin:0 0 22px; color:${cores.primaria}; }
+      .apr-corpo{ font-size:18px; line-height:1.6; color:#222; }
+      .apr-corpo ul{ margin:0; padding-left:22px; }
+      .apr-corpo li{ margin-bottom:10px; }
+      .apr-vazio{ color:#999; font-style:italic; }
+      .apr-minimalista .apr-slide{ background:#ffffff; }
+      .apr-minimalista h1{ font-weight:600; }
+      .apr-editorial .apr-slide{ background:#fbf8f3; }
+      .apr-editorial h1{ font-family:Georgia,'Times New Roman',serif; font-weight:400; }
+      .apr-editorial .apr-slide::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:10px; background:${cores.primaria}; }
+      .apr-academica .apr-slide{ background:#ffffff; }
+      .apr-academica h1{ font-weight:700; border-bottom:2px solid ${cores.primaria}; padding-bottom:12px; }
+      .apr-academica .apr-secao-tag{ font-weight:700; }
+      .apr-expressiva .apr-slide{ background:${cores.primaria}; color:#fff; }
+      .apr-expressiva h1{ color:#fff; font-size:40px; font-weight:800; }
+      .apr-expressiva .apr-corpo{ color:#fff; }
+      .apr-expressiva .apr-secao-tag{ color:#fff; opacity:.8; }
+    </style>
+    </head><body class="${estiloClasse}">
+      ${slidesHtml.join('')}
+    </body></html>`);
+  win.document.close();
+  win.onload = ()=>{ win.focus(); win.print(); };
+  setTimeout(()=>{ try{ win.focus(); win.print(); }catch(e){} }, 600);
+}
+
+async function onGerarFalaClick_DEPRECATED(p, slideId){
   const ctx = palestraFindSlideCtx(p, slideId);
   if(!ctx) return;
   const { secao, slide } = ctx;

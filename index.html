@@ -633,10 +633,22 @@
   .comunicado-banner .icon{color:var(--shared);flex-shrink:0;}
   .comunicado-banner a{color:var(--shared);}
   .comunicado-banner > div{font-weight:700;}
-  /* Montar Palestra (só Mentoria NCC) */
+  /* Estúdio de Palestras do NCC (só Mentoria NCC) */
   .palestra-header-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px;}
   .palestra-header-form .field.full{grid-column:1 / -1;}
   @media (max-width:640px){ .palestra-header-form{grid-template-columns:1fr;} }
+  /* Briefing da palestra: formulário curto no topo do editor */
+  .palestra-briefing{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px;}
+  .palestra-briefing-h{margin-bottom:14px;}
+  .palestra-briefing-h h3{font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .pb-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+  .pb-grid .field{display:flex;flex-direction:column;}
+  .pb-grid .field.full{grid-column:1 / -1;}
+  @media (max-width:640px){ .pb-grid{grid-template-columns:1fr;} }
+  .pb-checks{display:flex;flex-wrap:wrap;gap:10px;}
+  .pb-check{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-dim);font-weight:400;}
+  .pb-duo{display:flex;gap:10px;}
+  .pb-duo input{flex:1;min-width:0;}
   .palestra-secao{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
   .palestra-secao-h{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
   .palestra-secao-nome{flex:1;min-width:160px;font-weight:700;font-size:14.5px;border:1px solid transparent;background:transparent;padding:6px 8px;border-radius:var(--radius-sm);color:var(--text);}
@@ -1652,7 +1664,7 @@ const NAV_LABELS = {
   painel:['compass','Painel Profissional'],
   biblioteca:['biblioteca','Biblioteca de Negócios'],
   estudos:['book','Biblioteca Científica'],
-  palestras:['mic','Montar Palestra'],
+  palestras:['mic','Estúdio de Palestras do NCC'],
   projetoacademico:['briefcase','Projeto Acadêmico'],
   sessoes:['video','Minhas Sessões 1:1'], metas:['target','Minhas Metas'],
   interno:['lock','Acompanhamento Interno'],
@@ -6991,6 +7003,7 @@ async function bootstrapData(){
   (palestraRows||[]).forEach(p=>PALESTRAS.push({
     id:p.id, alunoId:p.aluno_id, titulo:p.titulo||'', subtitulo:p.subtitulo||'', evento:p.evento||'',
     duracaoEstimada:p.duracao_estimada||'', conteudo:Array.isArray(p.conteudo)?p.conteudo:[], referencias:p.referencias||'',
+    briefing:mergePalestraBriefing(p.briefing),
     createdAt:p.created_at, updatedAt:p.updated_at,
   }));
 
@@ -7536,6 +7549,50 @@ function palestraEsqueletoPadrao(){
     novaPalestraSecao('Encerramento', 'Obrigado(a)'),
   ];
 }
+/* Briefing da palestra: formulário curto (Estúdio de Palestras do NCC) que ajuda a IA a entender pra quem,
+   onde e com que objetivo a palestra vai ser apresentada, além de referências de conteúdo e visual. Tudo
+   opcional — guardado como jsonb (coluna "briefing" em palestras). */
+const PB_PUBLICO_OPCOES = ['Pais','Professores','Profissionais da infância','Gestores','Cientistas','Público misto'];
+const PB_CONTEXTO_OPCOES = ['Congresso','Escola','Aula','Evento corporativo','Palestra comercial','Outro'];
+const PB_CONHECIMENTO_OPCOES = ['Iniciante','Intermediário','Avançado'];
+const PB_TOM_OPCOES = ['Científico','Provocativo','Acolhedor','Institucional'];
+const PB_ESTILO_OPCOES = ['Minimalista','Editorial','Acadêmica','Expressiva','Outro'];
+const PB_FILE_FIELDS = {
+  logo: {url:'logoUrl', nome:'logoNome'},
+  paleta: {url:'paletaImagemUrl', nome:'paletaImagemNome'},
+  referenciaVisual: {url:'referenciaVisualUrl', nome:'referenciaVisualNome'},
+};
+function palestraBriefingPadrao(){
+  return {
+    temaTitulo:'',
+    publico:[], publicoOutro:'',
+    contexto:'', contextoOutro:'',
+    duracaoFala:'', duracaoPerguntas:'',
+    transformacao:'',
+    conhecimentoPrevio:'',
+    tom:[], tomOutro:'',
+    restricoes:'',
+    referenciasNome:'', referenciasTexto:'', referenciasLinks:'',
+    logoUrl:'', logoNome:'',
+    paletaCores:'', paletaImagemUrl:'', paletaImagemNome:'',
+    estiloVisual:'', estiloVisualOutro:'',
+    referenciaVisualUrl:'', referenciaVisualNome:'',
+  };
+}
+function mergePalestraBriefing(b){ return Object.assign(palestraBriefingPadrao(), b||{}); }
+/* Uploads reais do briefing (logo, paleta, referência visual) — mesmo padrão da foto de perfil, mas sem
+   redimensionar (são referências de design, não avatares pequenos): só limita o tamanho do arquivo. A
+   política de storage exige que a pasta comece com o próprio auth.uid() do aluno. */
+const PB_ARQUIVO_LIMITE_BYTES = 8*1024*1024;
+async function uploadPalestraBriefingFile(file, subpasta){
+  if(file.size > PB_ARQUIVO_LIMITE_BYTES) throw new Error('Arquivo muito grande (máx. 8MB). Escolha um arquivo menor.');
+  const ext = (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g,'') || 'bin';
+  const path = `${currentUser.id}/${subpasta}-${Date.now()}.${ext}`;
+  const { error: upErr } = await sb.storage.from('palestra-briefing').upload(path, file, {upsert:true, cacheControl:'31536000', contentType: file.type || undefined});
+  if(upErr) throw upErr;
+  const { data } = sb.storage.from('palestra-briefing').getPublicUrl(path);
+  return data.publicUrl;
+}
 async function syncPalestraInsert(titulo){
   const { data, error } = await sb.from('palestras')
     .insert({ aluno_id: currentUser.id, titulo, conteudo: palestraEsqueletoPadrao() })
@@ -7546,7 +7603,7 @@ async function syncPalestraInsert(titulo){
 function syncPalestraUpdate(p){
   syncNow(sb.from('palestras').update({
     titulo:p.titulo, subtitulo:p.subtitulo, evento:p.evento, duracao_estimada:p.duracaoEstimada,
-    conteudo:p.conteudo, referencias:p.referencias, updated_at:new Date().toISOString(),
+    conteudo:p.conteudo, referencias:p.referencias, briefing:p.briefing, updated_at:new Date().toISOString(),
   }).eq('id', p.id));
 }
 function syncPalestraDelete(id){ syncNow(sb.from('palestras').delete().eq('id', id)); }
@@ -9005,7 +9062,7 @@ async function enviarPerguntaEstudo(estudoId){
 
 /* ---- Montar Palestra (só Mentoria NCC) ---- */
 function renderPalestras(){
-  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('palestras', 'Montar Palestra', palestraListViewHtml()); return; }
+  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('palestras', 'Estúdio de Palestras do NCC', palestraListViewHtml()); return; }
   if(palestraAbertaId){
     const p = PALESTRAS.find(x=>x.id==palestraAbertaId);
     if(p){ renderPalestraEditor(p); return; }
@@ -9089,6 +9146,7 @@ async function onAddPalestraClick(){
     PALESTRAS.push({
       id:row.id, alunoId:row.aluno_id, titulo:row.titulo||'', subtitulo:row.subtitulo||'', evento:row.evento||'',
       duracaoEstimada:row.duracao_estimada||'', conteudo:Array.isArray(row.conteudo)?row.conteudo:[], referencias:row.referencias||'',
+      briefing:mergePalestraBriefing(row.briefing),
       createdAt:row.created_at, updatedAt:row.updated_at,
     });
     palestraAbertaId = row.id;
@@ -9108,6 +9166,135 @@ function palestraFindSlideCtx(p, slideId){
     if(slide) return {secao, slide};
   }
   return null;
+}
+
+/* Briefing da palestra — formulário curto no topo do editor, tudo opcional. Não é o roteiro em si:
+   é o contexto (público, tom, restrições, referências e identidade visual) que ajuda a IA a gerar falas
+   e sugestões mais alinhadas com o que a Daiane/o profissional realmente precisa. */
+function palestraBriefingHtml(p){
+  const b = mergePalestraBriefing(p.briefing);
+  const publico = b.publico||[];
+  const tom = b.tom||[];
+  return `
+    <div class="palestra-briefing">
+      <div class="palestra-briefing-h">
+        <h3>${icon('sliders')} Briefing da palestra</h3>
+        <p class="field-hint">Um formulário curto pra guiar o que a IA sugere daqui pra frente — preencha o quanto quiser, tudo é opcional.</p>
+      </div>
+      <div class="pb-grid">
+        <div class="field full">
+          <label class="ps-label">Tema e título</label>
+          <input class="ps-input" type="text" data-pb-campo="temaTitulo" value="${escapeAttr(b.temaTitulo)}" placeholder="Já tem um título? Escreva aqui. Se não, descreva o tema e a IA propõe um título depois.">
+        </div>
+
+        <div class="field full">
+          <label class="ps-label">Público</label>
+          <div class="pb-checks">
+            ${PB_PUBLICO_OPCOES.map(o=>`<label class="pb-check"><input type="checkbox" data-pb-multi="publico" value="${escapeAttr(o)}" ${publico.includes(o)?'checked':''}> ${escapeHtml(o)}</label>`).join('')}
+          </div>
+          <input class="ps-input" type="text" data-pb-campo="publicoOutro" value="${escapeAttr(b.publicoOutro)}" placeholder="Outro público (opcional)" style="margin-top:8px">
+        </div>
+
+        <div class="field">
+          <label class="ps-label">Contexto</label>
+          <select class="ps-input" data-pb-campo="contexto">
+            <option value="">Selecione...</option>
+            ${PB_CONTEXTO_OPCOES.map(o=>`<option value="${escapeAttr(o)}" ${b.contexto===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}
+          </select>
+          ${b.contexto==='Outro' ? `<input class="ps-input" type="text" data-pb-campo="contextoOutro" value="${escapeAttr(b.contextoOutro)}" placeholder="Qual?" style="margin-top:8px">` : ''}
+        </div>
+
+        <div class="field">
+          <label class="ps-label">Duração</label>
+          <div class="pb-duo">
+            <input class="ps-input" type="text" data-pb-campo="duracaoFala" value="${escapeAttr(b.duracaoFala)}" placeholder="Tempo de fala (ex.: 40 min)">
+            <input class="ps-input" type="text" data-pb-campo="duracaoPerguntas" value="${escapeAttr(b.duracaoPerguntas)}" placeholder="Tempo de perguntas (ex.: 10 min)">
+          </div>
+        </div>
+
+        <div class="field full">
+          <label class="ps-label">Transformação desejada</label>
+          <textarea class="ps-input" rows="2" data-pb-campo="transformacao" placeholder="O que o público deve sair pensando, sentindo ou fazendo diferente depois da palestra?">${escapeHtml(b.transformacao)}</textarea>
+        </div>
+
+        <div class="field">
+          <label class="ps-label">Conhecimento prévio</label>
+          <select class="ps-input" data-pb-campo="conhecimentoPrevio">
+            <option value="">Selecione...</option>
+            ${PB_CONHECIMENTO_OPCOES.map(o=>`<option value="${escapeAttr(o)}" ${b.conhecimentoPrevio===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="ps-label">Tom</label>
+          <div class="pb-checks">
+            ${PB_TOM_OPCOES.map(o=>`<label class="pb-check"><input type="checkbox" data-pb-multi="tom" value="${escapeAttr(o)}" ${tom.includes(o)?'checked':''}> ${escapeHtml(o)}</label>`).join('')}
+          </div>
+          <input class="ps-input" type="text" data-pb-campo="tomOutro" value="${escapeAttr(b.tomOutro)}" placeholder="Outro tom, ou combinação (opcional)" style="margin-top:8px">
+        </div>
+
+        <div class="field full">
+          <label class="ps-label">Restrições</label>
+          <textarea class="ps-input" rows="2" data-pb-campo="restricoes" placeholder="Temas obrigatórios, assuntos a evitar, materiais próprios que precisam ser usados...">${escapeHtml(b.restricoes)}</textarea>
+        </div>
+
+        <div class="field full">
+          <label class="ps-label">Estudos e referências para citar</label>
+          <div class="palestra-material-row">
+            <input type="file" accept="application/pdf" data-pb-refs-file style="display:none">
+            <button type="button" class="btn-outline btn-mini" id="pb-refs-btn">${icon('upload','tiny')} ${b.referenciasNome? 'Trocar arquivo' : 'Anexar PDF'}</button>
+            ${b.referenciasNome
+              ? `<span class="palestra-material-name">${icon('folder','tiny')} ${escapeHtml(b.referenciasNome)}</span><button type="button" class="btn-mini danger" id="pb-refs-del" title="Remover material">${icon('x','tiny')}</button>`
+              : `<span class="palestra-material-empty">Nenhum arquivo anexado</span>`}
+          </div>
+          <textarea class="ps-input" rows="2" data-pb-campo="referenciasLinks" placeholder="Links de estudos ou referências, um por linha (opcional)" style="margin-top:8px">${escapeHtml(b.referenciasLinks)}</textarea>
+        </div>
+
+        <div class="field">
+          <label class="ps-label">Logo</label>
+          <div class="palestra-material-row">
+            <input type="file" accept="image/*" data-pb-file="logo" style="display:none">
+            <button type="button" class="btn-outline btn-mini" data-pb-file-btn="logo">${icon('upload','tiny')} ${b.logoUrl? 'Trocar arquivo' : 'Enviar logo'}</button>
+            ${b.logoUrl
+              ? `<a href="${escapeAttr(b.logoUrl)}" target="_blank" rel="noopener" class="palestra-material-name">${icon('folder','tiny')} ${escapeHtml(b.logoNome||'logo enviado')}</a><button type="button" class="btn-mini danger" data-pb-file-del="logo" title="Remover">${icon('x','tiny')}</button>`
+              : `<span class="palestra-material-empty">Nenhum arquivo enviado</span>`}
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="ps-label">Paleta de cores</label>
+          <input class="ps-input" type="text" data-pb-campo="paletaCores" value="${escapeAttr(b.paletaCores)}" placeholder="Ex.: #1E3A5F, #F4A300...">
+          <div class="palestra-material-row" style="margin-top:8px">
+            <input type="file" accept="image/*" data-pb-file="paleta" style="display:none">
+            <button type="button" class="btn-outline btn-mini" data-pb-file-btn="paleta">${icon('upload','tiny')} ${b.paletaImagemUrl? 'Trocar imagem' : 'Anexar imagem (opcional)'}</button>
+            ${b.paletaImagemUrl
+              ? `<a href="${escapeAttr(b.paletaImagemUrl)}" target="_blank" rel="noopener" class="palestra-material-name">${icon('folder','tiny')} ${escapeHtml(b.paletaImagemNome||'imagem enviada')}</a><button type="button" class="btn-mini danger" data-pb-file-del="paleta" title="Remover">${icon('x','tiny')}</button>`
+              : `<span class="palestra-material-empty">Nenhuma imagem</span>`}
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="ps-label">Estilo visual</label>
+          <select class="ps-input" data-pb-campo="estiloVisual">
+            <option value="">Selecione...</option>
+            ${PB_ESTILO_OPCOES.map(o=>`<option value="${escapeAttr(o)}" ${b.estiloVisual===o?'selected':''}>${escapeHtml(o)}</option>`).join('')}
+          </select>
+          ${b.estiloVisual==='Outro' ? `<input class="ps-input" type="text" data-pb-campo="estiloVisualOutro" value="${escapeAttr(b.estiloVisualOutro)}" placeholder="Qual?" style="margin-top:8px">` : ''}
+        </div>
+
+        <div class="field">
+          <label class="ps-label">Referência visual</label>
+          <div class="palestra-material-row">
+            <input type="file" accept="image/*,application/pdf" data-pb-file="referenciaVisual" style="display:none">
+            <button type="button" class="btn-outline btn-mini" data-pb-file-btn="referenciaVisual">${icon('upload','tiny')} ${b.referenciaVisualUrl? 'Trocar arquivo' : 'Enviar apresentação ou imagem'}</button>
+            ${b.referenciaVisualUrl
+              ? `<a href="${escapeAttr(b.referenciaVisualUrl)}" target="_blank" rel="noopener" class="palestra-material-name">${icon('folder','tiny')} ${escapeHtml(b.referenciaVisualNome||'arquivo enviado')}</a><button type="button" class="btn-mini danger" data-pb-file-del="referenciaVisual" title="Remover">${icon('x','tiny')}</button>`
+              : `<span class="palestra-material-empty">Nenhum arquivo</span>`}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function palestraSlideEditorHtml(secao, slide, idx, total){
@@ -9197,6 +9384,7 @@ function renderPalestraEditor(p){
       <button type="button" class="back-btn" id="palestra-back">${icon('back')} Voltar às palestras</button>
       <button type="button" class="btn-outline" id="palestra-export-btn">${icon('download')} Exportar PDF</button>
     </div>
+    ${palestraBriefingHtml(p)}
     <div class="palestra-header-form">
       <div class="field full"><label>Título da palestra</label><input class="ps-input" type="text" data-palestra-campo="titulo" value="${escapeAttr(p.titulo)}"></div>
       <div class="field"><label>Subtítulo (opcional)</label><input class="ps-input" type="text" data-palestra-campo="subtitulo" value="${escapeAttr(p.subtitulo)}"></div>
@@ -9215,9 +9403,113 @@ function renderPalestraEditor(p){
   bindPalestraEditorEvents(p);
 }
 
+function bindPalestraBriefingEvents(p){
+  p.briefing = mergePalestraBriefing(p.briefing);
+
+  document.querySelectorAll('#view-palestras [data-pb-campo]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      p.briefing[inp.dataset.pbCampo] = inp.value;
+      syncPalestraUpdate(p);
+    });
+  });
+  // Contexto e Estilo visual mostram um campo "Outro" condicional — precisam reabrir o formulário
+  // pra esse campo aparecer/desaparecer depois da escolha.
+  ['contexto','estiloVisual'].forEach(campo=>{
+    const sel = document.querySelector(`#view-palestras [data-pb-campo="${campo}"]`);
+    if(sel) sel.addEventListener('change', ()=>renderPalestraEditor(p));
+  });
+
+  document.querySelectorAll('#view-palestras [data-pb-multi]').forEach(chk=>{
+    chk.addEventListener('change', ()=>{
+      const grupo = chk.dataset.pbMulti;
+      if(!Array.isArray(p.briefing[grupo])) p.briefing[grupo] = [];
+      const arr = p.briefing[grupo];
+      const idx = arr.indexOf(chk.value);
+      if(chk.checked){ if(idx<0) arr.push(chk.value); }
+      else if(idx>-1){ arr.splice(idx,1); }
+      syncPalestraUpdate(p);
+    });
+  });
+
+  // Estudos e referências para citar: mesmo leitor de PDF usado no material de apoio dos slides —
+  // extrai o texto no navegador e guarda; a IA usa isso (nunca inventa estudo além do que está aí).
+  const pbRefsBtn = document.getElementById('pb-refs-btn');
+  const pbRefsFile = document.querySelector('#view-palestras [data-pb-refs-file]');
+  if(pbRefsBtn && pbRefsFile){
+    pbRefsBtn.addEventListener('click', ()=>pbRefsFile.click());
+    pbRefsFile.addEventListener('change', async ()=>{
+      const file = pbRefsFile.files && pbRefsFile.files[0];
+      if(!file) return;
+      const original = pbRefsBtn.innerHTML;
+      pbRefsBtn.disabled = true; pbRefsBtn.innerHTML = 'Lendo arquivo...';
+      try{
+        const texto = await extrairTextoPdf(file);
+        p.briefing.referenciasNome = file.name;
+        p.briefing.referenciasTexto = texto.slice(0, 20000);
+        syncPalestraUpdate(p);
+        renderPalestraEditor(p);
+      }catch(err){
+        console.error('referências do briefing', err);
+        alert('Não foi possível ler esse arquivo. Envie um PDF.');
+        pbRefsBtn.disabled = false; pbRefsBtn.innerHTML = original;
+      }
+    });
+  }
+  const pbRefsDel = document.getElementById('pb-refs-del');
+  if(pbRefsDel) pbRefsDel.addEventListener('click', ()=>{
+    p.briefing.referenciasNome = '';
+    p.briefing.referenciasTexto = '';
+    syncPalestraUpdate(p);
+    renderPalestraEditor(p);
+  });
+
+  // Logo, paleta de cores (imagem) e referência visual: upload real pro bucket "palestra-briefing".
+  document.querySelectorAll('#view-palestras [data-pb-file-btn]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const input = document.querySelector(`#view-palestras [data-pb-file="${btn.dataset.pbFileBtn}"]`);
+      if(input) input.click();
+    });
+  });
+  document.querySelectorAll('#view-palestras [data-pb-file]').forEach(input=>{
+    input.addEventListener('change', async ()=>{
+      const file = input.files && input.files[0];
+      if(!file) return;
+      const campo = input.dataset.pbFile;
+      const mapa = PB_FILE_FIELDS[campo];
+      if(!mapa) return;
+      const btn = document.querySelector(`#view-palestras [data-pb-file-btn="${campo}"]`);
+      const original = btn ? btn.innerHTML : '';
+      if(btn){ btn.disabled = true; btn.innerHTML = 'Enviando...'; }
+      try{
+        const url = await uploadPalestraBriefingFile(file, campo);
+        p.briefing[mapa.url] = url;
+        p.briefing[mapa.nome] = file.name;
+        syncPalestraUpdate(p);
+        renderPalestraEditor(p);
+      }catch(err){
+        console.error('upload briefing', campo, err);
+        alert(err.message || 'Não foi possível enviar esse arquivo. Tente de novo.');
+        if(btn){ btn.disabled = false; btn.innerHTML = original; }
+      }
+    });
+  });
+  document.querySelectorAll('#view-palestras [data-pb-file-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const campo = btn.dataset.pbFileDel;
+      const mapa = PB_FILE_FIELDS[campo];
+      if(!mapa) return;
+      p.briefing[mapa.url] = '';
+      p.briefing[mapa.nome] = '';
+      syncPalestraUpdate(p);
+      renderPalestraEditor(p);
+    });
+  });
+}
+
 function bindPalestraEditorEvents(p){
   document.getElementById('palestra-back').addEventListener('click', ()=>{ palestraAbertaId = null; renderPalestras(); });
   document.getElementById('palestra-export-btn').addEventListener('click', ()=>exportPalestraPDF(p));
+  bindPalestraBriefingEvents(p);
 
   document.querySelectorAll('#view-palestras [data-palestra-campo]').forEach(inp=>{
     inp.addEventListener('change', ()=>{
@@ -9557,7 +9849,7 @@ function renderInicio(){
       <div class="kpi-tile"><div class="label">Faturamento mensal</div><div class="value" style="font-size:16px">${formatBRL(fatStats.mesAtual)}</div></div>
       <div class="kpi-tile"><div class="label">Faturamento total desde o início</div><div class="value" style="font-size:16px">${formatBRL(fatStats.totalAcumulado)}</div></div>
     </div>
-    <p class="kpi-note">Palestras sincronizadas com Montar Palestra; acompanhamentos sincronizados com a Gestão de Acompanhamentos (aba Meus Acompanhamentos); faturamento sincronizado com o Fluxo Financeiro (aba Faturamento).</p>
+    <p class="kpi-note">Palestras sincronizadas com o Estúdio de Palestras do NCC; acompanhamentos sincronizados com a Gestão de Acompanhamentos (aba Meus Acompanhamentos); faturamento sincronizado com o Fluxo Financeiro (aba Faturamento).</p>
 
     <h2 class="section-title">${icon('film')} Continue assistindo</h2>
     <div class="row-scroll">${continueList.map(c=>courseTileHtml(c)).join('')}</div>

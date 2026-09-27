@@ -659,16 +659,9 @@
   .palestra-material-empty{font-size:12px;color:var(--text-mute);}
   .palestra-list-row{cursor:pointer;}
   .palestra-list-row .desc{color:var(--text-dim);}
-  /* Projeto Acadêmico (Dashboard da Mentoria) */
-  .pa-etapas{display:flex;flex-direction:column;gap:12px;}
-  .pa-etapa{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;background:var(--bg-card);}
-  .pa-etapa-h{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
-  .pa-etapa-nome{flex:1;min-width:140px;font-weight:600;font-size:13.5px;}
-  .pa-etapa-status{max-width:180px;}
-  .pa-etapa-field{margin-bottom:8px;}
-  .pa-etapa-field label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:4px;}
-  .pa-etapa-field textarea{width:100%;resize:vertical;min-height:44px;}
-  .pa-etapa-field textarea[readonly]{opacity:.75;background:var(--bg);}
+  /* Projeto Acadêmico: tira-tabs com as etapas do NCC Integração (só exibição, não editável aqui). */
+  .pa-stage-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 22px;}
+  .pa-stage-tab{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:8px 14px;font-size:12.5px;font-weight:600;color:var(--text-dim);white-space:nowrap;}
   /* Status do "Exportar backup" (Visão Geral) */
   .backup-status{margin-top:10px;font-size:12.5px;color:var(--text-dim);line-height:1.6;}
   .backup-status.ok{color:var(--success);}
@@ -1441,10 +1434,7 @@
     <div class="nav-group-label" id="nav-group-metodo">Painel Profissional e Mentoria</div>
     <button class="nav-item shared" data-view="painel"></button>
     <button class="nav-item shared" data-view="palestras"></button>
-    <a class="nav-item shared" id="nav-projetoacademico" href="#" data-config-link="prontuario" target="_blank" rel="noopener">
-      <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></svg>
-      <span>Projeto Acadêmico</span>
-    </a>
+    <button class="nav-item shared" data-view="projetoacademico"></button>
     <button class="nav-item shared" data-view="biblioteca"></button>
 
     <div class="nav-group-label" id="nav-group-individual">Minha Área</div>
@@ -1531,6 +1521,7 @@
       <div class="view" id="view-biblioteca"></div>
       <div class="view" id="view-estudos"></div>
       <div class="view" id="view-palestras"></div>
+      <div class="view" id="view-projetoacademico"></div>
       <div class="view" id="view-sessoes"></div>
       <div class="view" id="view-metas"></div>
       <div class="view" id="view-interno"></div>
@@ -1662,6 +1653,7 @@ const NAV_LABELS = {
   biblioteca:['biblioteca','Biblioteca de Negócios'],
   estudos:['book','Biblioteca Científica'],
   palestras:['mic','Montar Palestra'],
+  projetoacademico:['briefcase','Projeto Acadêmico'],
   sessoes:['video','Minhas Sessões 1:1'], metas:['target','Minhas Metas'],
   interno:['lock','Acompanhamento Interno'],
   conteudo:['upload','Gerenciar Conteúdo'],
@@ -1672,7 +1664,7 @@ const NAV_LABELS = {
   financeiro:['money','Financeiro'],
 };
 const BADGE = {
-  painel:'shared', biblioteca:'shared', palestras:'shared',
+  painel:'shared', biblioteca:'shared', palestras:'shared', projetoacademico:'shared',
   dashboard:'individual', dashboardmentoria:'individual', sessoes:'individual', metas:'individual',
   interno:'restrict', conteudo:'restrict', visaogeral:'restrict', vendas:'restrict', clientes:'restrict',
 };
@@ -8098,14 +8090,6 @@ function setupNav(){
       openBloqueioMentoradosModal('Ferramentas NCC', 'O sistema de prontuários é exclusivo para mentorados da Mentoria. Fale com a equipe e conheça as condições para migrar seu acesso.');
     }
   });
-  document.getElementById('nav-projetoacademico').addEventListener('click',(e)=>{
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebar-backdrop').classList.remove('open');
-    if(e.currentTarget.dataset.locked){
-      e.preventDefault();
-      openBloqueioMentoradosModal('Projeto Acadêmico', 'O Projeto Acadêmico é exclusivo para mentorados da Mentoria. Fale com a equipe e conheça as condições para migrar seu acesso.');
-    }
-  });
   document.getElementById('nav-neurotodasidades').addEventListener('click',()=>{
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-backdrop').classList.remove('open');
@@ -8231,12 +8215,11 @@ function setRole(role){
     const el = document.querySelector(`.nav-item[data-view="${v}"]`);
     if(el) el.style.display = role==='aluno' ? 'flex' : 'none';
   });
-  /* Painel Profissional e Mentoria (Painel Profissional, Montar Palestra, Biblioteca de Negócios) e o
-     Dashboard da Mentoria (Minha Área) aparecem pra qualquer tier de aluno, mas com cadeado pra quem não
-     está na Mentoria NCC (Curso Gravado, Formação, PGNCC) — ao clicar, a própria tela mostra o aviso (ver
-     renderBloqueioMentorados, chamado de dentro de cada renderX). Projeto Acadêmico saiu desse grupo —
-     agora é link externo pro NCC Integração (ver bloco logo abaixo do Ferramentas NCC). */
-  ['painel','palestras','biblioteca'].forEach(v=>{
+  /* Painel Profissional e Mentoria (Painel Profissional, Montar Palestra, Projeto Acadêmico, Biblioteca
+     de Negócios) e o Dashboard da Mentoria (Minha Área) aparecem pra qualquer tier de aluno, mas com
+     cadeado pra quem não está na Mentoria NCC (Curso Gravado, Formação, PGNCC) — ao clicar, a própria
+     tela mostra o aviso (ver renderBloqueioMentorados, chamado de dentro de cada renderX). */
+  ['painel','palestras','projetoacademico','biblioteca'].forEach(v=>{
     const el = document.querySelector(`.nav-item[data-view="${v}"]`);
     if(!el) return;
     el.style.display = role==='aluno' ? 'flex' : 'none';
@@ -8272,15 +8255,6 @@ function setRole(role){
   prontEl.innerHTML = prontSvg + '<span>Ferramentas NCC</span>' + (isCursoView
     ? `<span style="margin-left:auto;display:flex" title="Disponível apenas para mentorados da Mentoria">${icon('lock','tiny')}</span>` : '');
   prontEl.dataset.locked = isCursoView ? '1' : '';
-  /* Projeto Acadêmico agora é link externo pro NCC Integração (mesmo link do Ferramentas NCC) — segue o
-     mesmo padrão de cadeado do restante do grupo "Painel Profissional e Mentoria" (exclusivo mentorado,
-     não só curso). */
-  const projAcademicoEl = document.getElementById('nav-projetoacademico');
-  projAcademicoEl.style.display = role==='aluno' ? 'flex' : 'none';
-  const paSvg = projAcademicoEl.querySelector('svg').outerHTML;
-  projAcademicoEl.innerHTML = paSvg + '<span>Projeto Acadêmico</span>' + (role==='aluno' && !isMentoradoView
-    ? `<span style="margin-left:auto;display:flex" title="Disponível apenas para mentorados da Mentoria">${icon('lock','tiny')}</span>` : '');
-  projAcademicoEl.dataset.locked = (role==='aluno' && !isMentoradoView) ? '1' : '';
   const neuroEl = document.getElementById('nav-neurotodasidades');
   if(neuroEl) neuroEl.style.display = role==='aluno' ? 'flex' : 'none';
   /* Os rótulos "Painel Profissional e Mentoria", "Minha Área" e "NCC Integração" só fazem sentido junto
@@ -8315,7 +8289,7 @@ function setRole(role){
      (renderBloqueioMentorados), então currentView pode ficar nelas mesmo fora da Mentoria. Dashboard do
      Curso agora é aberto pra qualquer tier, então também não redireciona mais. */
   if(role==='aluno' && isCursoView && ['sessoes','metas'].includes(currentView)){ goTo('inicio'); }
-  if(role==='staff' && ['inicio','aulas','comunidade','ranking','dashboard','dashboardmentoria','painel','palestras','biblioteca','estudos','sessoes','metas'].includes(currentView)){ goTo('visaogeral'); }
+  if(role==='staff' && ['inicio','aulas','comunidade','ranking','dashboard','dashboardmentoria','painel','palestras','projetoacademico','biblioteca','estudos','sessoes','metas'].includes(currentView)){ goTo('visaogeral'); }
 }
 
 function renderProfile(){
@@ -8385,10 +8359,10 @@ function renderCurrentView(){
   const map = {inicio:renderInicio, aulas:renderAulas, comunidade:renderComunidade, ranking:renderRanking, agenda:renderAgenda,
                materiais:renderMateriais, dashboard:renderDashboard, dashboardmentoria:renderDashboardMentoria,
                painel:renderPainel, biblioteca:renderBiblioteca,
-               estudos:renderEstudos, palestras:renderPalestras,
+               estudos:renderEstudos, palestras:renderPalestras, projetoacademico:renderProjetoAcademico,
                sessoes:renderSessoes, metas:renderMetas, interno:renderInterno, conteudo:renderConteudo, visaogeral:renderVisaoGeral,
                vendas:renderVendas, analise:renderAnalise, clientes:renderClientes, financeiro:renderFinanceiro};
-  const NEEDS_STUDENT = ['inicio','dashboard','dashboardmentoria','painel','sessoes','metas','interno','estudos','palestras'];
+  const NEEDS_STUDENT = ['inicio','dashboard','dashboardmentoria','painel','sessoes','metas','interno','estudos','palestras','projetoacademico'];
   if(NEEDS_STUDENT.includes(currentView) && !getStudent(currentStudentId)){
     document.getElementById('view-'+currentView).innerHTML = '<div class="empty-state">Nenhum mentorado cadastrado ainda. Assim que um aluno criar a conta, os dados aparecerão aqui.</div>';
     return;
@@ -11156,8 +11130,8 @@ function dashboardMentoriaHtml(s){
     <h2 class="section-title">${icon('briefcase')} Trajeto Acadêmico</h2>
     <div class="stat-row">
       <div class="stat-card clickable" id="dm-abrir-projeto">
-        <div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;">${icon('externallink','tiny')} Abrir Projeto Acadêmico</div>
-        <div style="color:var(--text-dim);font-size:12.5px;">Etapas, literatura científica, matriz de evidências, mapa metodológico e cronograma — no NCC Integração.</div>
+        <div style="font-size:15px;font-weight:700;">${icon('briefcase','tiny')} Abrir Projeto Acadêmico</div>
+        <div style="color:var(--text-dim);font-size:12.5px;">Acompanhe as etapas do seu projeto ou artigo científico.</div>
       </div>
     </div>
 
@@ -11179,8 +11153,26 @@ function renderDashboardMentoria(){
   if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('dashboardmentoria', 'Dashboard da Mentoria', dashboardMentoriaHtml(s)); return; }
   if(!s) return;
   document.getElementById('view-dashboardmentoria').innerHTML = dashboardMentoriaHtml(s);
-  document.getElementById('dm-abrir-projeto').addEventListener('click', ()=>{ window.open(CONFIG_LINK_PRONTUARIO || '#', '_blank', 'noopener'); });
+  document.getElementById('dm-abrir-projeto').addEventListener('click', ()=>goTo('projetoacademico'));
   document.getElementById('dm-abrir-palestras').addEventListener('click', ()=>goTo('palestras'));
+}
+
+/* ================= VIEW: PROJETO ACADÊMICO (Painel Profissional e Mentoria, exclusivo Mentoria NCC) =================
+   Mostra as etapas clássicas de um projeto/artigo científico (mesmas categorias do NCC Integração) e um
+   botão que leva pro sistema externo, onde o acompanhamento detalhado de fato acontece — nada aqui é
+   editável nem sincronizado, é só a "porta de entrada" dentro da Área do Aluno. */
+const PA_ETAPAS_TABS = ['Planejamento','Revisão de literatura','Qualificação','Coleta de dados','Análise','Escrita','Concluído'];
+function projetoAcademicoStageTabsHtml(){
+  return `<div class="pa-stage-tabs">${PA_ETAPAS_TABS.map(t=>`<span class="pa-stage-tab">${escapeHtml(t)} (0)</span>`).join('')}</div>`;
+}
+function renderProjetoAcademico(){
+  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('projetoacademico', 'Projeto Acadêmico', projetoAcademicoStageTabsHtml()); return; }
+  document.getElementById('view-projetoacademico').innerHTML = `
+    <p class="section-sub">Etapas do projeto ou artigo científico dentro da Mentoria NCC — planejamento, revisão de literatura, qualificação, coleta de dados, análise, escrita e conclusão. O acompanhamento detalhado de cada etapa, a matriz de evidências e o mapa metodológico ficam no NCC Integração.</p>
+    ${projetoAcademicoStageTabsHtml()}
+    <button class="btn-accent" id="pa-abrir-ncc" style="margin-top:8px">${icon('externallink','tiny')} Abrir no NCC Integração</button>
+  `;
+  document.getElementById('pa-abrir-ncc').addEventListener('click', ()=>{ window.open(CONFIG_LINK_PRONTUARIO || '#', '_blank', 'noopener'); });
 }
 
 /* ---- Vincula automaticamente itens "Assistir aula sobre X" do checklist do módulo com as aulas já

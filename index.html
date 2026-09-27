@@ -11124,18 +11124,11 @@ function renderDashboard(){
    Mentoria; progresso no próprio negócio ainda a definir com a Daiane). */
 function dashboardMentoriaHtml(s){
   const minhasPalestras = s ? PALESTRAS.filter(p=>p.alunoId===s.id) : [];
+  const crmStats = s ? computeCrmStats(s.id) : {emAcompanhamentoCount:0};
   return `
     <p class="section-sub">Acompanhamento do seu trajeto acadêmico e profissional dentro da Mentoria NCC.</p>
 
-    <h2 class="section-title">${icon('briefcase')} Trajeto Acadêmico</h2>
-    <div class="stat-row">
-      <div class="stat-card clickable" id="dm-abrir-projeto">
-        <div style="font-size:15px;font-weight:700;">${icon('briefcase','tiny')} Abrir Projeto Acadêmico</div>
-        <div style="color:var(--text-dim);font-size:12.5px;">Acompanhe as etapas do seu projeto ou artigo científico.</div>
-      </div>
-    </div>
-
-    <h2 class="section-title" style="margin-top:24px">${icon('idcard')} Trajeto Profissional</h2>
+    <h2 class="section-title">${icon('idcard')} Trajeto Profissional</h2>
     <div class="stat-row">
       <div class="stat-card clickable" id="dm-abrir-palestras">
         <div style="font-size:22px;font-weight:700;">${minhasPalestras.length}</div>
@@ -11143,7 +11136,31 @@ function dashboardMentoriaHtml(s){
       </div>
       <div class="stat-card">
         <div style="font-size:15px;font-weight:700;color:var(--text-mute)">Em breve</div>
-        <div style="color:var(--text-dim);font-size:12.5px;">progresso no próprio negócio</div>
+        <div style="color:var(--text-dim);font-size:12.5px;">cursos criados</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:15px;font-weight:700;color:var(--text-mute)">Em breve</div>
+        <div style="color:var(--text-dim);font-size:12.5px;">programas criados</div>
+      </div>
+      <div class="stat-card clickable" id="dm-abrir-acompanhamentos">
+        <div style="font-size:22px;font-weight:700;">${crmStats.emAcompanhamentoCount}</div>
+        <div style="color:var(--text-dim);font-size:12.5px;">acompanhamento${crmStats.emAcompanhamentoCount===1?'':'s'} em andamento</div>
+      </div>
+    </div>
+
+    <h2 class="section-title" style="margin-top:24px">${icon('briefcase')} Trajeto Acadêmico</h2>
+    <div class="stat-row">
+      <div class="stat-card">
+        <div style="font-size:15px;font-weight:700;color:var(--text-mute)">Em breve</div>
+        <div style="color:var(--text-dim);font-size:12.5px;">projeto de mestrado</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:15px;font-weight:700;color:var(--text-mute)">Em breve</div>
+        <div style="color:var(--text-dim);font-size:12.5px;">projeto de doutorado</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:15px;font-weight:700;color:var(--text-mute)">Em breve</div>
+        <div style="color:var(--text-dim);font-size:12.5px;">artigos científicos</div>
       </div>
     </div>
   `;
@@ -11153,8 +11170,8 @@ function renderDashboardMentoria(){
   if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('dashboardmentoria', 'Dashboard da Mentoria', dashboardMentoriaHtml(s)); return; }
   if(!s) return;
   document.getElementById('view-dashboardmentoria').innerHTML = dashboardMentoriaHtml(s);
-  document.getElementById('dm-abrir-projeto').addEventListener('click', ()=>goTo('projetoacademico'));
   document.getElementById('dm-abrir-palestras').addEventListener('click', ()=>goTo('palestras'));
+  document.getElementById('dm-abrir-acompanhamentos').addEventListener('click', ()=>{ panelQuadrantId = 'vendas'; goTo('painel'); });
 }
 
 /* ================= VIEW: PROJETO ACADÊMICO (Painel Profissional e Mentoria, exclusivo Mentoria NCC) =================

@@ -1642,6 +1642,7 @@ const ICONS = {
   sliders:'<path d="M4 6h9M17 6h3M4 12h3M9 12h11M4 18h13M19 18h1"/><circle cx="13" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
   pathicon:'<circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/><path d="M6.5 17.5C10 13 14 11 17.5 6.5"/>',
   mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v4M9 21h6"/>',
+  whatsapp:'<path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z"/><path d="M8.4 8.2c.2-.5.4-.5.6-.5h.5c.2 0 .4 0 .5.4.2.5.7 1.6.7 1.7.1.1.1.3 0 .4-.1.2-.2.3-.3.4-.1.1-.3.3-.4.4-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2 1.2 1 2.1 1.4 2.5 1.6.2.1.4.1.5-.1.1-.2.6-.7.8-.9.2-.2.3-.2.5-.1l1.6.8c.2.1.3.1.4.2.1.1.1.6-.1 1.1-.2.5-1.3 1.1-1.8 1.1-.5 0-1.1.1-3.5-1.3-2-1.3-3.3-3.1-3.4-3.3-.1-.2-.9-1.2-.9-2.3 0-1.1.6-1.6.8-1.8z" fill="currentColor" stroke="none"/>',
 };
 function icon(name,cls){return `<svg class="icon ${cls||''}" viewBox="0 0 24 24">${ICONS[name]}</svg>`;}
 function fillIcon(name,cls){return `<svg class="icon ${cls||''}" viewBox="0 0 24 24" fill="currentColor" stroke="none">${ICONS[name]}</svg>`;}
@@ -8121,12 +8122,16 @@ function openBloqueioMentoradosModal(titulo, texto){
    aparecendo no menu pra todo mundo (com cadeado), e é só ao clicar que aparece esse aviso pra quem não
    é mentorado, convidando a falar com a equipe sobre o pacote. */
 function renderBloqueioMentorados(viewId, titulo){
+  const msgZap = encodeURIComponent(`Olá! Gostaria de saber mais sobre o pacote da Mentoria NCC para liberar o acesso a "${titulo}".`);
   document.getElementById('view-'+viewId).innerHTML = `
     <div class="locked-view">
       <div class="locked-icon">${icon('lock')}</div>
       <h2>${escapeHtml(titulo)} bloqueado</h2>
       <p>${escapeHtml(titulo)} é exclusivo para mentorados da Mentoria NCC. Fale com a nossa equipe para conhecer o pacote e migrar seu acesso.</p>
-      <button class="btn-accent" id="bloqueio-mentorados-voltar" style="margin-top:18px">Voltar ao Início</button>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px">
+        <button class="btn-accent" id="bloqueio-mentorados-voltar">Voltar ao Início</button>
+        <a class="btn-outline" href="https://wa.me/5548992118883?text=${msgZap}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;color:#25d366;border-color:#25d366">${icon('whatsapp','tiny')} Falar no WhatsApp</a>
+      </div>
     </div>`;
   document.getElementById('bloqueio-mentorados-voltar').addEventListener('click', ()=>goTo('inicio'));
 }

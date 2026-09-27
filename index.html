@@ -1441,7 +1441,10 @@
     <div class="nav-group-label" id="nav-group-metodo">Painel Profissional e Mentoria</div>
     <button class="nav-item shared" data-view="painel"></button>
     <button class="nav-item shared" data-view="palestras"></button>
-    <button class="nav-item shared" data-view="projetoacademico"></button>
+    <a class="nav-item shared" id="nav-projetoacademico" href="#" data-config-link="prontuario" target="_blank" rel="noopener">
+      <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></svg>
+      <span>Projeto Acadêmico</span>
+    </a>
     <button class="nav-item shared" data-view="biblioteca"></button>
 
     <div class="nav-group-label" id="nav-group-individual">Minha Área</div>
@@ -1528,7 +1531,6 @@
       <div class="view" id="view-biblioteca"></div>
       <div class="view" id="view-estudos"></div>
       <div class="view" id="view-palestras"></div>
-      <div class="view" id="view-projetoacademico"></div>
       <div class="view" id="view-sessoes"></div>
       <div class="view" id="view-metas"></div>
       <div class="view" id="view-interno"></div>
@@ -1660,7 +1662,6 @@ const NAV_LABELS = {
   biblioteca:['biblioteca','Biblioteca de Negócios'],
   estudos:['book','Biblioteca Científica'],
   palestras:['mic','Montar Palestra'],
-  projetoacademico:['briefcase','Projeto Acadêmico'],
   sessoes:['video','Minhas Sessões 1:1'], metas:['target','Minhas Metas'],
   interno:['lock','Acompanhamento Interno'],
   conteudo:['upload','Gerenciar Conteúdo'],
@@ -1671,7 +1672,7 @@ const NAV_LABELS = {
   financeiro:['money','Financeiro'],
 };
 const BADGE = {
-  painel:'shared', biblioteca:'shared', palestras:'shared', projetoacademico:'shared',
+  painel:'shared', biblioteca:'shared', palestras:'shared',
   dashboard:'individual', dashboardmentoria:'individual', sessoes:'individual', metas:'individual',
   interno:'restrict', conteudo:'restrict', visaogeral:'restrict', vendas:'restrict', clientes:'restrict',
 };
@@ -8097,6 +8098,14 @@ function setupNav(){
       openBloqueioMentoradosModal('Ferramentas NCC', 'O sistema de prontuários é exclusivo para mentorados da Mentoria. Fale com a equipe e conheça as condições para migrar seu acesso.');
     }
   });
+  document.getElementById('nav-projetoacademico').addEventListener('click',(e)=>{
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-backdrop').classList.remove('open');
+    if(e.currentTarget.dataset.locked){
+      e.preventDefault();
+      openBloqueioMentoradosModal('Projeto Acadêmico', 'O Projeto Acadêmico é exclusivo para mentorados da Mentoria. Fale com a equipe e conheça as condições para migrar seu acesso.');
+    }
+  });
   document.getElementById('nav-neurotodasidades').addEventListener('click',()=>{
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-backdrop').classList.remove('open');
@@ -8222,11 +8231,12 @@ function setRole(role){
     const el = document.querySelector(`.nav-item[data-view="${v}"]`);
     if(el) el.style.display = role==='aluno' ? 'flex' : 'none';
   });
-  /* Painel Profissional e Mentoria (Painel Profissional, Montar Palestra, Projeto Acadêmico, Biblioteca
-     de Negócios) e o Dashboard da Mentoria (Minha Área) aparecem pra qualquer tier de aluno, mas com
-     cadeado pra quem não está na Mentoria NCC (Curso Gravado, Formação, PGNCC) — ao clicar, a própria
-     tela mostra o aviso (ver renderBloqueioMentorados, chamado de dentro de cada renderX). */
-  ['painel','palestras','projetoacademico','biblioteca'].forEach(v=>{
+  /* Painel Profissional e Mentoria (Painel Profissional, Montar Palestra, Biblioteca de Negócios) e o
+     Dashboard da Mentoria (Minha Área) aparecem pra qualquer tier de aluno, mas com cadeado pra quem não
+     está na Mentoria NCC (Curso Gravado, Formação, PGNCC) — ao clicar, a própria tela mostra o aviso (ver
+     renderBloqueioMentorados, chamado de dentro de cada renderX). Projeto Acadêmico saiu desse grupo —
+     agora é link externo pro NCC Integração (ver bloco logo abaixo do Ferramentas NCC). */
+  ['painel','palestras','biblioteca'].forEach(v=>{
     const el = document.querySelector(`.nav-item[data-view="${v}"]`);
     if(!el) return;
     el.style.display = role==='aluno' ? 'flex' : 'none';
@@ -8262,6 +8272,15 @@ function setRole(role){
   prontEl.innerHTML = prontSvg + '<span>Ferramentas NCC</span>' + (isCursoView
     ? `<span style="margin-left:auto;display:flex" title="Disponível apenas para mentorados da Mentoria">${icon('lock','tiny')}</span>` : '');
   prontEl.dataset.locked = isCursoView ? '1' : '';
+  /* Projeto Acadêmico agora é link externo pro NCC Integração (mesmo link do Ferramentas NCC) — segue o
+     mesmo padrão de cadeado do restante do grupo "Painel Profissional e Mentoria" (exclusivo mentorado,
+     não só curso). */
+  const projAcademicoEl = document.getElementById('nav-projetoacademico');
+  projAcademicoEl.style.display = role==='aluno' ? 'flex' : 'none';
+  const paSvg = projAcademicoEl.querySelector('svg').outerHTML;
+  projAcademicoEl.innerHTML = paSvg + '<span>Projeto Acadêmico</span>' + (role==='aluno' && !isMentoradoView
+    ? `<span style="margin-left:auto;display:flex" title="Disponível apenas para mentorados da Mentoria">${icon('lock','tiny')}</span>` : '');
+  projAcademicoEl.dataset.locked = (role==='aluno' && !isMentoradoView) ? '1' : '';
   const neuroEl = document.getElementById('nav-neurotodasidades');
   if(neuroEl) neuroEl.style.display = role==='aluno' ? 'flex' : 'none';
   /* Os rótulos "Painel Profissional e Mentoria", "Minha Área" e "NCC Integração" só fazem sentido junto
@@ -8296,7 +8315,7 @@ function setRole(role){
      (renderBloqueioMentorados), então currentView pode ficar nelas mesmo fora da Mentoria. Dashboard do
      Curso agora é aberto pra qualquer tier, então também não redireciona mais. */
   if(role==='aluno' && isCursoView && ['sessoes','metas'].includes(currentView)){ goTo('inicio'); }
-  if(role==='staff' && ['inicio','aulas','comunidade','ranking','dashboard','dashboardmentoria','painel','palestras','projetoacademico','biblioteca','estudos','sessoes','metas'].includes(currentView)){ goTo('visaogeral'); }
+  if(role==='staff' && ['inicio','aulas','comunidade','ranking','dashboard','dashboardmentoria','painel','palestras','biblioteca','estudos','sessoes','metas'].includes(currentView)){ goTo('visaogeral'); }
 }
 
 function renderProfile(){
@@ -8366,10 +8385,10 @@ function renderCurrentView(){
   const map = {inicio:renderInicio, aulas:renderAulas, comunidade:renderComunidade, ranking:renderRanking, agenda:renderAgenda,
                materiais:renderMateriais, dashboard:renderDashboard, dashboardmentoria:renderDashboardMentoria,
                painel:renderPainel, biblioteca:renderBiblioteca,
-               estudos:renderEstudos, palestras:renderPalestras, projetoacademico:renderProjetoAcademico,
+               estudos:renderEstudos, palestras:renderPalestras,
                sessoes:renderSessoes, metas:renderMetas, interno:renderInterno, conteudo:renderConteudo, visaogeral:renderVisaoGeral,
                vendas:renderVendas, analise:renderAnalise, clientes:renderClientes, financeiro:renderFinanceiro};
-  const NEEDS_STUDENT = ['inicio','dashboard','dashboardmentoria','painel','sessoes','metas','interno','estudos','palestras','projetoacademico'];
+  const NEEDS_STUDENT = ['inicio','dashboard','dashboardmentoria','painel','sessoes','metas','interno','estudos','palestras'];
   if(NEEDS_STUDENT.includes(currentView) && !getStudent(currentStudentId)){
     document.getElementById('view-'+currentView).innerHTML = '<div class="empty-state">Nenhum mentorado cadastrado ainda. Assim que um aluno criar a conta, os dados aparecerão aqui.</div>';
     return;
@@ -11117,9 +11136,6 @@ function renderDashboard(){
    trajeto acadêmico (resumo do Projeto Acadêmico) e trajeto profissional (palestras criadas na
    Mentoria; progresso no próprio negócio ainda a definir com a Daiane). */
 function dashboardMentoriaHtml(s){
-  const pa = s ? PROJETOS_ACADEMICOS.find(p=>p.alunoId===s.id) : null;
-  const totalEtapas = pa ? pa.etapas.length : PROJETO_ETAPAS_PADRAO.length;
-  const etapasConcluidas = pa ? pa.etapas.filter(e=>e.status==='concluido').length : 0;
   const minhasPalestras = s ? PALESTRAS.filter(p=>p.alunoId===s.id) : [];
   return `
     <p class="section-sub">Acompanhamento do seu trajeto acadêmico e profissional dentro da Mentoria NCC.</p>
@@ -11127,8 +11143,8 @@ function dashboardMentoriaHtml(s){
     <h2 class="section-title">${icon('briefcase')} Trajeto Acadêmico</h2>
     <div class="stat-row">
       <div class="stat-card clickable" id="dm-abrir-projeto">
-        <div style="font-size:22px;font-weight:700;">${etapasConcluidas}/${totalEtapas}</div>
-        <div style="color:var(--text-dim);font-size:12.5px;">etapas concluídas no Projeto Acadêmico</div>
+        <div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;">${icon('externallink','tiny')} Abrir Projeto Acadêmico</div>
+        <div style="color:var(--text-dim);font-size:12.5px;">Etapas, literatura científica, matriz de evidências, mapa metodológico e cronograma — no NCC Integração.</div>
       </div>
     </div>
 
@@ -11150,117 +11166,8 @@ function renderDashboardMentoria(){
   if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('dashboardmentoria', 'Dashboard da Mentoria', dashboardMentoriaHtml(s)); return; }
   if(!s) return;
   document.getElementById('view-dashboardmentoria').innerHTML = dashboardMentoriaHtml(s);
-  document.getElementById('dm-abrir-projeto').addEventListener('click', ()=>goTo('projetoacademico'));
+  document.getElementById('dm-abrir-projeto').addEventListener('click', ()=>{ window.open(CONFIG_LINK_PRONTUARIO || '#', '_blank', 'noopener'); });
   document.getElementById('dm-abrir-palestras').addEventListener('click', ()=>goTo('palestras'));
-}
-
-/* ================= VIEW: PROJETO ACADÊMICO (Painel Profissional e Mentoria, exclusivo Mentoria NCC) =================
-   Etapas clássicas de um projeto/artigo científico (PROJETO_ETAPAS_PADRAO). O mentorado marca o
-   andamento e escreve suas notas; a equipe interna deixa observações por etapa — os dois no mesmo
-   registro (ver "Projeto Acadêmico" no comentário acima de PROJETO_ETAPAS_PADRAO). */
-function projetoAcademicoPreviewHtml(){
-  const paFake = {titulo:'', tema:'', etapas:projetoAcademicoEsqueletoPadrao()};
-  return `
-    <p class="section-sub">Etapas do projeto ou artigo científico dentro da Mentoria NCC. Marque o andamento e escreva suas notas em cada etapa — a equipe também acompanha e pode deixar observações.</p>
-    <div class="palestra-header-form">
-      <div class="field full"><label>Título do projeto/artigo (opcional)</label><input class="ps-input" type="text" value="" placeholder="Ex.: Diferenças cerebrais entre meninos e meninas no desenvolvimento"></div>
-      <div class="field full"><label>Tema/linha de pesquisa (opcional)</label><input class="ps-input" type="text" value="" placeholder="Ex.: Neurodesenvolvimento infantil"></div>
-    </div>
-    <div class="pa-etapas">
-      ${paFake.etapas.map((et,i)=>projetoAcademicoEtapaHtml(et,i,false)).join('')}
-    </div>
-  `;
-}
-function renderProjetoAcademico(){
-  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('projetoacademico', 'Projeto Acadêmico', projetoAcademicoPreviewHtml()); return; }
-  const s = getStudent(currentStudentId);
-  const el = document.getElementById('view-projetoacademico');
-  if(!s){ el.innerHTML = '<div class="empty-state">Nenhum mentorado selecionado.</div>'; return; }
-  let pa = PROJETOS_ACADEMICOS.find(p=>p.alunoId===s.id);
-  if(!pa){
-    el.innerHTML = '<div class="empty-state">Carregando o projeto acadêmico...</div>';
-    syncProjetoAcademicoInsert(s.id).then(row=>{
-      PROJETOS_ACADEMICOS.push(mapProjetoAcademicoRow(row));
-      if(currentView==='projetoacademico' && getStudent(currentStudentId)?.id===s.id) renderProjetoAcademico();
-    }).catch(e=>{
-      console.error('criar projeto acadêmico', e);
-      el.innerHTML = '<div class="empty-state">Não foi possível carregar o projeto acadêmico agora. Tente recarregar a página.</div>';
-    });
-    return;
-  }
-  const isStaffView = currentRole==='staff';
-  el.innerHTML = `
-    <p class="section-sub">Etapas do projeto ou artigo científico dentro da Mentoria NCC. ${isStaffView
-      ? 'Você pode deixar observações em cada etapa.'
-      : 'Marque o andamento e escreva suas notas em cada etapa — a equipe também acompanha e pode deixar observações.'}</p>
-    <div class="palestra-header-form">
-      <div class="field full"><label>Título do projeto/artigo (opcional)</label><input class="ps-input" type="text" data-pa-campo="titulo" value="${escapeAttr(pa.titulo)}" ${isStaffView?'readonly':''} placeholder="Ex.: Diferenças cerebrais entre meninos e meninas no desenvolvimento"></div>
-      <div class="field full"><label>Tema/linha de pesquisa (opcional)</label><input class="ps-input" type="text" data-pa-campo="tema" value="${escapeAttr(pa.tema)}" ${isStaffView?'readonly':''} placeholder="Ex.: Neurodesenvolvimento infantil"></div>
-    </div>
-    <div class="pa-etapas">
-      ${pa.etapas.map((et,i)=>projetoAcademicoEtapaHtml(et,i,isStaffView)).join('')}
-    </div>
-  `;
-  bindProjetoAcademicoEvents(pa, isStaffView);
-}
-
-function projetoAcademicoEtapaHtml(et, idx, isStaffView){
-  return `
-    <div class="pa-etapa" data-etapa-id="${et.id}">
-      <div class="pa-etapa-h">
-        <span class="cm-count">Etapa ${idx+1}</span>
-        <span class="pa-etapa-nome">${escapeHtml(et.nome)}</span>
-        <select class="ps-input pa-etapa-status" data-pa-etapa-status="${et.id}" ${isStaffView?'disabled':''}>
-          ${ETAPA_STATUS_OPCOES.map(o=>`<option value="${o.value}" ${(et.status||'nao_iniciado')===o.value?'selected':''}>${escapeHtml(o.label)}</option>`).join('')}
-        </select>
-      </div>
-      <div class="pa-etapa-field">
-        <label>Suas notas (mentorado)</label>
-        <textarea class="ps-input" rows="2" data-pa-etapa-notas-aluno="${et.id}" ${isStaffView?'readonly':''} placeholder="Como está o andamento desta etapa?">${escapeHtml(et.notasAluno)}</textarea>
-      </div>
-      <div class="pa-etapa-field">
-        <label>Observação da equipe</label>
-        <textarea class="ps-input" rows="2" data-pa-etapa-notas-equipe="${et.id}" ${isStaffView?'':'readonly'} placeholder="${isStaffView? 'Deixe uma observação pra esse mentorado...' : ''}">${escapeHtml(et.notasEquipe)}</textarea>
-      </div>
-    </div>
-  `;
-}
-
-function bindProjetoAcademicoEvents(pa, isStaffView){
-  document.querySelectorAll('#view-projetoacademico [data-pa-campo]').forEach(inp=>{
-    if(isStaffView) return;
-    inp.addEventListener('change', ()=>{
-      pa[inp.dataset.paCampo] = inp.value;
-      syncProjetoAcademicoUpdate(pa);
-    });
-  });
-  document.querySelectorAll('#view-projetoacademico [data-pa-etapa-status]').forEach(sel=>{
-    if(isStaffView) return;
-    sel.addEventListener('change', ()=>{
-      const et = pa.etapas.find(e=>e.id===sel.dataset.paEtapaStatus);
-      if(!et) return;
-      et.status = sel.value;
-      syncProjetoAcademicoUpdate(pa);
-    });
-  });
-  document.querySelectorAll('#view-projetoacademico [data-pa-etapa-notas-aluno]').forEach(ta=>{
-    if(isStaffView) return;
-    ta.addEventListener('change', ()=>{
-      const et = pa.etapas.find(e=>e.id===ta.dataset.paEtapaNotasAluno);
-      if(!et) return;
-      et.notasAluno = ta.value;
-      syncProjetoAcademicoUpdate(pa);
-    });
-  });
-  document.querySelectorAll('#view-projetoacademico [data-pa-etapa-notas-equipe]').forEach(ta=>{
-    if(!isStaffView) return;
-    ta.addEventListener('change', ()=>{
-      const et = pa.etapas.find(e=>e.id===ta.dataset.paEtapaNotasEquipe);
-      if(!et) return;
-      et.notasEquipe = ta.value;
-      syncProjetoAcademicoUpdate(pa);
-    });
-  });
 }
 
 /* ---- Vincula automaticamente itens "Assistir aula sobre X" do checklist do módulo com as aulas já

@@ -9548,6 +9548,7 @@ function renderInicio(){
   const continueList = inProgress.length? inProgress : metodoCourses.filter(c=>s.courseProgress[c.id]===0).slice(0,3);
   const crmStats = computeCrmStats(s.id);
   const fatStats = computeFaturamentoStats(s.id);
+  const palestrasStats = computePalestrasStats(s.id);
   const heroPts = STUDENT_POINTS[s.id] || {conquistas:0};
   const heroDias = diasRestantes(s);
 
@@ -9574,14 +9575,15 @@ function renderInicio(){
     ${essenciaBannerHtml()}
     ${acessoRapidoHtml()}
 
-    <h2 class="section-title">Indicadores do consultório</h2>
+    <h2 class="section-title">Indicadores Profissionais</h2>
     <div class="kpi-row">
-      <div class="kpi-tile"><div class="label">Novos acompanhamentos no mês</div><div class="value">${crmStats.leadsMesCount}</div></div>
-      <div class="kpi-tile"><div class="label">Em acompanhamento</div><div class="value">${crmStats.emAcompanhamentoCount}</div></div>
-      <div class="kpi-tile"><div class="label">Faturamento do mês</div><div class="value" style="font-size:16px">${formatBRL(fatStats.mesAtual)}</div></div>
+      <div class="kpi-tile"><div class="label">Novas Palestras</div><div class="value">${palestrasStats.palestrasMesCount}</div></div>
+      <div class="kpi-tile"><div class="label">Cursos criados</div><div class="value" style="font-size:15px;color:var(--text-mute)">Em breve</div></div>
+      <div class="kpi-tile"><div class="label">Novos Acompanhamentos</div><div class="value">${crmStats.leadsMesCount}</div></div>
+      <div class="kpi-tile"><div class="label">Faturamento mensal</div><div class="value" style="font-size:16px">${formatBRL(fatStats.mesAtual)}</div></div>
       <div class="kpi-tile"><div class="label">Faturamento total desde o início</div><div class="value" style="font-size:16px">${formatBRL(fatStats.totalAcumulado)}</div></div>
     </div>
-    <p class="kpi-note">Acompanhamentos sincronizados com a Gestão de Acompanhamentos (aba Meus Acompanhamentos); faturamento sincronizado com o Fluxo Financeiro (aba Faturamento).</p>
+    <p class="kpi-note">Palestras sincronizadas com Montar Palestra; acompanhamentos sincronizados com a Gestão de Acompanhamentos (aba Meus Acompanhamentos); faturamento sincronizado com o Fluxo Financeiro (aba Faturamento).</p>
 
     <h2 class="section-title">${icon('film')} Continue assistindo</h2>
     <div class="row-scroll">${continueList.map(c=>courseTileHtml(c)).join('')}</div>
@@ -11061,6 +11063,26 @@ const BUSINESS_LIBRARY = [
    Catálogo de modelos de negócio complementares, organizado por frente estratégica (ver BUSINESS_LIBRARY acima). */
 function bibliotecaHtml(){
   return `
+    <div class="category-block">
+      <h2 class="section-title">Meus Cursos e Programas</h2>
+      <p class="category-sub">Cursos e programas que você criou a partir do método NCC, gerenciados no NCC Integração.</p>
+      <div class="biz-grid">
+        <div class="biz-card">
+          <div class="qi">${icon('film')}</div>
+          <div class="title">Meus Cursos criados a partir do NCC</div>
+          <div class="desc">Acesse e gerencie os cursos que você criou a partir do método NCC.</div>
+          <button type="button" class="btn-outline" id="biblioteca-abrir-cursos" style="margin-top:14px;align-self:flex-start">${icon('externallink','tiny')} Abrir no NCC Integração</button>
+        </div>
+        <div class="biz-card">
+          <div class="qi">${icon('briefcase')}</div>
+          <div class="title">Meus Programas Criados a partir do NCC</div>
+          <div class="desc">Acesse e gerencie os programas que você criou a partir do método NCC.</div>
+          <button type="button" class="btn-outline" id="biblioteca-abrir-programas" style="margin-top:14px;align-self:flex-start">${icon('externallink','tiny')} Abrir no NCC Integração</button>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Biblioteca de Negócios</h2>
     <p class="section-sub">Modelos de negócio complementares para os profissionais NCC, organizados por frente estratégica.</p>
     ${BUSINESS_LIBRARY.map(f=>`
       <div class="category-block">
@@ -11083,6 +11105,8 @@ function bibliotecaHtml(){
 function renderBiblioteca(){
   if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('biblioteca', 'Biblioteca de Negócios', bibliotecaHtml()); return; }
   document.getElementById('view-biblioteca').innerHTML = bibliotecaHtml();
+  document.getElementById('biblioteca-abrir-cursos').addEventListener('click', ()=>{ window.open(CONFIG_LINK_PRONTUARIO || '#', '_blank', 'noopener'); });
+  document.getElementById('biblioteca-abrir-programas').addEventListener('click', ()=>{ window.open(CONFIG_LINK_PRONTUARIO || '#', '_blank', 'noopener'); });
 }
 
 /* ================= VIEW: DASHBOARD (compartilhado aluno + equipe) ================= */
@@ -11594,9 +11618,9 @@ function computeFinFaturamento(){
   }));
   return {detailed, monthTotals};
 }
-/* Indicadores do consultório (página Início): novos acompanhamentos no mês e total em acompanhamento
-   ativo vêm direto da Gestão de Acompanhamentos (aba Meus Acompanhamentos), e o faturamento vem direto
-   do Fluxo Financeiro (aba Faturamento) — nada autorrelatado aqui. */
+/* Indicadores Profissionais (página Início): novos acompanhamentos no mês vêm direto da Gestão de
+   Acompanhamentos (aba Meus Acompanhamentos), e o faturamento vem direto do Fluxo Financeiro (aba
+   Faturamento) — nada autorrelatado aqui. */
 function computeCrmStats(sid){
   const data = getTopicData(sid, 'diagnosticos-leads');
   const crm = (data && data.crmLeads) || {leads:[]};
@@ -11612,6 +11636,18 @@ function computeCrmStats(sid){
     leadsMesCount: leadsMes.length,
     emAcompanhamentoCount: emAcompanhamento.length,
   };
+}
+/* Novas palestras no mês (Indicadores Profissionais, página Início) — conta as palestras criadas em
+   Montar Palestra pelo próprio mentorado dentro do mês corrente. */
+function computePalestrasStats(sid){
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  const palestrasMes = PALESTRAS.filter(p=>{
+    if(p.alunoId!==sid || !p.createdAt) return false;
+    const d = new Date(p.createdAt);
+    return d.getFullYear()===y && d.getMonth()===m;
+  });
+  return { palestrasMesCount: palestrasMes.length };
 }
 function computeFaturamentoStats(sid){
   const {monthTotals} = computeFaturamento(sid, {});

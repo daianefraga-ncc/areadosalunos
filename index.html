@@ -1336,6 +1336,9 @@
   .locked-view .locked-icon .icon{width:28px;height:28px;}
   .locked-view h2{font-size:18px;margin:0 0 10px;color:var(--text);}
   .locked-view p{font-size:13.5px;color:var(--text-mute);line-height:1.6;margin:0;}
+  /* Prévia (não clicável) do conteúdo real por trás da tela de bloqueio — dá pro aluno ver o que tem lá
+     dentro, mas pointer-events:none impede qualquer clique/foco/seleção chegar nela. */
+  .locked-preview{pointer-events:none;user-select:none;opacity:.5;filter:grayscale(.15);margin-top:28px;}
 
   @media (max-width:880px){
     .sidebar{position:fixed;left:-260px;top:0;transition:left .2s;z-index:50;box-shadow:var(--shadow-side);}
@@ -8121,7 +8124,7 @@ function openBloqueioMentoradosModal(titulo, texto){
    Dashboard da Mentoria) — mesmo padrão visual já usado no bloqueio da Agenda ao Vivo. O item continua
    aparecendo no menu pra todo mundo (com cadeado), e é só ao clicar que aparece esse aviso pra quem não
    é mentorado, convidando a falar com a equipe sobre o pacote. */
-function renderBloqueioMentorados(viewId, titulo){
+function renderBloqueioMentorados(viewId, titulo, previewHtml){
   const msgZap = encodeURIComponent(`Olá! Gostaria de saber mais sobre o pacote da Mentoria NCC para liberar o acesso a "${titulo}".`);
   document.getElementById('view-'+viewId).innerHTML = `
     <div class="locked-view">
@@ -8132,7 +8135,8 @@ function renderBloqueioMentorados(viewId, titulo){
         <button class="btn-accent" id="bloqueio-mentorados-voltar">Voltar ao Início</button>
         <a class="btn-outline" href="https://wa.me/5548992118883?text=${msgZap}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;color:#25d366;border-color:#25d366">${icon('whatsapp','tiny')} Falar no WhatsApp</a>
       </div>
-    </div>`;
+    </div>
+    ${previewHtml? `<div class="locked-preview" aria-hidden="true">${previewHtml}</div>` : ''}`;
   document.getElementById('bloqueio-mentorados-voltar').addEventListener('click', ()=>goTo('inicio'));
 }
 function isAnswered(p){
@@ -9008,7 +9012,7 @@ async function enviarPerguntaEstudo(estudoId){
 
 /* ---- Montar Palestra (só Mentoria NCC) ---- */
 function renderPalestras(){
-  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('palestras', 'Montar Palestra'); return; }
+  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('palestras', 'Montar Palestra', palestraListViewHtml()); return; }
   if(palestraAbertaId){
     const p = PALESTRAS.find(x=>x.id==palestraAbertaId);
     if(p){ renderPalestraEditor(p); return; }
@@ -9024,9 +9028,9 @@ function palestraResumoContagem(p){
   return {secoes:secoes.length, slides, comFala};
 }
 
-function renderPalestraListView(){
+function palestraListViewHtml(){
   const minhas = PALESTRAS.filter(p=>p.alunoId===currentUser.id).slice().sort((a,b)=> (b.updatedAt||b.createdAt) < (a.updatedAt||a.createdAt) ? -1 : 1);
-  document.getElementById('view-palestras').innerHTML = `
+  return `
     <p class="section-sub">Monte o roteiro completo de uma palestra, seção por seção e slide por slide. Escreva suas notas e referências em cada slide — a IA só organiza o que você escreveu ali, nunca pesquisa nem inventa estudo, autor ou dado.</p>
     <div class="add-form">
       <div class="field full"><label>Título da palestra</label><input class="ps-input" type="text" id="nova-palestra-titulo" placeholder="Ex.: Diferenças cerebrais entre meninos e meninas" maxlength="200"></div>
@@ -9048,6 +9052,10 @@ function renderPalestraListView(){
       }).join('') || `<div class="empty-state">Nenhuma palestra criada ainda. Crie sua primeira palestra acima.</div>`}
     </div>
   `;
+}
+
+function renderPalestraListView(){
+  document.getElementById('view-palestras').innerHTML = palestraListViewHtml();
   bindRenderPalestrasList();
 }
 
@@ -11032,9 +11040,8 @@ const BUSINESS_LIBRARY = [
 
 /* ================= VIEW: BIBLIOTECA DE NEGÓCIOS =================
    Catálogo de modelos de negócio complementares, organizado por frente estratégica (ver BUSINESS_LIBRARY acima). */
-function renderBiblioteca(){
-  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('biblioteca', 'Biblioteca de Negócios'); return; }
-  document.getElementById('view-biblioteca').innerHTML = `
+function bibliotecaHtml(){
+  return `
     <p class="section-sub">Modelos de negócio complementares para os profissionais NCC, organizados por frente estratégica.</p>
     ${BUSINESS_LIBRARY.map(f=>`
       <div class="category-block">
@@ -11053,6 +11060,10 @@ function renderBiblioteca(){
       </div>
     `).join('')}
   `;
+}
+function renderBiblioteca(){
+  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('biblioteca', 'Biblioteca de Negócios', bibliotecaHtml()); return; }
+  document.getElementById('view-biblioteca').innerHTML = bibliotecaHtml();
 }
 
 /* ================= VIEW: DASHBOARD (compartilhado aluno + equipe) ================= */
@@ -11105,15 +11116,12 @@ function renderDashboard(){
 /* Dashboard da Mentoria acompanha o TRAJETO (não o consumo de aulas — isso é o Dashboard do Curso):
    trajeto acadêmico (resumo do Projeto Acadêmico) e trajeto profissional (palestras criadas na
    Mentoria; progresso no próprio negócio ainda a definir com a Daiane). */
-function renderDashboardMentoria(){
-  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('dashboardmentoria', 'Dashboard da Mentoria'); return; }
-  const s = getStudent(currentStudentId);
-  if(!s) return;
-  const pa = PROJETOS_ACADEMICOS.find(p=>p.alunoId===s.id);
+function dashboardMentoriaHtml(s){
+  const pa = s ? PROJETOS_ACADEMICOS.find(p=>p.alunoId===s.id) : null;
   const totalEtapas = pa ? pa.etapas.length : PROJETO_ETAPAS_PADRAO.length;
   const etapasConcluidas = pa ? pa.etapas.filter(e=>e.status==='concluido').length : 0;
-  const minhasPalestras = PALESTRAS.filter(p=>p.alunoId===s.id);
-  document.getElementById('view-dashboardmentoria').innerHTML = `
+  const minhasPalestras = s ? PALESTRAS.filter(p=>p.alunoId===s.id) : [];
+  return `
     <p class="section-sub">Acompanhamento do seu trajeto acadêmico e profissional dentro da Mentoria NCC.</p>
 
     <h2 class="section-title">${icon('briefcase')} Trajeto Acadêmico</h2>
@@ -11136,6 +11144,12 @@ function renderDashboardMentoria(){
       </div>
     </div>
   `;
+}
+function renderDashboardMentoria(){
+  const s = getStudent(currentStudentId);
+  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('dashboardmentoria', 'Dashboard da Mentoria', dashboardMentoriaHtml(s)); return; }
+  if(!s) return;
+  document.getElementById('view-dashboardmentoria').innerHTML = dashboardMentoriaHtml(s);
   document.getElementById('dm-abrir-projeto').addEventListener('click', ()=>goTo('projetoacademico'));
   document.getElementById('dm-abrir-palestras').addEventListener('click', ()=>goTo('palestras'));
 }
@@ -11144,8 +11158,21 @@ function renderDashboardMentoria(){
    Etapas clássicas de um projeto/artigo científico (PROJETO_ETAPAS_PADRAO). O mentorado marca o
    andamento e escreve suas notas; a equipe interna deixa observações por etapa — os dois no mesmo
    registro (ver "Projeto Acadêmico" no comentário acima de PROJETO_ETAPAS_PADRAO). */
+function projetoAcademicoPreviewHtml(){
+  const paFake = {titulo:'', tema:'', etapas:projetoAcademicoEsqueletoPadrao()};
+  return `
+    <p class="section-sub">Etapas do projeto ou artigo científico dentro da Mentoria NCC. Marque o andamento e escreva suas notas em cada etapa — a equipe também acompanha e pode deixar observações.</p>
+    <div class="palestra-header-form">
+      <div class="field full"><label>Título do projeto/artigo (opcional)</label><input class="ps-input" type="text" value="" placeholder="Ex.: Diferenças cerebrais entre meninos e meninas no desenvolvimento"></div>
+      <div class="field full"><label>Tema/linha de pesquisa (opcional)</label><input class="ps-input" type="text" value="" placeholder="Ex.: Neurodesenvolvimento infantil"></div>
+    </div>
+    <div class="pa-etapas">
+      ${paFake.etapas.map((et,i)=>projetoAcademicoEtapaHtml(et,i,false)).join('')}
+    </div>
+  `;
+}
 function renderProjetoAcademico(){
-  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('projetoacademico', 'Projeto Acadêmico'); return; }
+  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('projetoacademico', 'Projeto Acadêmico', projetoAcademicoPreviewHtml()); return; }
   const s = getStudent(currentStudentId);
   const el = document.getElementById('view-projetoacademico');
   if(!s){ el.innerHTML = '<div class="empty-state">Nenhum mentorado selecionado.</div>'; return; }
@@ -11428,12 +11455,8 @@ function topicFilled(quadrant, topic, idx, s){
 function quadrantFilledCount(q,s){
   return q.topics.filter((t,i)=>topicFilled(q,t,i,s)).length;
 }
-function renderPainel(){
-  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('painel', 'Painel Profissional'); return; }
-  const s = getStudent(currentStudentId);
-  const el = document.getElementById('view-painel');
-  if(!panelQuadrantId){
-    el.innerHTML = `
+function painelGridHtml(s){
+  return `
       <p class="section-sub">Espaço de trabalho do Neurociência do Comportamento da Criança, organizado nos 4 pilares do negócio — visível para você e para a equipe interna.</p>
       <div class="quadrant-grid">
         ${QUADRANTS.map(q=>{
@@ -11447,7 +11470,7 @@ function renderPainel(){
               <div class="frac" style="font-size:11px;color:var(--text-mute);margin-top:6px;">${icon('idcard','tiny')} Por paciente — acesse pelo card em Meus Acompanhamentos</div>
             </button>`;
           }
-          const filled = quadrantFilledCount(q,s);
+          const filled = s ? quadrantFilledCount(q,s) : 0;
           const pct = Math.round(filled/q.topics.length*100);
           return `<button class="quadrant-card" data-quadrant="${q.id}">
             <div class="qi">${icon(q.icon)}</div>
@@ -11459,6 +11482,13 @@ function renderPainel(){
         }).join('')}
       </div>
     `;
+}
+function renderPainel(){
+  const s = getStudent(currentStudentId);
+  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('painel', 'Painel Profissional', painelGridHtml(s)); return; }
+  const el = document.getElementById('view-painel');
+  if(!panelQuadrantId){
+    el.innerHTML = painelGridHtml(s);
     document.querySelectorAll('[data-quadrant]').forEach(elx=>elx.addEventListener('click',()=>{
       panelQuadrantId = elx.dataset.quadrant; renderPainel();
     }));

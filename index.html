@@ -7571,6 +7571,7 @@ const PB_TOM_OPCOES = ['Científico','Provocativo','Acolhedor','Institucional'];
 const PB_ESTILO_OPCOES = ['Minimalista','Editorial','Acadêmica','Expressiva','Outro'];
 const PB_FILE_FIELDS = {
   logo: {url:'logoUrl', nome:'logoNome'},
+  logoEvento: {url:'logoEventoUrl', nome:'logoEventoNome'},
   paleta: {url:'paletaImagemUrl', nome:'paletaImagemNome'},
   referenciaVisual: {url:'referenciaVisualUrl', nome:'referenciaVisualNome'},
 };
@@ -7586,7 +7587,10 @@ function palestraBriefingPadrao(){
     restricoes:'',
     referenciasArquivos:[], /* [{nome, texto}] — quantos PDFs forem necessários, sem limite fixo */
     referenciasLinks:'',
-    logoUrl:'', logoNome:'',
+    titulacaoNome:'', /* linha de apresentação da palestrante na capa, ex.: "Daiane Fraga · Neurocientista do Comportamento Infantil" */
+    logoUrl:'', logoNome:'', /* "sua logo" */
+    logoEventoUrl:'', logoEventoNome:'', /* logo do congresso/evento, quando houver */
+    contatoEmail:'', contatoInstagram:'', /* aparecem no slide de encerramento */
     paletaCores:'', paletaImagemUrl:'', paletaImagemNome:'',
     estiloVisual:'', estiloVisualOutro:'',
     referenciaVisualUrl:'', referenciaVisualNome:'',
@@ -9096,7 +9100,7 @@ function palestraResumoContagem(p){
 function palestraListViewHtml(){
   const minhas = PALESTRAS.filter(p=>p.alunoId===currentUser.id).slice().sort((a,b)=> (b.updatedAt||b.createdAt) < (a.updatedAt||a.createdAt) ? -1 : 1);
   return `
-    <p class="section-sub">Monte o roteiro completo de uma palestra, seção por seção e slide por slide. Escreva suas notas e referências em cada slide — a IA só organiza o que você escreveu ali, nunca pesquisa nem inventa estudo, autor ou dado.</p>
+    <p class="section-sub">Preencha o Briefing da palestra com o contexto (público, tom, duração, restrições) e, se quiser, anexe PDFs de estudos que já tem em mãos. Depois, clique em "Criar roteiro" para a IA montar o roteiro completo — seções, slides, "na tela" e fala — e em "Criar apresentação" para gerar os slides visuais. A IA nunca inventa dado, autor ou estudo: cita só o que estiver nos PDFs anexados e estudos reais que ela mesma busca dentro de uma lista fixa de periódicos científicos de alto impacto.</p>
     <div class="add-form">
       <div class="field full"><label>Título da palestra</label><input class="ps-input" type="text" id="nova-palestra-titulo" placeholder="Ex.: Diferenças cerebrais entre meninos e meninas" maxlength="200"></div>
       <p class="field-error" id="nova-palestra-error" style="display:none"></p>
@@ -9230,6 +9234,7 @@ function palestraBriefingHtml(p){
         <div class="field full">
           <label class="ps-label">Transformação desejada</label>
           <textarea class="ps-input" rows="2" data-pb-campo="transformacao" placeholder="O que o público deve sair pensando, sentindo ou fazendo diferente depois da palestra?">${escapeHtml(b.transformacao)}</textarea>
+          <p class="field-hint">Exemplo: "O público deve sair da palestra atualizado, compreendendo a relevância do tema e suas implicações para a prática. A experiência deve despertar confiança na minha competência e na minha capacidade de tornar a ciência clara e aplicável, deixando a sensação: 'Essa profissional tem muito a acrescentar à minha atuação. Quero continuar acompanhando e aprendendo com ela.'"</p>
         </div>
 
         <div class="field">
@@ -9263,12 +9268,17 @@ function palestraBriefingHtml(p){
           ${(b.referenciasArquivos||[]).length ? `<div class="pb-refs-list">${b.referenciasArquivos.map((a,i)=>`
             <div class="pb-refs-item"><span class="palestra-material-name">${icon('folder','tiny')} ${escapeHtml(a.nome)}</span><button type="button" class="btn-mini danger" data-pb-refs-del="${i}" title="Remover">${icon('x','tiny')}</button></div>
           `).join('')}</div>` : ''}
-          <p class="field-hint">Anexe quantos estudos ou PDFs forem necessários — a IA só cita o que estiver nesses arquivos, nunca pesquisa por conta própria.</p>
+          <p class="field-hint">Opcional: anexe quantos estudos ou PDFs quiser garantir que sejam citados. Além deles, a IA sempre busca estudos reais dentro de uma lista fixa de periódicos de alto impacto (Nature, JAMA, The Lancet, Annual Reviews, entre outros) — nunca cita nada fora dos PDFs anexados ou dessa busca.</p>
           <textarea class="ps-input" rows="2" data-pb-campo="referenciasLinks" placeholder="Links de estudos ou referências, um por linha (opcional)" style="margin-top:8px">${escapeHtml(b.referenciasLinks)}</textarea>
         </div>
 
+        <div class="field full">
+          <label class="ps-label">Titulação e nome</label>
+          <input class="ps-input" type="text" data-pb-campo="titulacaoNome" value="${escapeAttr(b.titulacaoNome)}" placeholder="Como deve aparecer na capa da apresentação, ex.: Daiane Fraga · Neurocientista do Comportamento Infantil">
+        </div>
+
         <div class="field">
-          <label class="ps-label">Logo</label>
+          <label class="ps-label">Sua logo</label>
           <div class="palestra-material-row">
             <input type="file" accept="image/*" data-pb-file="logo" style="display:none">
             <button type="button" class="btn-outline btn-mini" data-pb-file-btn="logo">${icon('upload','tiny')} ${b.logoUrl? 'Trocar arquivo' : 'Enviar logo'}</button>
@@ -9276,6 +9286,27 @@ function palestraBriefingHtml(p){
               ? `<a href="${escapeAttr(b.logoUrl)}" target="_blank" rel="noopener" class="palestra-material-name">${icon('folder','tiny')} ${escapeHtml(b.logoNome||'logo enviado')}</a><button type="button" class="btn-mini danger" data-pb-file-del="logo" title="Remover">${icon('x','tiny')}</button>`
               : `<span class="palestra-material-empty">Nenhum arquivo enviado</span>`}
           </div>
+        </div>
+
+        <div class="field">
+          <label class="ps-label">Logo do evento (opcional)</label>
+          <div class="palestra-material-row">
+            <input type="file" accept="image/*" data-pb-file="logoEvento" style="display:none">
+            <button type="button" class="btn-outline btn-mini" data-pb-file-btn="logoEvento">${icon('upload','tiny')} ${b.logoEventoUrl? 'Trocar arquivo' : 'Enviar logo do evento'}</button>
+            ${b.logoEventoUrl
+              ? `<a href="${escapeAttr(b.logoEventoUrl)}" target="_blank" rel="noopener" class="palestra-material-name">${icon('folder','tiny')} ${escapeHtml(b.logoEventoNome||'logo enviado')}</a><button type="button" class="btn-mini danger" data-pb-file-del="logoEvento" title="Remover">${icon('x','tiny')}</button>`
+              : `<span class="palestra-material-empty">Nenhum arquivo enviado</span>`}
+          </div>
+          <p class="field-hint">Se a palestra for num congresso ou evento com marca própria, a logo dele aparece junto com a sua na capa.</p>
+        </div>
+
+        <div class="field full">
+          <label class="ps-label">Contato para o encerramento</label>
+          <div class="pb-duo">
+            <input class="ps-input" type="text" data-pb-campo="contatoEmail" value="${escapeAttr(b.contatoEmail)}" placeholder="E-mail (opcional)">
+            <input class="ps-input" type="text" data-pb-campo="contatoInstagram" value="${escapeAttr(b.contatoInstagram)}" placeholder="Instagram (opcional)">
+          </div>
+          <p class="field-hint">Aparece no slide final da apresentação, para quem quiser continuar o contato.</p>
         </div>
 
         <div class="field">
@@ -9555,13 +9586,11 @@ function bindPalestraEditorEvents(p){
    referências para citar" — nunca pesquisa por conta própria nem completa com conhecimento geral. */
 async function onCriarRoteiroClick(p){
   p.briefing = mergePalestraBriefing(p.briefing);
-  const arquivos = (p.briefing.referenciasArquivos||[]).filter(a=>(a.texto||'').trim());
-  if(!arquivos.length){
-    alert('Anexe pelo menos um PDF em "Estudos e referências para citar", no Briefing acima, antes de criar o roteiro — a IA só escreve com base no que estiver anexado ali.');
-    return;
-  }
+  // PDFs anexados não são mais obrigatórios: além deles, a IA também pesquisa estudos reais dentro de
+  // uma lista fixa de periódicos científicos de alto impacto (ver função gerar-roteiro-palestra) — nunca
+  // inventa fora dessas duas fontes.
   const temRoteiro = !!(p.conteudo && p.conteudo.some(s=>(s.slides||[]).length));
-  if(temRoteiro && !confirm('Isso substitui o roteiro atual desta palestra por um novo, gerado pela IA a partir do Briefing e dos PDFs anexados. Continuar?')) return;
+  if(temRoteiro && !confirm('Isso substitui o roteiro atual desta palestra por um novo, gerado pela IA a partir do Briefing, dos PDFs anexados e dos periódicos de alto impacto. Continuar?')) return;
   palestraGerandoRoteiroId = p.id;
   renderPalestraEditor(p);
   try{
@@ -9606,8 +9635,12 @@ async function chamarIaGerarRoteiro(p){
    Briefing — não chama a IA de novo, é só a formatação do que "Criar roteiro" já produziu. */
 function palestraCoresDaPaleta(str){
   const encontradas = String(str||'').match(/#(?:[0-9a-fA-F]{3}){1,2}\b/g) || [];
-  return { primaria: encontradas[0] || '#8f6231', secundaria: encontradas[1] || encontradas[0] || '#5a5a5a' };
+  return { primaria: encontradas[0] || '#8f6231', secundaria: encontradas[1] || encontradas[0] || '#7a5c3d' };
 }
+/* Sistema antigo de 4 estilos visuais (Minimalista/Editorial/Acadêmica/Expressiva) pro "Criar apresentação" —
+   mantido no arquivo (sem uso) porque o campo "Estilo visual" do Briefing continua existindo; o PDF de
+   apresentação agora segue sempre o modelo de slides da NCC (ver exportPalestraApresentacaoPDF) em vez
+   dessas variações de CSS. */
 const PB_ESTILO_CSS = { 'Minimalista':'apr-minimalista', 'Editorial':'apr-editorial', 'Acadêmica':'apr-academica', 'Expressiva':'apr-expressiva' };
 function palestraNaTelaItensHtml(naTela){
   const texto = String(naTela||'').trim();
@@ -9617,58 +9650,101 @@ function palestraNaTelaItensHtml(naTela){
   if(limpas.length>1) return `<ul>${limpas.map(t=>`<li>${escapeHtml(t)}</li>`).join('')}</ul>`;
   return `<p>${escapeHtml(texto).replace(/\n/g,'<br>')}</p>`;
 }
+/* "Criar apresentação": gera os slides visuais (PDF, paisagem) seguindo o modelo oficial de apresentação
+   da NCC (capa com logos + título, um slide divisor por seção do roteiro, slides de conteúdo e um slide de
+   encerramento com contato) — em vez do antigo sistema de 4 estilos visuais genéricos. As cores de marca
+   (#8f6231 / #7a5c3d) continuam podendo ser sobrescritas por hex escrito em "Paleta de cores" no Briefing. */
 function exportPalestraApresentacaoPDF(p){
   const secoes = p.conteudo||[];
   if(!secoes.some(s=>(s.slides||[]).length)){ alert('Crie o roteiro primeiro — a apresentação é montada a partir dos slides do roteiro.'); return; }
   const b = mergePalestraBriefing(p.briefing);
   const cores = palestraCoresDaPaleta(b.paletaCores);
-  const estiloClasse = PB_ESTILO_CSS[b.estiloVisual] || 'apr-minimalista';
-  const logoSrc = b.logoUrl || BRAND_LOGO_DATA_URI;
   const win = window.open('', '_blank');
   if(!win){ alert('Seu navegador bloqueou a abertura da aba de impressão. Permita pop-ups para este site e tente de novo.'); return; }
-  const slidesHtml = [];
-  secoes.forEach(secao=>{
-    (secao.slides||[]).forEach(sl=>{
-      slidesHtml.push(`
-        <section class="apr-slide">
-          <div class="apr-topo">
-            <img src="${logoSrc}" class="apr-logo" alt="">
-            <span class="apr-secao-tag">${escapeHtml(secao.nome)}</span>
-          </div>
-          <h1>${escapeHtml(sl.titulo||'')}</h1>
-          <div class="apr-corpo">${palestraNaTelaItensHtml(sl.naTela)}</div>
-        </section>`);
-    });
-  });
+
+  // Capa: logo do evento (opcional, esquerda) + sua logo (opcional, direita) — nenhum dos dois é inventado,
+  // cada slot só aparece se o arquivo correspondente foi enviado no Briefing.
+  const capaLogosHtml = (b.logoEventoUrl || b.logoUrl) ? `
+    <div class="apr-capa-logos">
+      <div>${b.logoEventoUrl? `<img src="${escapeAttr(b.logoEventoUrl)}" alt="">` : ''}</div>
+      <div>${b.logoUrl? `<img src="${escapeAttr(b.logoUrl)}" alt="">` : ''}</div>
+    </div>` : '';
+  const capaEvento = p.evento || b.contexto;
+  const capaHtml = `
+    <section class="apr-slide apr-capa">
+      ${capaLogosHtml}
+      <div class="apr-capa-texto">
+        ${capaEvento? `<p class="apr-capa-evento">${escapeHtml(capaEvento)}</p>` : ''}
+        <h1 class="apr-capa-titulo">${escapeHtml(p.titulo||'')}</h1>
+        ${p.subtitulo? `<p class="apr-capa-subtitulo">${escapeHtml(p.subtitulo)}</p>` : ''}
+        ${b.titulacaoNome? `<p class="apr-capa-apresentador">${escapeHtml(b.titulacaoNome)}</p>` : ''}
+      </div>
+    </section>`;
+
+  const secoesHtml = secoes.filter(s=>(s.slides||[]).length).map(secao=>{
+    const divisorHtml = `
+      <section class="apr-slide apr-divisor">
+        <h1>${escapeHtml(secao.nome||'')}</h1>
+      </section>`;
+    const slidesHtml = (secao.slides||[]).map(sl=>`
+      <section class="apr-slide apr-conteudo">
+        <div class="apr-topo"><span class="apr-secao-tag">${escapeHtml(secao.nome)}</span></div>
+        <h1>${escapeHtml(sl.titulo||'')}</h1>
+        <div class="apr-corpo">${palestraNaTelaItensHtml(sl.naTela)}</div>
+      </section>`).join('');
+    return divisorHtml + slidesHtml;
+  }).join('');
+
+  const contatoLinhas = [
+    b.contatoEmail? `<p>${escapeHtml(b.contatoEmail)}</p>` : '',
+    b.contatoInstagram? `<p>${escapeHtml(b.contatoInstagram)}</p>` : '',
+  ].filter(Boolean).join('');
+  const encerramentoHtml = `
+    <section class="apr-slide apr-obrigada">
+      <h1>Obrigada</h1>
+      ${contatoLinhas ? `
+        <div class="apr-obrigada-contato">
+          <svg class="apr-obrigada-icone" viewBox="0 0 48 48" width="40" height="40" fill="none" stroke="${cores.primaria}" stroke-width="1.6"><circle cx="24" cy="24" r="22"></circle><rect x="13" y="16" width="22" height="16" rx="1.5"></rect><path d="M13 17.5 24 27l11-9.5"></path></svg>
+          ${contatoLinhas}
+        </div>` : ''}
+    </section>`;
+
   win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(p.titulo)} — Apresentação</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=Mak:wght@400;700&display=swap">
     <style>
       @page{ size: landscape; margin:0; }
       *{ box-sizing:border-box; }
-      body{ font-family:Arial,Helvetica,sans-serif; margin:0; }
-      .apr-slide{ width:100%; min-height:100vh; page-break-after:always; padding:36px 56px; display:flex; flex-direction:column; justify-content:center; position:relative; }
-      .apr-topo{ position:absolute; top:24px; left:56px; right:56px; display:flex; align-items:center; justify-content:space-between; }
-      .apr-logo{ height:26px; width:auto; }
-      .apr-secao-tag{ font-size:11px; text-transform:uppercase; letter-spacing:1px; color:${cores.secundaria}; }
-      h1{ font-size:34px; margin:0 0 22px; color:${cores.primaria}; }
-      .apr-corpo{ font-size:18px; line-height:1.6; color:#222; }
+      body{ font-family:'Montserrat',Arial,Helvetica,sans-serif; margin:0; }
+      .apr-slide{ width:100%; min-height:100vh; page-break-after:always; padding:56px; display:flex; flex-direction:column; justify-content:center; position:relative; background:#f8f6f2; }
+      .apr-topo{ position:absolute; top:28px; left:56px; right:56px; display:flex; align-items:center; justify-content:flex-end; }
+      .apr-secao-tag{ font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:${cores.secundaria}; }
+      h1{ font-family:'Mak',Georgia,serif; margin:0; color:${cores.primaria}; }
+      .apr-conteudo h1{ font-size:32px; margin-bottom:22px; }
+      .apr-corpo{ font-size:17px; line-height:1.65; color:#2a2a2a; max-width:900px; }
       .apr-corpo ul{ margin:0; padding-left:22px; }
       .apr-corpo li{ margin-bottom:10px; }
       .apr-vazio{ color:#999; font-style:italic; }
-      .apr-minimalista .apr-slide{ background:#ffffff; }
-      .apr-minimalista h1{ font-weight:600; }
-      .apr-editorial .apr-slide{ background:#fbf8f3; }
-      .apr-editorial h1{ font-family:Georgia,'Times New Roman',serif; font-weight:400; }
-      .apr-editorial .apr-slide::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:10px; background:${cores.primaria}; }
-      .apr-academica .apr-slide{ background:#ffffff; }
-      .apr-academica h1{ font-weight:700; border-bottom:2px solid ${cores.primaria}; padding-bottom:12px; }
-      .apr-academica .apr-secao-tag{ font-weight:700; }
-      .apr-expressiva .apr-slide{ background:${cores.primaria}; color:#fff; }
-      .apr-expressiva h1{ color:#fff; font-size:40px; font-weight:800; }
-      .apr-expressiva .apr-corpo{ color:#fff; }
-      .apr-expressiva .apr-secao-tag{ color:#fff; opacity:.8; }
+
+      .apr-capa{ align-items:center; text-align:center; }
+      .apr-capa-logos{ position:absolute; top:40px; left:56px; right:56px; display:flex; align-items:center; justify-content:space-between; }
+      .apr-capa-logos img{ height:38px; width:auto; max-width:160px; object-fit:contain; }
+      .apr-capa-texto{ max-width:760px; margin:0 auto; }
+      .apr-capa-evento{ font-size:13px; text-transform:uppercase; letter-spacing:2.5px; color:${cores.secundaria}; margin:0 0 20px; }
+      .apr-capa-titulo{ font-size:48px; font-weight:700; line-height:1.2; margin:0 0 16px; }
+      .apr-capa-subtitulo{ font-size:16px; text-transform:uppercase; letter-spacing:3px; color:${cores.secundaria}; font-weight:600; margin:0 0 30px; }
+      .apr-capa-apresentador{ font-size:13px; letter-spacing:1.5px; text-transform:uppercase; color:${cores.secundaria}; margin:0; }
+
+      .apr-divisor{ align-items:flex-start; justify-content:center; padding-left:100px; }
+      .apr-divisor h1{ font-size:40px; font-weight:700; }
+
+      .apr-obrigada{ align-items:center; justify-content:center; text-align:center; }
+      .apr-obrigada h1{ font-size:52px; font-weight:700; margin-bottom:28px; }
+      .apr-obrigada-contato{ display:flex; flex-direction:column; align-items:center; gap:10px; font-size:14px; color:${cores.secundaria}; letter-spacing:.5px; }
     </style>
-    </head><body class="${estiloClasse}">
-      ${slidesHtml.join('')}
+    </head><body>
+      ${capaHtml}
+      ${secoesHtml}
+      ${encerramentoHtml}
     </body></html>`);
   win.document.close();
   win.onload = ()=>{ win.focus(); win.print(); };

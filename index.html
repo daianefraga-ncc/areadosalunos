@@ -657,6 +657,32 @@
   .palestra-roteiro-resumo h3{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:6px;}
   .palestra-roteiro-secoes{margin:10px 0 0;padding-left:20px;font-size:12.5px;color:var(--text-dim);}
   .palestra-roteiro-secoes li{margin-bottom:4px;}
+  /* Biblioteca de Modelos de Apresentação — seletor do aluno (Briefing) e cadastro da equipe (Conteúdo) */
+  .pm-grupo{margin-top:16px;}
+  .pm-grupo-titulo{font-size:13px;font-weight:700;color:var(--text-dim);margin:0 0 10px;}
+  .pm-picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;}
+  .pm-picker-card{border:2px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--bg-card);display:flex;flex-direction:column;transition:border-color .15s;}
+  .pm-picker-card.selecionado{border-color:var(--individual);}
+  .pm-picker-thumb{position:relative;aspect-ratio:4/3;background:var(--bg);cursor:pointer;}
+  .pm-picker-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .pm-admin-thumb-empty{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-mute);}
+  .pm-picker-badge{position:absolute;bottom:6px;left:6px;right:6px;background:var(--individual);color:#fff;font-size:11px;font-weight:700;border-radius:var(--radius-sm);padding:3px 8px;display:flex;align-items:center;gap:4px;justify-content:center;}
+  .pm-picker-nome{font-size:12.5px;font-weight:600;padding:8px 10px 2px;}
+  .pm-picker-actions{display:flex;flex-direction:column;gap:6px;padding:8px 10px 10px;}
+  .pm-preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:12px;max-height:60vh;overflow-y:auto;}
+  .pm-preview-item{margin:0;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);}
+  .pm-preview-item img{width:100%;display:block;}
+  .pm-preview-item figcaption{font-size:11.5px;color:var(--text-mute);padding:6px 8px;}
+  .pm-grupo-admin{margin-top:20px;}
+  .pm-grupo-admin-h{display:flex;align-items:baseline;gap:10px;margin-bottom:10px;}
+  .pm-grupo-admin-h h3{font-size:14px;font-weight:700;}
+  .pm-grupo-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;}
+  .pm-admin-card{border:1px solid var(--border);border-radius:var(--radius);padding:10px;background:var(--bg-card);display:flex;flex-direction:column;gap:6px;}
+  .pm-admin-thumb{aspect-ratio:4/3;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg);cursor:pointer;}
+  .pm-admin-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .pm-admin-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .pm-admin-layouts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+  .pm-admin-layout-chip{display:flex;align-items:center;gap:4px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:3px 8px;color:var(--text-dim);}
   .palestra-secao{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
   .palestra-secao-h{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
   .palestra-secao-nome{flex:1;min-width:160px;font-weight:700;font-size:14.5px;border:1px solid transparent;background:transparent;padding:6px 8px;border-radius:var(--radius-sm);color:var(--text);}
@@ -677,6 +703,19 @@
   .palestra-material-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
   .palestra-material-name{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-dim);}
   .palestra-material-empty{font-size:12px;color:var(--text-mute);}
+  /* Revisão do roteiro gerado (pendências, objetivo do tópico, figura científica a confirmar) */
+  .rv-pendencias{background:var(--bg-card);border:1px solid var(--individual);border-left:4px solid var(--individual);border-radius:var(--radius);padding:14px 16px;margin-bottom:18px;}
+  .rv-pendencias h3{font-size:13.5px;font-weight:700;color:var(--individual);display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .rv-pendencias ul{margin:0;padding-left:20px;font-size:12.5px;color:var(--text-dim);line-height:1.6;}
+  .rv-secao-objetivo{font-size:12px;color:var(--text-dim);font-style:italic;margin:-4px 0 10px;}
+  .rv-slide-mensagem{font-size:12.5px;font-weight:600;color:var(--accent-2);background:var(--bg-card);border-radius:var(--radius-sm);padding:7px 10px;margin-bottom:10px;}
+  .rv-figura{border:1px solid var(--individual);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;background:var(--bg-card);}
+  .rv-figura-h{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--individual);margin-bottom:6px;}
+  .rv-figura p{font-size:12.5px;color:var(--text-dim);margin:0 0 4px;line-height:1.5;}
+  .rv-figura-thumb{max-width:260px;border-radius:var(--radius-sm);margin:8px 0;display:block;border:1px solid var(--border);}
+  .rv-figura-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;}
+  .rv-extra-toggle{background:none;border:none;color:var(--accent-2);font-size:12px;font-weight:600;cursor:pointer;padding:2px 0;display:flex;align-items:center;gap:4px;}
+  .rv-extra{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);}
   .palestra-list-row{cursor:pointer;}
   .palestra-list-row .desc{color:var(--text-dim);}
   /* Projeto Acadêmico: tira-tabs com as etapas do NCC Integração (só exibição, não editável aqui). */
@@ -1561,6 +1600,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- PptxGenJS: gera o .pptx real da apresentação (slides com texto/caixas editáveis, não uma imagem) —
+     é esse arquivo que o aluno importa no Canva (ou abre no PowerPoint) pra editar sem perder o que a IA
+     já montou. Expõe window.PptxGenJS. -->
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3/dist/pptxgen.bundle.js"></script>
 <!-- pdf.js: extrai o texto do PDF do artigo direto no navegador do aluno, antes de mandar pra IA (Biblioteca
      Científica). É um pacote ES module (não tem build clássico "window.pdfjsLib" pronto mais), então carregamos
      via um bloco de script do tipo module abaixo e penduramos o resultado em window.pdfjsLib pra o resto do
@@ -1658,6 +1701,7 @@ const ICONS = {
   sliders:'<path d="M4 6h9M17 6h3M4 12h3M9 12h11M4 18h13M19 18h1"/><circle cx="13" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
   pathicon:'<circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/><path d="M6.5 17.5C10 13 14 11 17.5 6.5"/>',
   mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v4M9 21h6"/>',
+  alert:'<path d="M12 3 2 20h20L12 3z"/><path d="M12 9.5v4.5"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/>',
   whatsapp:'<path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z"/><path d="M8.4 8.2c.2-.5.4-.5.6-.5h.5c.2 0 .4 0 .5.4.2.5.7 1.6.7 1.7.1.1.1.3 0 .4-.1.2-.2.3-.3.4-.1.1-.3.3-.4.4-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2 1.2 1 2.1 1.4 2.5 1.6.2.1.4.1.5-.1.1-.2.6-.7.8-.9.2-.2.3-.2.5-.1l1.6.8c.2.1.3.1.4.2.1.1.1.6-.1 1.1-.2.5-1.3 1.1-1.8 1.1-.5 0-1.1.1-3.5-1.3-2-1.3-3.3-3.1-3.4-3.3-.1-.2-.9-1.2-.9-2.3 0-1.1.6-1.6.8-1.8z" fill="currentColor" stroke="none"/>',
 };
 function icon(name,cls){return `<svg class="icon ${cls||''}" viewBox="0 0 24 24">${ICONS[name]}</svg>`;}
@@ -6360,6 +6404,13 @@ let NOVIDADES = [];
 /* Comentários de cada novidade, agrupados por novidade_id: { [novidadeId]: [{id, authorId, text, createdAt}] } */
 let NOVIDADE_COMMENTS = {};
 
+/* Biblioteca de Modelos de Apresentação do Estúdio de Palestras: cada linha é uma identidade visual
+   completa (capa + prévias dos layouts internos) associada a um dos 6 grupos de público. Cadastrada pela
+   equipe interna em Conteúdo (ver renderConteudo / palestraModelosAdminHtml); o aluno escolhe um desses
+   modelos no Briefing da palestra, de acordo com o público selecionado (ver palestraModeloPickerHtml). */
+let PALESTRA_MODELOS = [];
+const PALESTRA_MODELO_GRUPOS = ['Pais','Professores','Profissionais da infância','Gestores','Cientistas','Público misto'];
+
 /* Biblioteca Científica — artigos que o próprio aluno sobe (o texto do PDF já vem extraído no
    navegador, via pdf.js) pra estudar, com um chat de perguntas e respostas em português sobre
    cada artigo (a resposta vem da IA, ver Edge Function "perguntar-estudo"). Cada estudo pertence
@@ -6905,7 +6956,7 @@ async function bootstrapData(){
   PEOPLE = {};
   profiles.forEach(p=>{ PEOPLE[p.id] = {id:p.id, name:p.name, initials:p.initials, color:p.color, avatarUrl:p.avatar_url||null, role:p.role}; });
 
-  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:cursoModuloRows},{data:comunicadoRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows},{data:novidadeCommentRows},{data:estudoRows},{data:estudoMensagemRows},{data:palestraRows},{data:projetoAcademicoRows}] = await Promise.all([
+  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:cursoModuloRows},{data:comunicadoRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows},{data:novidadeCommentRows},{data:estudoRows},{data:estudoMensagemRows},{data:palestraRows},{data:projetoAcademicoRows},{data:palestraModeloRows}] = await Promise.all([
     sb.from('module_checklist_state').select('*'),
     sb.from('panel_data').select('*'),
     sb.from('panel_overrides').select('*'),
@@ -6934,6 +6985,8 @@ async function bootstrapData(){
     // Projeto Acadêmico (Dashboard da Mentoria): uma linha por mentorado; RLS deixa tanto o próprio
     // mentorado quanto a equipe interna ver e atualizar (a equipe deixa observações por etapa).
     sb.from('projetos_academicos').select('*'),
+    // Biblioteca de Modelos de Apresentação: todo mundo autenticado (menos vendas) lê; só a equipe escreve.
+    sb.from('palestra_modelos').select('*').order('grupo').order('ordem'),
   ]);
 
   LIVE_SESSIONS.length = 0;
@@ -7015,12 +7068,20 @@ async function bootstrapData(){
   (palestraRows||[]).forEach(p=>PALESTRAS.push({
     id:p.id, alunoId:p.aluno_id, titulo:p.titulo||'', subtitulo:p.subtitulo||'', evento:p.evento||'',
     duracaoEstimada:p.duracao_estimada||'', conteudo:Array.isArray(p.conteudo)?p.conteudo:[], referencias:p.referencias||'',
+    pendencias:Array.isArray(p.pendencias)?p.pendencias:[], publicoChave:p.publico_chave||'',
     briefing:mergePalestraBriefing(p.briefing),
     createdAt:p.created_at, updatedAt:p.updated_at,
   }));
 
   PROJETOS_ACADEMICOS.length = 0;
   (projetoAcademicoRows||[]).forEach(r=>PROJETOS_ACADEMICOS.push(mapProjetoAcademicoRow(r)));
+
+  PALESTRA_MODELOS.length = 0;
+  (palestraModeloRows||[]).forEach(m=>PALESTRA_MODELOS.push({
+    id:m.id, grupo:m.grupo, nome:m.nome||'', ordem:m.ordem||0,
+    capaUrl:m.capa_url||'', capaNome:m.capa_nome||'',
+    layouts:Array.isArray(m.layouts)?m.layouts:[], ativo:m.ativo!==false,
+  }));
 
   MEUS_LIKES = new Set((meusLikes||[]).map(l=>l.post_id));
   EU_JA_APRESENTEI = !!(apresentacaoRows && apresentacaoRows.length);
@@ -7477,6 +7538,51 @@ async function syncNovidadeCommentInsert(novidadeId, text){
 function syncNovidadeCommentDelete(id){
   syncNow(sb.from('novidade_comments').delete().eq('id', id));
 }
+/* ---- Biblioteca de Modelos de Apresentação (Estúdio de Palestras) — cadastrada pela equipe interna em
+   Conteúdo, escolhida pelo aluno no Briefing da palestra de acordo com o público selecionado. ---- */
+async function syncPalestraModeloInsert(m){
+  const { data, error } = await sb.from('palestra_modelos').insert({
+    grupo:m.grupo, nome:m.nome||'', ordem:m.ordem||0,
+    capa_url:m.capaUrl||null, capa_nome:m.capaNome||null, layouts:m.layouts||[],
+    created_by: currentUser.id,
+  }).select().single();
+  if(error) throw error;
+  return data;
+}
+function syncPalestraModeloUpdate(id, fields){
+  const row = {};
+  if('nome' in fields) row.nome = fields.nome;
+  if('ordem' in fields) row.ordem = fields.ordem;
+  if('grupo' in fields) row.grupo = fields.grupo;
+  if('capaUrl' in fields) row.capa_url = fields.capaUrl;
+  if('capaNome' in fields) row.capa_nome = fields.capaNome;
+  if('layouts' in fields) row.layouts = fields.layouts;
+  if('ativo' in fields) row.ativo = fields.ativo;
+  syncNow(sb.from('palestra_modelos').update(row).eq('id', id));
+}
+function syncPalestraModeloDelete(id){
+  syncNow(sb.from('palestra_modelos').delete().eq('id', id));
+}
+const PALESTRA_MODELO_IMG_ALVO_BYTES = 450*1024;
+const PALESTRA_MODELO_IMG_MAX_DIM = 1600;
+async function uploadPalestraModeloFile(file, pastaId){
+  let toUpload = file;
+  try{
+    toUpload = await Promise.race([
+      resizeImageForUpload(file, PALESTRA_MODELO_IMG_ALVO_BYTES, PALESTRA_MODELO_IMG_MAX_DIM),
+      new Promise((_,rej)=> setTimeout(()=>rej(new Error('Tempo esgotado ao processar a imagem.')), 12000))
+    ]);
+  }catch(e){
+    console.error('Falha ao redimensionar modelo de apresentação, enviando original:', e);
+    toUpload = file;
+  }
+  const ext = (toUpload.name||'').split('.').pop() || 'jpg';
+  const path = `${pastaId}-${Date.now()}-${Math.random().toString(36).slice(2,7)}.${ext.toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg'}`;
+  const { error: upErr } = await sb.storage.from('palestra-modelos').upload(path, toUpload, {upsert:true, cacheControl:'31536000', contentType: toUpload.type || undefined});
+  if(upErr) throw upErr;
+  const { data } = sb.storage.from('palestra-modelos').getPublicUrl(path);
+  return data.publicUrl;
+}
 /* ---- Biblioteca Científica (estudos) ---- */
 async function syncEstudoInsert(titulo, nomeArquivo, textoExtraido){
   const { data, error } = await sb.from('estudos')
@@ -7587,6 +7693,7 @@ function palestraBriefingPadrao(){
     restricoes:'',
     referenciasArquivos:[], /* [{nome, texto}] — quantos PDFs forem necessários, sem limite fixo */
     referenciasLinks:'',
+    modeloId:'', /* id do modelo escolhido na Biblioteca de Modelos de Apresentação (ver PALESTRA_MODELOS) */
     titulacaoNome:'', /* linha de apresentação da palestrante na capa, ex.: "Daiane Fraga · Neurocientista do Comportamento Infantil" */
     logoUrl:'', logoNome:'', /* "sua logo" */
     logoEventoUrl:'', logoEventoNome:'', /* logo do congresso/evento, quando houver */
@@ -7622,7 +7729,8 @@ async function syncPalestraInsert(titulo){
 function syncPalestraUpdate(p){
   syncNow(sb.from('palestras').update({
     titulo:p.titulo, subtitulo:p.subtitulo, evento:p.evento, duracao_estimada:p.duracaoEstimada,
-    conteudo:p.conteudo, referencias:p.referencias, briefing:p.briefing, updated_at:new Date().toISOString(),
+    conteudo:p.conteudo, referencias:p.referencias, briefing:p.briefing,
+    pendencias:p.pendencias||[], publico_chave:p.publicoChave||null, updated_at:new Date().toISOString(),
   }).eq('id', p.id));
 }
 function syncPalestraDelete(id){ syncNow(sb.from('palestras').delete().eq('id', id)); }
@@ -9165,6 +9273,7 @@ async function onAddPalestraClick(){
     PALESTRAS.push({
       id:row.id, alunoId:row.aluno_id, titulo:row.titulo||'', subtitulo:row.subtitulo||'', evento:row.evento||'',
       duracaoEstimada:row.duracao_estimada||'', conteudo:Array.isArray(row.conteudo)?row.conteudo:[], referencias:row.referencias||'',
+      pendencias:Array.isArray(row.pendencias)?row.pendencias:[], publicoChave:row.publico_chave||'',
       briefing:mergePalestraBriefing(row.briefing),
       createdAt:row.created_at, updatedAt:row.updated_at,
     });
@@ -9345,6 +9454,94 @@ function palestraBriefingHtml(p){
   `;
 }
 
+/* Biblioteca de Modelos de Apresentação — aparece no Briefing assim que o aluno marca ao menos um
+   público; mostra os até 5 modelos cadastrados (ver renderConteudo / palestra_modelos) de cada grupo
+   marcado, sem duplicar nada já que cada modelo pertence a um único grupo. Trocar de modelo é só clicar
+   em outro cartão — não existe um estado "travado" depois de escolher. */
+function palestraModeloPickerHtml(p){
+  const b = mergePalestraBriefing(p.briefing);
+  const gruposSelecionados = PALESTRA_MODELO_GRUPOS.filter(g=>(b.publico||[]).includes(g));
+  if(!gruposSelecionados.length) return '';
+  return `
+    <div class="palestra-briefing" style="margin-top:18px">
+      <div class="palestra-briefing-h">
+        <h3>${icon('film')} Modelo de apresentação</h3>
+        <p class="field-hint">Escolha a identidade visual da apresentação, de acordo com o(s) público(s) marcado(s) no Briefing acima. Pode trocar quando quiser — inclusive depois de já ter gerado o roteiro.</p>
+      </div>
+      ${gruposSelecionados.map(grupo=>{
+        const modelos = PALESTRA_MODELOS.filter(m=>m.grupo===grupo && m.ativo!==false).sort((a,b2)=>a.ordem-b2.ordem);
+        return `
+          <div class="pm-grupo">
+            <h4 class="pm-grupo-titulo">${escapeHtml(grupo)}</h4>
+            ${modelos.length ? `
+              <div class="pm-picker-grid">
+                ${modelos.map(m=>{
+                  const selecionado = b.modeloId === m.id;
+                  return `
+                    <div class="pm-picker-card ${selecionado?'selecionado':''}">
+                      <div class="pm-picker-thumb" data-pm-preview="${m.id}">
+                        ${m.capaUrl? `<img src="${escapeAttr(m.capaUrl)}" alt="">` : `<div class="pm-admin-thumb-empty">${icon('film','tiny')}</div>`}
+                        ${selecionado? `<span class="pm-picker-badge">${icon('check','tiny')} Selecionado</span>` : ''}
+                      </div>
+                      <div class="pm-picker-nome">${escapeHtml(m.nome||'Modelo')}</div>
+                      <div class="pm-picker-actions">
+                        <button type="button" class="btn-outline btn-mini" data-pm-preview="${m.id}">${icon('externallink','tiny')} Visualizar modelo</button>
+                        <button type="button" class="btn-mini ${selecionado?'btn-accent':'btn-outline'}" data-pm-usar="${m.id}" ${selecionado?'disabled':''}>${selecionado? icon('check','tiny')+' Selecionado' : 'Usar este modelo'}</button>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            ` : `<p class="section-sub">Nenhum modelo cadastrado ainda para este grupo — em breve.</p>`}
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+function bindPalestraModeloPickerEvents(p){
+  document.querySelectorAll('#view-palestras [data-pm-preview]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const m = PALESTRA_MODELOS.find(x=>x.id===el.dataset.pmPreview);
+      if(m) openPalestraModeloPreviewModal(m);
+    });
+  });
+  document.querySelectorAll('#view-palestras [data-pm-usar]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      p.briefing = mergePalestraBriefing(p.briefing);
+      p.briefing.modeloId = btn.dataset.pmUsar;
+      syncPalestraUpdate(p);
+      renderPalestraEditor(p);
+    });
+  });
+}
+/* Prévia ampliada de um modelo (capa + layouts internos) — usada tanto pelo aluno (escolha de modelo)
+   quanto pela equipe interna (cadastro em Conteúdo). */
+function openPalestraModeloPreviewModal(modelo){
+  const imagens = [modelo.capaUrl? {url:modelo.capaUrl, nome:'Capa'} : null, ...(modelo.layouts||[])].filter(Boolean);
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <button class="modal-close" id="modal-close">${icon('x')}</button>
+      <h2>${escapeHtml(modelo.nome||'Modelo de apresentação')}</h2>
+      <p class="section-sub" style="margin-top:-4px">${escapeHtml(modelo.grupo||'')}</p>
+      ${imagens.length ? `
+        <div class="pm-preview-grid">
+          ${imagens.map(img=>`
+            <figure class="pm-preview-item">
+              <img src="${escapeAttr(img.url)}" alt="${escapeAttr(img.nome||'')}">
+              <figcaption>${escapeHtml(img.nome||'')}</figcaption>
+            </figure>
+          `).join('')}
+        </div>
+      ` : `<p class="section-sub">Nenhuma imagem cadastrada ainda para este modelo.</p>`}
+      <div class="modal-actions"><button class="btn-outline" id="modal-close-2">Fechar</button></div>
+    </div>
+  `;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('modal-close-2').addEventListener('click', closeModal);
+}
+
 function palestraSlideEditorHtml(secao, slide, idx, total){
   const isFirst = idx===0, isLast = idx===total-1;
   const gerando = palestraGerandoSlideId === slide.id;
@@ -9425,22 +9622,160 @@ function palestraSecaoEditorHtml(secao, idxSecao, totalSecoes){
   `;
 }
 
-/* Depois do Briefing não há mais campos manuais: o roteiro (seções, slides, "na tela" e fala) é
-   inteiramente gerado pela IA em "Criar roteiro", só com base no Briefing e nos PDFs anexados — nunca
-   editado slide a slide à mão. "Criar apresentação" transforma esse roteiro já gerado nos slides
-   visuais (PDF, paisagem) usando a identidade visual do Briefing. */
+/* O roteiro (seções, slides, "na tela", fala e os campos de aprofundamento — base neurobiológica,
+   exemplo, analogia, implicação prática, figura científica) nasce inteiro da IA em "Criar roteiro", a
+   partir do Briefing, dos PDFs anexados e da busca em periódicos de alto impacto. Antes de exportar,
+   a profissional revisa tudo aqui: pode editar "na tela" e a fala/notas de cada slide, confirmar ou
+   trocar o modelo visual, e — quando a IA sinalizar uma figura científica pertinente — inserir a imagem
+   real dessa figura (a IA nunca baixa nem inventa a imagem, só indica qual figura buscar). */
+function palestraPendenciasHtml(p){
+  const pendencias = Array.isArray(p.pendencias) ? p.pendencias.filter(Boolean) : [];
+  if(!pendencias.length) return '';
+  return `
+    <div class="rv-pendencias">
+      <h3>${icon('alert')} Pontos para verificar antes de usar esta palestra</h3>
+      <ul>${pendencias.map(t=>`<li>${escapeHtml(t)}</li>`).join('')}</ul>
+    </div>
+  `;
+}
+function palestraRevisaoExtrasHtml(slide){
+  // Sempre mostra os 4 campos de aprofundamento, mesmo vazios — eles podem ser preenchidos na revisão.
+  const campos = [
+    ['baseNeurobiologica','Base neurobiológica'], ['exemplo','Exemplo'], ['analogia','Analogia'], ['implicacaoPratica','Implicação prática'],
+  ];
+  return `
+    <button type="button" class="rv-extra-toggle" data-rv-extra-toggle="${slide.id}">${icon('down','tiny')} Ver/editar desenvolvimento completo (base neurobiológica, exemplo, analogia, implicação prática)</button>
+    <div class="rv-extra" data-rv-extra="${slide.id}" style="display:none">
+      ${campos.map(([campo,label])=>`
+        <div class="palestra-slide-field">
+          <label>${label}</label>
+          <textarea class="ps-input" rows="2" data-rv-campo="${campo}" data-rv-slide="${slide.id}" placeholder="(vazio — a IA não encontrou nada pertinente aqui)">${escapeHtml(slide[campo]||'')}</textarea>
+        </div>
+      `).join('')}
+      ${slide.referenciasSlide? `<p class="field-hint">Referências deste slide: ${escapeHtml(slide.referenciasSlide)}</p>` : ''}
+    </div>
+  `;
+}
+function palestraRevisaoFiguraHtml(slide){
+  const f = slide.figura;
+  if(!f || !f.temFigura) return '';
+  return `
+    <div class="rv-figura" data-rv-figura="${slide.id}">
+      <div class="rv-figura-h">${icon('alert','tiny')} Figura científica pendente de verificação</div>
+      ${f.estudoRef? `<p><strong>Estudo:</strong> ${escapeHtml(f.estudoRef)}</p>` : ''}
+      ${f.descricao? `<p><strong>O que ela deve mostrar:</strong> ${escapeHtml(f.descricao)}</p>` : ''}
+      ${f.comoLer? `<p><strong>Como ler:</strong> ${escapeHtml(f.comoLer)}</p>` : ''}
+      <p style="font-style:italic">A IA não tem acesso à imagem real desta figura — confirme no estudo original e insira a imagem aqui antes de apresentar.</p>
+      ${f.imagemUrl? `<img class="rv-figura-thumb" src="${escapeAttr(f.imagemUrl)}" alt="">` : ''}
+      <div class="rv-figura-actions">
+        <input type="file" accept="image/*" data-rv-figura-file="${slide.id}" style="display:none">
+        <button type="button" class="btn-outline btn-mini" data-rv-figura-btn="${slide.id}">${icon('upload','tiny')} ${f.imagemUrl? 'Trocar imagem' : 'Inserir imagem da figura'}</button>
+        ${f.imagemUrl? `<button type="button" class="btn-mini danger" data-rv-figura-del="${slide.id}">${icon('trash','tiny')} Remover</button>` : ''}
+      </div>
+    </div>
+  `;
+}
+function palestraRevisaoSlideHtml(secao, slide){
+  const metaBits = [];
+  if(slide.tempo) metaBits.push(escapeHtml(slide.tempo));
+  if(slide.evidencia) metaBits.push(escapeHtml(evidenciaLabel(slide.evidencia)));
+  return `
+    <div class="palestra-slide" data-slide-id="${slide.id}">
+      <div class="palestra-slide-h">
+        <span class="cm-count">${escapeHtml(slide.titulo||'Slide')}</span>
+        ${metaBits.length? `<span class="section-sub" style="margin:0">${metaBits.join(' · ')}</span>` : ''}
+      </div>
+      ${slide.mensagemCentral? `<div class="rv-slide-mensagem">${escapeHtml(slide.mensagemCentral)}</div>` : ''}
+      ${palestraRevisaoFiguraHtml(slide)}
+      <div class="palestra-slide-field">
+        <label>Na tela (o que aparece no slide)</label>
+        <textarea class="ps-input" rows="2" data-rv-campo="naTela" data-rv-slide="${slide.id}">${escapeHtml(slide.naTela)}</textarea>
+      </div>
+      <div class="palestra-slide-field">
+        <label>Fala / notas do apresentador</label>
+        <textarea class="ps-input palestra-fala-input" rows="4" data-rv-campo="fala" data-rv-slide="${slide.id}">${escapeHtml(slide.fala)}</textarea>
+      </div>
+      ${palestraRevisaoExtrasHtml(slide)}
+    </div>
+  `;
+}
+function palestraRevisaoSecaoHtml(secao){
+  const slides = secao.slides||[];
+  return `
+    <div class="palestra-secao">
+      <div class="palestra-secao-h"><span class="palestra-secao-nome" style="cursor:default">${escapeHtml(secao.nome)}</span></div>
+      ${secao.objetivo? `<p class="rv-secao-objetivo">${escapeHtml(secao.objetivo)}</p>` : ''}
+      <div class="palestra-slides">
+        ${slides.map(sl=>palestraRevisaoSlideHtml(secao, sl)).join('')}
+      </div>
+    </div>
+  `;
+}
 function palestraRoteiroResumoHtml(p){
   const secoes = p.conteudo||[];
   const totalSlides = secoes.reduce((n,s)=>n+(s.slides||[]).length, 0);
   return `
-    <div class="palestra-roteiro-resumo">
-      <h3>${icon('check')} Roteiro gerado</h3>
+    <div class="palestra-roteiro-resumo" style="margin-bottom:18px">
+      <h3>${icon('check')} Roteiro gerado — revise antes de exportar</h3>
       <p class="section-sub">${escapeHtml(p.titulo||'(sem título)')}${p.duracaoEstimada? ' · '+escapeHtml(p.duracaoEstimada) : ''} — ${secoes.length} seção${secoes.length===1?'':'ões'}, ${totalSlides} slide${totalSlides===1?'':'s'}.</p>
-      <ul class="palestra-roteiro-secoes">
-        ${secoes.map(s=>`<li>${escapeHtml(s.nome)} <span style="color:var(--text-mute)">(${(s.slides||[]).length} slide${(s.slides||[]).length===1?'':'s'})</span></li>`).join('')}
-      </ul>
     </div>
+    ${palestraPendenciasHtml(p)}
+    ${secoes.map(s=>palestraRevisaoSecaoHtml(s)).join('')}
   `;
+}
+function bindPalestraRevisaoEvents(p){
+  document.querySelectorAll('#view-palestras [data-rv-campo]').forEach(ta=>{
+    ta.addEventListener('change', ()=>{
+      const ctx = palestraFindSlideCtx(p, ta.dataset.rvSlide);
+      if(!ctx) return;
+      ctx.slide[ta.dataset.rvCampo] = ta.value;
+      syncPalestraUpdate(p);
+    });
+  });
+  document.querySelectorAll('#view-palestras [data-rv-extra-toggle]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const bloco = document.querySelector(`#view-palestras [data-rv-extra="${btn.dataset.rvExtraToggle}"]`);
+      if(bloco) bloco.style.display = bloco.style.display==='none' ? 'flex' : 'none';
+    });
+  });
+  document.querySelectorAll('#view-palestras [data-rv-figura-btn]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const input = document.querySelector(`#view-palestras [data-rv-figura-file="${btn.dataset.rvFiguraBtn}"]`);
+      if(input) input.click();
+    });
+  });
+  document.querySelectorAll('#view-palestras [data-rv-figura-file]').forEach(input=>{
+    input.addEventListener('change', async ()=>{
+      const file = input.files && input.files[0];
+      if(!file) return;
+      const ctx = palestraFindSlideCtx(p, input.dataset.rvFiguraFile);
+      if(!ctx) return;
+      const btn = document.querySelector(`#view-palestras [data-rv-figura-btn="${input.dataset.rvFiguraFile}"]`);
+      const original = btn ? btn.innerHTML : '';
+      if(btn){ btn.disabled = true; btn.innerHTML = 'Enviando...'; }
+      try{
+        const url = await uploadPalestraBriefingFile(file, `figura-${ctx.slide.id}`);
+        ctx.slide.figura.imagemUrl = url;
+        ctx.slide.figura.imagemNome = file.name;
+        syncPalestraUpdate(p);
+        renderPalestraEditor(p);
+      }catch(err){
+        console.error('upload figura', err);
+        alert(err.message || 'Não foi possível enviar essa imagem. Tente de novo.');
+        if(btn){ btn.disabled = false; btn.innerHTML = original; }
+      }
+    });
+  });
+  document.querySelectorAll('#view-palestras [data-rv-figura-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const ctx = palestraFindSlideCtx(p, btn.dataset.rvFiguraDel);
+      if(!ctx) return;
+      ctx.slide.figura.imagemUrl = '';
+      ctx.slide.figura.imagemNome = '';
+      syncPalestraUpdate(p);
+      renderPalestraEditor(p);
+    });
+  });
 }
 function renderPalestraEditor(p){
   const temRoteiro = !!(p.conteudo && p.conteudo.some(s=>(s.slides||[]).length));
@@ -9451,9 +9786,12 @@ function renderPalestraEditor(p){
       ${temRoteiro ? `<button type="button" class="btn-outline" id="palestra-export-btn">${icon('download')} Exportar roteiro em PDF</button>` : ''}
     </div>
     ${palestraBriefingHtml(p)}
+    ${palestraModeloPickerHtml(p)}
     <div class="palestra-gerar-actions">
       <button type="button" class="btn-accent" id="palestra-criar-roteiro" ${gerandoRoteiro?'disabled':''}>${icon('edit')} ${gerandoRoteiro? 'Criando roteiro...' : (temRoteiro? 'Criar roteiro de novo' : 'Criar roteiro')}</button>
-      <button type="button" class="btn-outline" id="palestra-criar-apresentacao" ${temRoteiro?'':'disabled'} title="${temRoteiro?'':'Crie o roteiro primeiro'}">${icon('download')} Criar apresentação</button>
+      <button type="button" class="btn-outline" id="palestra-criar-apresentacao" ${temRoteiro?'':'disabled'} title="${temRoteiro?'':'Crie o roteiro primeiro'}">${icon('download')} Criar apresentação (PDF)</button>
+      <button type="button" class="btn-outline" id="palestra-baixar-pptx" ${temRoteiro?'':'disabled'} title="${temRoteiro?'':'Crie o roteiro primeiro'}">${icon('download')} Baixar em PowerPoint (editável no Canva)</button>
+      ${temRoteiro ? `<button type="button" class="btn-outline" id="palestra-trocar-modelo">${icon('film')} Trocar modelo</button>` : ''}
     </div>
     ${temRoteiro ? palestraRoteiroResumoHtml(p) : ''}
   `;
@@ -9485,6 +9823,9 @@ function bindPalestraBriefingEvents(p){
       if(chk.checked){ if(idx<0) arr.push(chk.value); }
       else if(idx>-1){ arr.splice(idx,1); }
       syncPalestraUpdate(p);
+      // "Público" decide quais grupos de modelo de apresentação aparecem logo abaixo — precisa reabrir
+      // o formulário pra essa seção aparecer/desaparecer/atualizar na hora.
+      if(grupo==='publico') renderPalestraEditor(p);
     });
   });
 
@@ -9575,10 +9916,19 @@ function bindPalestraEditorEvents(p){
   const exportBtn = document.getElementById('palestra-export-btn');
   if(exportBtn) exportBtn.addEventListener('click', ()=>exportPalestraPDF(p));
   bindPalestraBriefingEvents(p);
+  bindPalestraModeloPickerEvents(p);
+  bindPalestraRevisaoEvents(p);
 
   document.getElementById('palestra-criar-roteiro').addEventListener('click', ()=>onCriarRoteiroClick(p));
   const apresentacaoBtn = document.getElementById('palestra-criar-apresentacao');
   if(apresentacaoBtn && !apresentacaoBtn.disabled) apresentacaoBtn.addEventListener('click', ()=>exportPalestraApresentacaoPDF(p));
+  const pptxBtn = document.getElementById('palestra-baixar-pptx');
+  if(pptxBtn && !pptxBtn.disabled) pptxBtn.addEventListener('click', ()=>exportPalestraApresentacaoPPTX(p));
+  const trocarModeloBtn = document.getElementById('palestra-trocar-modelo');
+  if(trocarModeloBtn) trocarModeloBtn.addEventListener('click', ()=>{
+    const alvo = document.querySelector('#view-palestras .pm-grupo, #view-palestras .palestra-briefing');
+    if(alvo) alvo.scrollIntoView({behavior:'smooth', block:'start'});
+  });
 }
 
 /* "Criar roteiro": a IA monta as seções e slides inteiros de uma vez (título, tempo, selo de
@@ -9598,9 +9948,14 @@ async function onCriarRoteiroClick(p){
     p.conteudo = (resultado.secoes||[]).map(s=>({
       id: novoPalestraId('ps'),
       nome: s.nome,
+      objetivo: s.objetivo||'',
       slides: (s.slides||[]).map(sl=>({
         id: novoPalestraId('sl'), titulo: sl.titulo, tempo: sl.tempo, evidencia: sl.evidencia,
         naTela: sl.naTela, notas:'', fala: sl.fala, materialNome:'', materialTexto:'',
+        baseNeurobiologica: sl.baseNeurobiologica||'', exemplo: sl.exemplo||'', analogia: sl.analogia||'',
+        implicacaoPratica: sl.implicacaoPratica||'', mensagemCentral: sl.mensagemCentral||'',
+        figura: sl.figura && sl.figura.temFigura ? { temFigura:true, estudoRef:sl.figura.estudoRef||'', descricao:sl.figura.descricao||'', comoLer:sl.figura.comoLer||'', pendenciaVerificacao:true, imagemUrl:'', imagemNome:'' } : { temFigura:false },
+        referenciasSlide: sl.referenciasSlide||'',
       })),
     }));
     if(resultado.titulo) p.titulo = resultado.titulo;
@@ -9608,7 +9963,11 @@ async function onCriarRoteiroClick(p){
     if(resultado.evento) p.evento = resultado.evento;
     if(resultado.duracaoEstimada) p.duracaoEstimada = resultado.duracaoEstimada;
     if(resultado.referencias) p.referencias = resultado.referencias;
+    p.pendencias = Array.isArray(resultado.pendencias) ? resultado.pendencias : [];
+    p.publicoChave = resultado.publicoChave || '';
     syncPalestraUpdate(p);
+    // Revisão vem antes da exportação: o roteiro abre direto na tela de revisão (texto, fala e figuras
+    // pendentes editáveis) em vez de já baixar o PDF — a exportação fica a um clique, nos botões abaixo.
   }catch(e){
     console.error('criar roteiro', e);
     alert(e.message || 'Não foi possível gerar o roteiro agora. Tente de novo em instantes.');
@@ -9686,12 +10045,21 @@ function exportPalestraApresentacaoPDF(p){
       <section class="apr-slide apr-divisor">
         <h1>${escapeHtml(secao.nome||'')}</h1>
       </section>`;
-    const slidesHtml = (secao.slides||[]).map(sl=>`
-      <section class="apr-slide apr-conteudo">
+    const slidesHtml = (secao.slides||[]).map(sl=>{
+      const temFig = sl.figura && sl.figura.temFigura;
+      const figHtml = !temFig ? '' : sl.figura.imagemUrl
+        ? `<figure class="apr-figura"><img src="${escapeAttr(sl.figura.imagemUrl)}" alt="">${sl.figura.estudoRef? `<figcaption>${escapeHtml(sl.figura.estudoRef)}</figcaption>` : ''}</figure>`
+        : `<div class="apr-figura-pendente">Figura científica pendente de inserção${sl.figura.estudoRef? ' — '+escapeHtml(sl.figura.estudoRef) : ''}</div>`;
+      return `
+      <section class="apr-slide apr-conteudo ${temFig?'apr-com-figura':''}">
         <div class="apr-topo"><span class="apr-secao-tag">${escapeHtml(secao.nome)}</span></div>
         <h1>${escapeHtml(sl.titulo||'')}</h1>
-        <div class="apr-corpo">${palestraNaTelaItensHtml(sl.naTela)}</div>
-      </section>`).join('');
+        <div class="apr-conteudo-flex">
+          <div class="apr-corpo">${palestraNaTelaItensHtml(sl.naTela)}</div>
+          ${figHtml}
+        </div>
+      </section>`;
+    }).join('');
     return divisorHtml + slidesHtml;
   }).join('');
 
@@ -9724,6 +10092,12 @@ function exportPalestraApresentacaoPDF(p){
       .apr-corpo ul{ margin:0; padding-left:22px; }
       .apr-corpo li{ margin-bottom:10px; }
       .apr-vazio{ color:#999; font-style:italic; }
+      .apr-conteudo-flex{ display:flex; gap:36px; align-items:flex-start; }
+      .apr-com-figura .apr-corpo{ max-width:520px; flex:1; }
+      .apr-figura{ flex:0 0 340px; margin:0; }
+      .apr-figura img{ max-width:100%; border-radius:6px; display:block; }
+      .apr-figura figcaption{ font-size:11px; color:${cores.secundaria}; font-style:italic; margin-top:6px; }
+      .apr-figura-pendente{ flex:0 0 300px; border:1.5px dashed ${cores.secundaria}; border-radius:6px; padding:14px; font-size:12px; color:${cores.secundaria}; font-style:italic; }
 
       .apr-capa{ align-items:center; text-align:center; }
       .apr-capa-logos{ position:absolute; top:40px; left:56px; right:56px; display:flex; align-items:center; justify-content:space-between; }
@@ -9749,6 +10123,134 @@ function exportPalestraApresentacaoPDF(p){
   win.document.close();
   win.onload = ()=>{ win.focus(); win.print(); };
   setTimeout(()=>{ try{ win.focus(); win.print(); }catch(e){} }, 600);
+}
+
+function hexPptx(h){ return String(h||'').replace('#','').toUpperCase(); }
+
+/* Monta o texto completo de apoio ao apresentador pra um slide — fala + os campos de aprofundamento
+   (base neurobiológica, exemplo, analogia, implicação prática) — pra ir nas notas do apresentador
+   (PPTX) ou no bloco de fala do roteiro em PDF. Nada aqui aparece no slide em si: o slide mostra só o
+   "na tela" (ver palestraNaTelaItensHtml/Array) e, quando houver, a referência da figura científica. */
+function palestraNotasCompletas(sl){
+  const blocos = [];
+  if(sl.fala) blocos.push(sl.fala);
+  if(sl.baseNeurobiologica) blocos.push(`Base neurobiológica: ${sl.baseNeurobiologica}`);
+  if(sl.exemplo) blocos.push(`Exemplo: ${sl.exemplo}`);
+  if(sl.analogia) blocos.push(`Analogia: ${sl.analogia}`);
+  if(sl.implicacaoPratica) blocos.push(`Implicação prática: ${sl.implicacaoPratica}`);
+  if(sl.figura && sl.figura.temFigura){
+    const f = sl.figura;
+    blocos.push(`Figura científica (${f.imagemUrl? 'já inserida' : 'PENDENTE DE INSERIR'}): ${[f.estudoRef, f.descricao, f.comoLer].filter(Boolean).join(' — ')}`);
+  }
+  if(sl.referenciasSlide) blocos.push(`Referências: ${sl.referenciasSlide}`);
+  return blocos.join('\n\n');
+}
+
+// Mesma lógica de palestraNaTelaItensHtml, mas devolvendo um array de strings (sem HTML) — usado pra
+// montar os bullets de texto editável no PowerPoint.
+function palestraNaTelaItensArray(naTela){
+  const texto = String(naTela||'').trim();
+  if(!texto) return [];
+  const partes = texto.includes('·') ? texto.split('·') : texto.split(/\n+/);
+  return partes.map(t=>t.trim()).filter(Boolean);
+}
+
+/* "Baixar em PowerPoint": gera um .pptx de verdade (texto em caixas editáveis, não uma imagem de slide)
+   com a mesma estrutura da apresentação em PDF — capa, divisor por seção, slides de conteúdo e
+   encerramento — pra o aluno importar no Canva (Criar um design > Importar arquivo) ou abrir direto no
+   PowerPoint e editar livremente sem perder nada do que a IA já montou. A fala de cada slide vai junto
+   como anotações do apresentador (addNotes), mesmo não aparecendo no slide em si. */
+async function exportPalestraApresentacaoPPTX(p){
+  const secoes = (p.conteudo||[]).filter(s=>(s.slides||[]).length);
+  if(!secoes.length){ alert('Crie o roteiro primeiro — a apresentação é montada a partir dos slides do roteiro.'); return; }
+  if(typeof PptxGenJS === 'undefined'){ alert('A biblioteca de PowerPoint ainda está carregando. Aguarde alguns segundos e tente de novo.'); return; }
+
+  const b = mergePalestraBriefing(p.briefing);
+  const cores = palestraCoresDaPaleta(b.paletaCores);
+  const corPrimaria = hexPptx(cores.primaria);
+  const corSecundaria = hexPptx(cores.secundaria);
+  const corFundo = 'F8F6F2';
+  const imgOpts = (url)=> url && url.indexOf('data:')===0 ? { data:url } : { path:url };
+
+  const pptx = new PptxGenJS();
+  pptx.layout = 'LAYOUT_WIDE'; // 13.333" x 7.5" — widescreen 16:9, mesmo padrão do PowerPoint e do Canva
+  pptx.title = p.titulo || 'Apresentação';
+  const W = 13.333, H = 7.5;
+
+  // Capa: logo do evento (esquerda) + sua logo (direita), cada uma só se tiver sido enviada no Briefing —
+  // igual à versão em PDF, sem inventar nenhuma imagem.
+  {
+    const slide = pptx.addSlide();
+    slide.background = { color: corFundo };
+    if(b.logoEventoUrl) slide.addImage({ ...imgOpts(b.logoEventoUrl), x:0.6, y:0.5, w:1.6, h:0.7, sizing:{ type:'contain', w:1.6, h:0.7 } });
+    if(b.logoUrl) slide.addImage({ ...imgOpts(b.logoUrl), x:W-2.2, y:0.5, w:1.6, h:0.7, sizing:{ type:'contain', w:1.6, h:0.7 } });
+    const capaEvento = p.evento || b.contexto;
+    let y = H/2 - 1.6;
+    if(capaEvento){
+      slide.addText(capaEvento, { x:1, y, w:W-2, h:0.4, align:'center', fontFace:'Montserrat', fontSize:13, bold:true, color:corSecundaria, charSpacing:2 });
+      y += 0.65;
+    }
+    slide.addText(p.titulo||'', { x:1, y, w:W-2, h:1.3, align:'center', fontFace:'Montserrat', fontSize:36, bold:true, color:corPrimaria });
+    y += 1.5;
+    if(p.subtitulo){
+      slide.addText(p.subtitulo, { x:1, y, w:W-2, h:0.5, align:'center', fontFace:'Montserrat', fontSize:15, bold:true, color:corSecundaria, charSpacing:3 });
+      y += 0.7;
+    }
+    if(b.titulacaoNome){
+      slide.addText(b.titulacaoNome, { x:1, y, w:W-2, h:0.4, align:'center', fontFace:'Montserrat', fontSize:12, color:corSecundaria, charSpacing:1.5 });
+    }
+  }
+
+  // Um slide divisor (só o título da seção) seguido pelos slides de conteúdo dessa seção.
+  secoes.forEach(secao=>{
+    const divisor = pptx.addSlide();
+    divisor.background = { color: corFundo };
+    divisor.addText(secao.nome||'', { x:1, y:H/2-0.6, w:W-2, h:1.2, fontFace:'Montserrat', fontSize:30, bold:true, color:corPrimaria });
+
+    (secao.slides||[]).forEach(sl=>{
+      const slide = pptx.addSlide();
+      slide.background = { color: corFundo };
+      slide.addText(String(secao.nome||'').toUpperCase(), { x:0.8, y:0.4, w:W-1.6, h:0.3, align:'right', fontFace:'Montserrat', fontSize:10, color:corSecundaria, charSpacing:1.5 });
+      slide.addText(sl.titulo||'', { x:0.8, y:0.9, w:W-1.6, h:0.8, fontFace:'Montserrat', fontSize:24, bold:true, color:corPrimaria });
+      const temFigImg = sl.figura && sl.figura.temFigura && sl.figura.imagemUrl;
+      const corpoW = temFigImg ? (W-1.8)*0.56 : W-1.8;
+      const itens = palestraNaTelaItensArray(sl.naTela);
+      if(itens.length>1){
+        slide.addText(itens.map(t=>({ text:t, options:{ bullet:true, breakLine:true } })), { x:0.8, y:1.9, w:corpoW, h:H-2.6, fontFace:'Montserrat', fontSize:16, color:'2A2A2A', valign:'top', paraSpaceAfter:10 });
+      } else if(itens.length===1){
+        slide.addText(itens[0], { x:0.8, y:1.9, w:corpoW, h:H-2.6, fontFace:'Montserrat', fontSize:16, color:'2A2A2A', valign:'top' });
+      }
+      if(temFigImg){
+        // Figura científica já confirmada e inserida na revisão — entra no próprio slide, ao lado do texto.
+        slide.addImage({ ...imgOpts(sl.figura.imagemUrl), x:0.8+corpoW+0.3, y:1.9, w:(W-1.8)*0.4, h:H-3.3, sizing:{ type:'contain', w:(W-1.8)*0.4, h:H-3.3 } });
+        if(sl.figura.estudoRef) slide.addText(sl.figura.estudoRef, { x:0.8+corpoW+0.3, y:H-1.3, w:(W-1.8)*0.4, h:0.5, fontFace:'Montserrat', fontSize:9, italic:true, color:corSecundaria, valign:'top' });
+      } else if(sl.figura && sl.figura.temFigura){
+        // Figura indicada pela IA mas ainda não inserida na revisão — avisa discretamente no slide, sem inventar a imagem.
+        slide.addText('⚠ Figura científica pendente de inserção — ver notas do apresentador', { x:0.8, y:H-0.7, w:W-1.6, h:0.4, fontFace:'Montserrat', fontSize:10, italic:true, color:corSecundaria });
+      }
+      const notas = palestraNotasCompletas(sl);
+      if(notas) slide.addNotes(notas);
+    });
+  });
+
+  // Encerramento
+  {
+    const slide = pptx.addSlide();
+    slide.background = { color: corFundo };
+    slide.addText('Obrigada', { x:1, y:H/2-1.3, w:W-2, h:1, align:'center', fontFace:'Montserrat', fontSize:40, bold:true, color:corPrimaria });
+    const contato = [b.contatoEmail, b.contatoInstagram].filter(Boolean);
+    if(contato.length){
+      slide.addText(contato.join('\n'), { x:1, y:H/2-0.1, w:W-2, h:1, align:'center', fontFace:'Montserrat', fontSize:14, color:corSecundaria, charSpacing:1, lineSpacingMultiple:1.4 });
+    }
+  }
+
+  const nomeArquivo = (p.titulo||'apresentacao').replace(/[\\/:*?"<>|]+/g,' ').trim().slice(0,80) || 'apresentacao';
+  try{
+    await pptx.writeFile({ fileName: `${nomeArquivo}.pptx` });
+  }catch(e){
+    console.error('exportar pptx', e);
+    alert('Não foi possível gerar o arquivo PowerPoint agora. Tente de novo em instantes.');
+  }
 }
 
 async function onGerarFalaClick_DEPRECATED(p, slideId){
@@ -9793,16 +10295,36 @@ function exportPalestraPDF(p){
       const metaBits = [];
       if(sl.tempo) metaBits.push(`Tempo: ${escapeHtml(sl.tempo)}`);
       if(sl.evidencia) metaBits.push(`Evidência: ${escapeHtml(evidenciaLabel(sl.evidencia))}`);
+      const extrasBits = [
+        sl.baseNeurobiologica? `<p class="pdf-extra"><strong>Base neurobiológica:</strong> ${escapeHtml(sl.baseNeurobiologica)}</p>` : '',
+        sl.exemplo? `<p class="pdf-extra"><strong>Exemplo:</strong> ${escapeHtml(sl.exemplo)}</p>` : '',
+        sl.analogia? `<p class="pdf-extra"><strong>Analogia:</strong> ${escapeHtml(sl.analogia)}</p>` : '',
+        sl.implicacaoPratica? `<p class="pdf-extra"><strong>Implicação prática:</strong> ${escapeHtml(sl.implicacaoPratica)}</p>` : '',
+      ].join('');
+      const figHtml = sl.figura && sl.figura.temFigura ? `
+        <div class="pdf-figura">
+          <strong>Figura científica ${sl.figura.imagemUrl? '(inserida)' : '— PENDENTE DE VERIFICAÇÃO E INSERÇÃO'}</strong>
+          ${sl.figura.estudoRef? `<p>Estudo: ${escapeHtml(sl.figura.estudoRef)}</p>` : ''}
+          ${sl.figura.descricao? `<p>${escapeHtml(sl.figura.descricao)}</p>` : ''}
+          ${sl.figura.comoLer? `<p>Como ler: ${escapeHtml(sl.figura.comoLer)}</p>` : ''}
+          ${sl.figura.imagemUrl? `<img src="${escapeAttr(sl.figura.imagemUrl)}" alt="">` : ''}
+        </div>` : '';
       return `
         <div class="pdf-slide">
           <h3>${escapeHtml(sl.titulo||'(sem título)')}</h3>
           ${metaBits.length? `<p class="pdf-meta">${metaBits.join(' · ')}</p>` : ''}
+          ${sl.mensagemCentral? `<p class="pdf-mensagem">${escapeHtml(sl.mensagemCentral)}</p>` : ''}
           ${sl.naTela? `<div class="pdf-natela"><strong>Na tela:</strong> ${escapeHtml(sl.naTela).replace(/\n/g,'<br>')}</div>` : ''}
+          ${figHtml}
           ${sl.fala? `<div class="pdf-fala"><strong>FALA</strong>${palestraFalaParagrafosHtml(sl.fala)}</div>` : '<p class="pdf-empty">Fala ainda não escrita.</p>'}
+          ${extrasBits}
+          ${sl.referenciasSlide? `<p class="pdf-extra"><strong>Referências deste slide:</strong> ${escapeHtml(sl.referenciasSlide)}</p>` : ''}
         </div>`;
     }).join('');
-    return `<div class="pdf-secao"><h2>${escapeHtml(secao.nome)}</h2>${slidesHtml}</div>`;
+    return `<div class="pdf-secao"><h2>${escapeHtml(secao.nome)}</h2>${secao.objetivo? `<p class="pdf-objetivo">${escapeHtml(secao.objetivo)}</p>` : ''}${slidesHtml}</div>`;
   }).join('');
+  const pendenciasHtml = (Array.isArray(p.pendencias) && p.pendencias.length) ? `
+    <div class="pdf-secao pdf-pendencias"><h2>Pontos para verificar</h2><ul>${p.pendencias.map(t=>`<li>${escapeHtml(t)}</li>`).join('')}</ul></div>` : '';
   win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(p.titulo)} — Neurociência do Comportamento da Criança</title>
     <style>
       @page{ margin:24mm 16mm; }
@@ -9821,12 +10343,21 @@ function exportPalestraPDF(p){
       .pdf-fala p{ margin:0 0 8px; }
       .pdf-empty{ font-size:12px; color:#999; font-style:italic; }
       .pdf-refs{ font-size:12px; white-space:pre-wrap; margin-top:8px; }
+      .pdf-objetivo{ font-size:12px; color:#666; font-style:italic; margin:-4px 0 10px; }
+      .pdf-mensagem{ font-size:12.5px; font-weight:700; color:#4f6a5a; margin:0 0 8px; }
+      .pdf-extra{ font-size:12px; color:#444; margin:0 0 6px; line-height:1.5; }
+      .pdf-extra strong{ color:#8f6231; }
+      .pdf-figura{ font-size:12px; color:#444; background:#fdf6ee; border:1px solid #d9b98a; border-radius:4px; padding:8px 10px; margin-bottom:8px; }
+      .pdf-figura strong{ display:block; color:#8f6231; margin-bottom:4px; }
+      .pdf-figura img{ max-width:260px; display:block; margin-top:6px; border-radius:4px; }
+      .pdf-pendencias ul{ font-size:12.5px; color:#444; line-height:1.7; padding-left:18px; }
     </style>
     </head><body>
       <div class="pdf-header">
         <img src="${BRAND_LOGO_DATA_URI}" alt="NCC Plat · Neurociência do Comportamento da Criança" style="height:34px;width:auto;">
         <div><div class="cat">${p.evento? escapeHtml(p.evento) : 'Roteiro de palestra'}${p.duracaoEstimada? ' · '+escapeHtml(p.duracaoEstimada) : ''}</div><h1>${escapeHtml(p.titulo)}</h1>${p.subtitulo? `<div class="cat">${escapeHtml(p.subtitulo)}</div>` : ''}</div>
       </div>
+      ${pendenciasHtml}
       ${secoesHtml}
       ${p.referencias? `<div class="pdf-secao"><h2>Referências</h2><div class="pdf-refs">${escapeHtml(p.referencias)}</div></div>` : ''}
     </body></html>`);
@@ -14615,6 +15146,120 @@ function bindCursoAulaAdmin(){
     });
   });
 }
+
+/* ---- Cadastro de Modelos de Apresentação (equipe interna, dentro de Conteúdo) ---- */
+function bindConteudoPalestraModelosEvents(){
+  document.querySelectorAll('#view-conteudo [data-pm-preview]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const m = PALESTRA_MODELOS.find(x=>x.id===el.dataset.pmPreview);
+      if(m) openPalestraModeloPreviewModal(m);
+    });
+  });
+  document.querySelectorAll('#view-conteudo [data-pm-nome]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const m = PALESTRA_MODELOS.find(x=>x.id===inp.dataset.pmNome);
+      if(!m) return;
+      m.nome = inp.value.trim();
+      syncPalestraModeloUpdate(m.id, {nome:m.nome});
+    });
+  });
+  document.querySelectorAll('#view-conteudo [data-pm-ordem]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const m = PALESTRA_MODELOS.find(x=>x.id===inp.dataset.pmOrdem);
+      if(!m) return;
+      m.ordem = parseInt(inp.value,10) || 0;
+      syncPalestraModeloUpdate(m.id, {ordem:m.ordem});
+      renderConteudo();
+    });
+  });
+  document.querySelectorAll('#view-conteudo [data-pm-capa-btn]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const input = document.querySelector(`#view-conteudo [data-pm-capa-file="${btn.dataset.pmCapaBtn}"]`);
+      if(input) input.click();
+    });
+  });
+  document.querySelectorAll('#view-conteudo [data-pm-capa-file]').forEach(input=>{
+    input.addEventListener('change', async ()=>{
+      const file = input.files && input.files[0];
+      if(!file) return;
+      const m = PALESTRA_MODELOS.find(x=>x.id===input.dataset.pmCapaFile);
+      if(!m) return;
+      try{
+        const url = await uploadPalestraModeloFile(file, 'capa-'+m.id);
+        m.capaUrl = url; m.capaNome = file.name;
+        syncPalestraModeloUpdate(m.id, {capaUrl:url, capaNome:file.name});
+        renderConteudo();
+      }catch(e){ console.error('capa modelo', e); alert('Não foi possível enviar essa imagem. Tente de novo.'); }
+    });
+  });
+  document.querySelectorAll('#view-conteudo [data-pm-layout-btn]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const input = document.querySelector(`#view-conteudo [data-pm-layout-file="${btn.dataset.pmLayoutBtn}"]`);
+      if(input) input.click();
+    });
+  });
+  document.querySelectorAll('#view-conteudo [data-pm-layout-file]').forEach(input=>{
+    input.addEventListener('change', async ()=>{
+      const files = Array.from(input.files||[]);
+      if(!files.length) return;
+      const m = PALESTRA_MODELOS.find(x=>x.id===input.dataset.pmLayoutFile);
+      if(!m) return;
+      if(!Array.isArray(m.layouts)) m.layouts = [];
+      const falhas = [];
+      for(const file of files){
+        try{
+          const url = await uploadPalestraModeloFile(file, 'layout-'+m.id);
+          m.layouts.push({url, nome:file.name});
+        }catch(e){ console.error('layout modelo', file.name, e); falhas.push(file.name); }
+      }
+      input.value = '';
+      syncPalestraModeloUpdate(m.id, {layouts:m.layouts});
+      renderConteudo();
+      if(falhas.length) alert('Não foi possível enviar: ' + falhas.join(', '));
+    });
+  });
+  document.querySelectorAll('#view-conteudo [data-pm-layout-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const [id, idxStr] = btn.dataset.pmLayoutDel.split(':');
+      const m = PALESTRA_MODELOS.find(x=>x.id===id);
+      if(!m) return;
+      const idx = parseInt(idxStr,10);
+      if(Array.isArray(m.layouts) && idx>-1) m.layouts.splice(idx,1);
+      syncPalestraModeloUpdate(m.id, {layouts:m.layouts});
+      renderConteudo();
+    });
+  });
+  document.querySelectorAll('#view-conteudo [data-pm-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(!confirmDelete('Remover este modelo de apresentação? Essa ação não pode ser desfeita — alunos que já escolheram esse modelo precisam escolher outro.')) return;
+      const idx = PALESTRA_MODELOS.findIndex(m=>m.id===btn.dataset.pmDel);
+      if(idx>-1){ syncPalestraModeloDelete(PALESTRA_MODELOS[idx].id); PALESTRA_MODELOS.splice(idx,1); }
+      renderConteudo();
+    });
+  });
+  document.querySelectorAll('#view-conteudo [data-pm-add]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const card = btn.closest('.pm-admin-card-new');
+      const grupo = card.dataset.pmAddGrupo;
+      const nomeInp = card.querySelector('[data-pm-new-nome]');
+      const capaInp = card.querySelector('[data-pm-new-capa]');
+      const nome = nomeInp.value.trim();
+      const file = capaInp.files && capaInp.files[0];
+      if(!nome){ alert('Dê um nome para o modelo.'); return; }
+      if(!file){ alert('Envie a imagem da capa deste modelo.'); return; }
+      const jaTem = PALESTRA_MODELOS.filter(m=>m.grupo===grupo).length;
+      if(jaTem>=5){ alert('Esse grupo já tem 5 modelos — remova um antes de adicionar outro.'); return; }
+      btn.disabled = true;
+      try{
+        const capaUrl = await uploadPalestraModeloFile(file, 'capa-novo');
+        const row = await syncPalestraModeloInsert({ grupo, nome, ordem: jaTem, capaUrl, capaNome:file.name, layouts:[] });
+        PALESTRA_MODELOS.push({ id:row.id, grupo:row.grupo, nome:row.nome||'', ordem:row.ordem||0, capaUrl:row.capa_url||'', capaNome:row.capa_nome||'', layouts:[], ativo:true });
+        renderConteudo();
+      }catch(e){ console.error('novo modelo', e); alert('Não foi possível cadastrar esse modelo agora. Tente de novo.'); btn.disabled = false; }
+    });
+  });
+}
+
 function renderConteudo(){
   document.getElementById('view-conteudo').innerHTML = `
     <div class="staff-banner">${icon('lock')} Acesso restrito — visível apenas para a equipe interna. O que for publicado aqui aparece na hora em Aulas e Materiais, para todos os alunos.</div>
@@ -14719,6 +15364,44 @@ function renderConteudo(){
       <div class="actions"><button class="btn-accent" id="add-material-btn">${icon('upload')} Publicar material</button></div>
     </div>
 
+    <h2 class="section-title">${icon('film')} Modelos de Apresentação (Estúdio de Palestras)</h2>
+    <p class="section-sub" style="margin-top:-6px">Até 5 identidades visuais por grupo de público — o aluno escolhe uma delas no Briefing da palestra, de acordo com o público marcado. Envie a capa (obrigatória) e, se quiser, imagens dos layouts internos como referência visual; nome e ordem de exibição dá pra editar a qualquer momento.</p>
+    ${PALESTRA_MODELO_GRUPOS.map(grupo=>{
+      const modelos = PALESTRA_MODELOS.filter(m=>m.grupo===grupo).sort((a,b)=>a.ordem-b.ordem);
+      return `
+        <div class="pm-grupo-admin">
+          <div class="pm-grupo-admin-h"><h3>${escapeHtml(grupo)}</h3><span class="section-sub">${modelos.length}/5 modelos</span></div>
+          <div class="pm-grupo-admin-grid">
+            ${modelos.map(m=>`
+              <div class="pm-admin-card">
+                <div class="pm-admin-thumb" data-pm-preview="${m.id}">${m.capaUrl? `<img src="${escapeAttr(m.capaUrl)}" alt="">` : `<div class="pm-admin-thumb-empty">${icon('film','tiny')}</div>`}</div>
+                <input class="ps-input" type="text" data-pm-nome="${m.id}" value="${escapeAttr(m.nome)}" placeholder="Nome do modelo">
+                <div class="pm-admin-row">
+                  <input class="ps-input" type="number" data-pm-ordem="${m.id}" value="${m.ordem}" style="width:64px" title="Ordem de exibição">
+                  <button type="button" class="btn-mini" data-pm-capa-btn="${m.id}">${icon('upload','tiny')} Trocar capa</button>
+                  <input type="file" accept="image/*" data-pm-capa-file="${m.id}" style="display:none">
+                  <button type="button" class="btn-mini danger" data-pm-del="${m.id}" title="Remover modelo">${icon('trash','tiny')}</button>
+                </div>
+                <div class="pm-admin-layouts">
+                  ${(m.layouts||[]).map((l,li)=>`<span class="pm-admin-layout-chip">${icon('film','tiny')} ${escapeHtml(l.nome||('layout '+(li+1)))}<button type="button" class="btn-mini danger" data-pm-layout-del="${m.id}:${li}" title="Remover">${icon('x','tiny')}</button></span>`).join('')}
+                  <button type="button" class="btn-mini" data-pm-layout-btn="${m.id}">${icon('plus','tiny')} Layout interno</button>
+                  <input type="file" accept="image/*" multiple data-pm-layout-file="${m.id}" style="display:none">
+                </div>
+              </div>
+            `).join('')}
+            ${modelos.length<5 ? `
+              <div class="pm-admin-card pm-admin-card-new" data-pm-add-grupo="${escapeAttr(grupo)}">
+                <div class="pm-admin-thumb pm-admin-thumb-empty">${icon('plus')}</div>
+                <input class="ps-input" type="text" data-pm-new-nome placeholder="Nome do novo modelo">
+                <input type="file" accept="image/*" data-pm-new-capa style="margin-top:6px">
+                <button type="button" class="btn-accent btn-mini" data-pm-add style="margin-top:8px">${icon('upload','tiny')} Adicionar modelo</button>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('')}
+
     <h2 class="section-title">${icon('calendar')} Eventos / Aulas ao Vivo</h2>
     <p class="section-sub" style="margin-top:-6px">Agende aqui qualquer encontro ao vivo — coletivo (Mastermind, Plantão de Dúvidas, Consultório Simulado, visível na Agenda ao Vivo de todos) ou 1:1 com um mentorado específico (visível só pra ele). 1h depois do horário marcado, o encontro sai de "Próximos encontros" automaticamente: os coletivos vão para as gravações da Agenda ao Vivo, separadas por tipo; os 1:1 vão para Minhas Sessões 1:1 do mentorado. Reuniões 1:1 também podem ser agendadas direto do Acompanhamento Interno do aluno, na aba "Registro de Contatos Futuros".</p>
     <div class="table-wrap">
@@ -14777,6 +15460,7 @@ function renderConteudo(){
   bindConteudoCourseEvents();
   bindCursoModuloAdmin();
   bindCursoAulaAdmin();
+  bindConteudoPalestraModelosEvents();
   document.getElementById('comunicado-save-btn').addEventListener('click', async ()=>{
     const texto = document.getElementById('comunicado-texto').value.trim();
     const ativo = document.getElementById('comunicado-ativo').checked;

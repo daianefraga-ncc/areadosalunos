@@ -306,6 +306,27 @@
   .sidebar-backdrop.open{display:block;}
   .dot-alert{position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--danger);}
   .notif-badge{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;padding:0 4px;border-radius:20px;background:var(--danger);color:#fff;font-size:10px;font-weight:800;align-items:center;justify-content:center;border:2px solid var(--bg-elev);}
+  .notif-switch{position:relative;}
+  .notif-dropdown{
+    position:absolute;right:0;top:44px;width:320px;max-width:calc(100vw - 24px);
+    background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius-sm);
+    box-shadow:var(--shadow-drop);padding:8px;display:none;z-index:30;
+    max-height:min(70vh,480px);overflow-y:auto;overscroll-behavior:contain;
+  }
+  .notif-dropdown.open{display:block;}
+  .notif-dropdown-head{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 8px;}
+  .notif-dropdown-head .label{font-size:11px;color:var(--text-mute);text-transform:uppercase;letter-spacing:0.5px;}
+  .notif-dropdown-head button{font-size:11.5px;color:var(--accent);font-weight:700;}
+  .notif-item{display:flex;gap:10px;align-items:flex-start;padding:9px 8px;border-radius:8px;width:100%;text-align:left;}
+  .notif-item:hover{background:var(--bg-card);}
+  .notif-item.unread{background:color-mix(in srgb, var(--accent) 7%, transparent);}
+  .notif-item-icon{width:30px;height:30px;border-radius:50%;background:var(--bg-card);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);}
+  .notif-item-body{min-width:0;flex:1;}
+  .notif-item-title{font-size:13px;font-weight:700;color:var(--text);margin:0 0 2px;}
+  .notif-item-msg{font-size:12.5px;color:var(--text-dim);margin:0;line-height:1.4;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .notif-item-time{font-size:10.5px;color:var(--text-mute);margin-top:3px;}
+  .notif-dropdown-empty{padding:22px 10px;text-align:center;color:var(--text-mute);font-size:12.5px;}
+  .notif-dropdown-sep{font-size:10.5px;color:var(--text-mute);text-transform:uppercase;letter-spacing:0.5px;padding:10px 8px 4px;}
   .profile-switch{position:relative;}
   .profile-btn{display:flex;align-items:center;gap:8px;padding:5px 10px 5px 5px;border-radius:24px;background:var(--bg-card);}
   .profile-btn .avatar{width:26px;height:26px;font-size:11px;}
@@ -1539,11 +1560,14 @@
           <button data-role="aluno">Aluno</button>
           <button data-role="staff">Equipe Interna</button>
         </div>
-        <button class="icon-btn" id="notif-btn" title="Notificações">
-          <span class="dot-alert" id="notif-dot"></span>
-          <span class="notif-badge" id="notif-badge" style="display:none"></span>
-          <svg class="icon" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
-        </button>
+        <div class="notif-switch" id="notif-switch">
+          <button class="icon-btn" id="notif-btn" title="Notificações">
+            <span class="dot-alert" id="notif-dot"></span>
+            <span class="notif-badge" id="notif-badge" style="display:none"></span>
+            <svg class="icon" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          </button>
+          <div class="notif-dropdown" id="notif-dropdown"></div>
+        </div>
         <div class="profile-switch">
           <button class="profile-btn" id="profile-btn">
             <div class="avatar" id="profile-avatar"></div>
@@ -6252,6 +6276,7 @@ const MURAL_ESTADO = { mentorado:{fim:false, carregando:false}, curso:{fim:false
 const AULAS_COMENTADAS = new Set();  // ids de aula cujos comentários já foram baixados
 let MEUS_LIKES = new Set();          // ids de publicações que EU curti
 let PENDENCIAS = [];                 // sininho — vem da função comunidade_pendencias() no banco
+let NOTIFICACOES = [];               // sininho — feed de notificações (tabela public.notificacoes: novidade/aula/evento/conclusão/lembrete)
 let EU_JA_APRESENTEI = false;        // se já publiquei minha apresentação (checado direto no banco)
 let cursoAbertoNoModal = null;
 
@@ -6327,6 +6352,22 @@ async function refreshPendencias(){
 function pendenciasDoSino(){
   if(currentRole==='staff') return PENDENCIAS.filter(x=>x.motivo==='duvida' || x.motivo==='mencao');
   return PENDENCIAS.filter(x=>x.motivo==='resposta' || x.motivo==='mencao');
+}
+/* Feed novo do sininho (tabela notificacoes): novidade do Mural, aula nova, encontro novo, aluno
+   concluiu uma aula (equipe) e lembrete de agenda do dia seguinte (equipe). A RLS da tabela já restringe
+   cada leitura ao próprio destinatario_id, então essa busca nunca traz notificação de outra pessoa. */
+async function refreshNotificacoes(){
+  try{
+    const { data, error } = await sb.from('notificacoes').select('*').order('created_at',{ascending:false}).limit(30);
+    if(error) throw error;
+    NOTIFICACOES = data || [];
+  }catch(e){
+    console.error('Não foi possível verificar as notificações', e);
+  }
+  updateNotifBadge();
+}
+function notificacoesNaoLidas(){
+  return NOTIFICACOES.filter(n=>!n.lida);
 }
 function fuiMencionadoEm(postId){
   return PENDENCIAS.some(x=>x.motivo==='mencao' && String(x.post_id)===String(postId));
@@ -7124,6 +7165,7 @@ async function bootstrapData(){
      então a consulta extra é inofensiva e evita depender da ordem em que o app descobre o tier. */
   await Promise.all([carregarMural('mentorado'), carregarMural('curso')]);
   refreshPendencias(); // sem await de propósito: o sininho pode chegar meio segundo depois
+  refreshNotificacoes(); // idem — feed de notificações (novidade/aula/evento/conclusão/lembrete)
 
   // Registros Internos: buscado à parte, e só quando é equipe interna — o aluno nunca faz essa
   // consulta, então esse conteúdo jamais chega ao navegador dele (nem via RLS, nem por não pedir).
@@ -8260,36 +8302,21 @@ function setupNav(){
     document.getElementById('profile-dropdown').classList.remove('open');
     openSetNewPasswordModal('change');
   });
-  document.getElementById('notif-btn').addEventListener('click',()=>{
-    if(currentRole==='staff'){
-      // Como comentários feitos dentro de uma aula não aparecem mais no mural da Comunidade, uma dúvida
-      // sem resposta registrada numa aula não aparecia lá mesmo depois de clicar no sino — a equipe
-      // interna clicava e não achava do que se tratava. Abre a aula certa direto nesse caso.
-      const pendingDuvida = pendenciasDoSino()[0];
-      if(pendingDuvida){
-        // getViewingTier() segue currentCommunityAudience enquanto a equipe estiver no modo "Equipe
-        // Interna" — sem isto, abrir a aula certa mostraria os comentários da comunidade errada (ou o
-        // mural cairia na aba errada) se a dúvida pendente for da comunidade do Curso.
-        currentCommunityAudience = pendingDuvida.audience||'mentorado';
-      }
-      if(pendingDuvida && pendingDuvida.course_id){
-        openCourseModal(pendingDuvida.course_id);
-        return;
-      }
-      communityFilter = 'duvida';
-      goTo('comunidade');
-      return;
+  document.getElementById('notif-btn').addEventListener('click',(e)=>{
+    e.stopPropagation();
+    const dropdown = document.getElementById('notif-dropdown');
+    const abrindo = !dropdown.classList.contains('open');
+    document.getElementById('profile-dropdown').classList.remove('open');
+    if(abrindo){
+      renderNotifDropdown();
+      dropdown.classList.add('open');
+      refreshNotificacoes().then(renderNotifDropdown); // reabre com o que houver de mais novo
+    } else {
+      dropdown.classList.remove('open');
     }
-    // Se o aviso pendente for de um comentário feito dentro de uma aula (que não aparece mais no mural
-    // da Comunidade), abre a aula direto — senão a pessoa clicaria no sino e não acharia a resposta.
-    const pending = pendenciasDoSino()[0];
-    if(pending && pending.course_id){
-      openCourseModal(pending.course_id);
-      return;
-    }
-    communityFilter = 'todas';
-    goTo('comunidade');
   });
+  document.getElementById('notif-dropdown').addEventListener('click',(e)=>e.stopPropagation());
+  document.addEventListener('click',()=>document.getElementById('notif-dropdown').classList.remove('open'));
   document.getElementById('menu-btn').addEventListener('click',()=>{
     document.getElementById('sidebar').classList.add('open');
     document.getElementById('sidebar-backdrop').classList.add('open');
@@ -8354,17 +8381,100 @@ function isAnswered(p){
 function updateNotifBadge(){
   const dot = document.getElementById('notif-dot');
   const badge = document.getElementById('notif-badge');
-  // A contagem vem de comunidade_pendencias() no banco (ver refreshPendencias) — antes era feita
-  // varrendo COMMUNITY_POSTS, o que só funcionava baixando a comunidade inteira em toda abertura.
+  // A contagem soma duas fontes: comunidade_pendencias() no banco (dúvida/menção/resposta — ver
+  // refreshPendencias) e o feed novo em notificacoes (novidade/aula/evento/conclusão/lembrete — ver
+  // refreshNotificacoes). Antes era feita varrendo COMMUNITY_POSTS, o que só funcionava baixando a
+  // comunidade inteira em toda abertura.
   const pend = pendenciasDoSino();
+  const total = pend.length + notificacoesNaoLidas().length;
   if(currentRole==='staff'){
     dot.style.display = 'none';
-    badge.style.display = pend.length>0 ? 'flex' : 'none';
-    badge.textContent = pend.length;
+    badge.style.display = total>0 ? 'flex' : 'none';
+    badge.textContent = total;
   } else {
-    dot.style.display = pend.length>0 ? 'block' : 'none';
+    dot.style.display = total>0 ? 'block' : 'none';
     badge.style.display = 'none';
   }
+}
+/* Ícone de cada tipo de notificação do sininho — mesma paleta de ícones já usada no resto do app
+   (ver função icon()). */
+const NOTIF_TIPO_ICON = {
+  novidade:'newspaper', aula:'film', evento:'calendar', conclusao:'award', lembrete_evento:'bell',
+};
+function notifTempoAtras(iso){
+  return timeAgo(iso);
+}
+/* Pra onde ir ao clicar em cada tipo de pendência antiga (dúvida/menção/resposta) — mesma lógica que já
+   existia no clique direto do sino, agora por item (a lista pode ter mais de uma pendência ao mesmo
+   tempo, cada uma abrindo o lugar certo). */
+function abrirPendenciaDoSino(p){
+  document.getElementById('notif-dropdown').classList.remove('open');
+  currentCommunityAudience = p.audience || 'mentorado';
+  if(p.course_id){ openCourseModal(p.course_id); return; }
+  communityFilter = (currentRole==='staff') ? 'duvida' : 'todas';
+  goTo('comunidade');
+}
+async function abrirNotificacaoDoSino(n){
+  document.getElementById('notif-dropdown').classList.remove('open');
+  if(!n.lida){
+    n.lida = true;
+    updateNotifBadge();
+    syncNow(sb.from('notificacoes').update({lida:true}).eq('id', n.id));
+  }
+  if(n.view) goTo(n.view);
+}
+function notifDropdownHtml(){
+  const pend = pendenciasDoSino();
+  const semNada = !pend.length && !NOTIFICACOES.length;
+  if(semNada) return `<div class="notif-dropdown-empty">${icon('bell')}<div style="margin-top:8px">Nenhuma notificação por aqui ainda.</div></div>`;
+  const motivoLabel = (m)=> m==='duvida' ? 'Pergunta pendente na comunidade' : m==='mencao' ? 'Você foi mencionado(a)' : 'Responderam seu post';
+  const pendHtml = pend.length ? `
+    <div class="notif-dropdown-sep">Pendências na comunidade</div>
+    ${pend.map((p,i)=>`
+      <button type="button" class="notif-item unread" data-notif-pend="${i}">
+        <span class="notif-item-icon">${icon('comment')}</span>
+        <div class="notif-item-body">
+          <p class="notif-item-title">${escapeHtml(motivoLabel(p.motivo))}</p>
+        </div>
+      </button>
+    `).join('')}` : '';
+  const feedHtml = NOTIFICACOES.length ? `
+    <div class="notif-dropdown-sep">Notificações</div>
+    ${NOTIFICACOES.map((n,i)=>`
+      <button type="button" class="notif-item ${n.lida?'':'unread'}" data-notif-item="${i}">
+        <span class="notif-item-icon">${icon(NOTIF_TIPO_ICON[n.tipo]||'bell')}</span>
+        <div class="notif-item-body">
+          <p class="notif-item-title">${escapeHtml(n.titulo)}</p>
+          ${n.mensagem? `<p class="notif-item-msg">${escapeHtml(n.mensagem)}</p>` : ''}
+          <p class="notif-item-time">${notifTempoAtras(n.created_at)}</p>
+        </div>
+      </button>
+    `).join('')}` : '';
+  return `
+    <div class="notif-dropdown-head">
+      <span class="label">Notificações</span>
+      ${NOTIFICACOES.some(n=>!n.lida)? `<button type="button" id="notif-marcar-todas">Marcar todas como lidas</button>` : ''}
+    </div>
+    ${pendHtml}${feedHtml}`;
+}
+function renderNotifDropdown(){
+  const el = document.getElementById('notif-dropdown');
+  el.innerHTML = notifDropdownHtml();
+  const pend = pendenciasDoSino();
+  el.querySelectorAll('[data-notif-pend]').forEach(btn=>{
+    btn.addEventListener('click', ()=> abrirPendenciaDoSino(pend[Number(btn.dataset.notifPend)]));
+  });
+  el.querySelectorAll('[data-notif-item]').forEach(btn=>{
+    btn.addEventListener('click', ()=> abrirNotificacaoDoSino(NOTIFICACOES[Number(btn.dataset.notifItem)]));
+  });
+  const marcarTodas = document.getElementById('notif-marcar-todas');
+  if(marcarTodas) marcarTodas.addEventListener('click', ()=>{
+    const idsNaoLidas = NOTIFICACOES.filter(n=>!n.lida).map(n=>n.id);
+    NOTIFICACOES.forEach(n=>n.lida=true);
+    updateNotifBadge();
+    renderNotifDropdown();
+    if(idsNaoLidas.length) syncNow(sb.from('notificacoes').update({lida:true}).in('id', idsNaoLidas));
+  });
 }
 
 /* Barra lateral da vendedora (role 'vendas'): esconde TUDO e reacende só o Registro de Sessões 1:1.

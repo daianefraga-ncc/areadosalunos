@@ -1577,6 +1577,7 @@
           <div class="profile-dropdown" id="profile-dropdown">
             <button class="opt cadastro-opt" id="open-cadastro"></button>
             <button class="opt" id="open-change-password"></button>
+            <button class="opt" id="open-push-notif"></button>
             <div class="dropdown-divider"></div>
             <div class="label">Tema</div>
             <div class="theme-switch" id="theme-switch">
@@ -1653,6 +1654,9 @@ const CONFIG_BANNERS_EVENTOS = [
 ];
 const CONFIG_LINK_PRONTUARIO = '#'; // link externo do item "Ferramentas NCC" do menu (sistema de prontuário que você usa)
 const CONFIG_LINK_NEUROTODASIDADES = '#'; // link externo do item "Neurociência todas as idades" do menu — cole aqui quando tiver o link
+// Chave pública do par VAPID usado nas notificações push (celular/navegador) — não é segredo, só a
+// chave PRIVADA (guardada nos secrets da Edge Function enviar-push-pendentes) precisa ficar protegida.
+const VAPID_PUBLIC_KEY = 'BGQK4XNR96LDKpHVc0rSkq_NhS76VXbPoydiFq1QsUjFZwyc0oUuo-yznZGTxu1eQKYfTmHDBb36kDd4uQtgmHw';
 if(/^COLE_AQUI/.test(SUPABASE_URL) || /^COLE_AQUI/.test(SUPABASE_KEY)){
   document.addEventListener('DOMContentLoaded', ()=>{
     document.body.innerHTML = '<div style="font-family:sans-serif;max-width:640px;margin:80px auto;padding:24px;border:1px solid #ccc;border-radius:12px;line-height:1.5"><h2>Sistema ainda não configurado</h2><p>Abra o <b>index.html</b>, procure o bloco <b>CONFIGURAÇÃO</b> e preencha <code>SUPABASE_URL</code> e <code>SUPABASE_KEY</code> com os dados do seu projeto Supabase. O passo a passo completo está no <b>README.md</b>.</p></div>';
@@ -6369,6 +6373,72 @@ async function refreshNotificacoes(){
 function notificacoesNaoLidas(){
   return NOTIFICACOES.filter(n=>!n.lida);
 }
+
+/* Notificação push (celular/navegador) — avisa mesmo com o app fechado, diferente do sininho (que só
+   mostra quando a pessoa abre o app). Guarda a inscrição em push_subscriptions; o envio de fato é feito
+   no servidor pela Edge Function enviar-push-pendentes (job do pg_cron a cada minuto). */
+function urlBase64ToUint8Array(base64String){
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g,'+').replace(/_/g,'/');
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for(let i=0;i<rawData.length;i++) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+async function pushJaAtivado(){
+  try{
+    if(!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+    const reg = await navigator.serviceWorker.getRegistration();
+    if(!reg) return false;
+    const sub = await reg.pushManager.getSubscription();
+    return !!sub;
+  }catch(e){ return false; }
+}
+async function ativarPushNotifications(){
+  try{
+    if(!('serviceWorker' in navigator) || !('PushManager' in window)){
+      alert('Esse navegador não é compatível com notificações push. No iPhone, use Safari e adicione a Área do Aluno à Tela de Início primeiro.');
+      return false;
+    }
+    const permissao = await Notification.requestPermission();
+    if(permissao !== 'granted'){
+      alert('Sem a permissão do navegador não é possível ativar as notificações no celular. Você pode permitir depois nas configurações do site.');
+      return false;
+    }
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if(!sub){
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+      });
+    }
+    const subJson = sub.toJSON();
+    const { error } = await sb.from('push_subscriptions').upsert({
+      user_id: currentUser.id,
+      endpoint: subJson.endpoint,
+      p256dh: subJson.keys.p256dh,
+      auth: subJson.keys.auth,
+      user_agent: navigator.userAgent,
+    }, { onConflict: 'endpoint' });
+    if(error) throw error;
+    return true;
+  }catch(e){
+    console.error('Não foi possível ativar as notificações push', e);
+    alert('Não foi possível ativar as notificações no celular agora. Tente de novo em alguns instantes.');
+    return false;
+  }
+}
+async function atualizarBotaoPush(){
+  const btn = document.getElementById('open-push-notif');
+  if(!btn) return;
+  const ativo = await pushJaAtivado();
+  btn.innerHTML = ativo
+    ? `${icon('bell')}<span>Notificações no celular ativadas</span>`
+    : `${icon('bell')}<span>Ativar notificações no celular</span>`;
+  btn.disabled = ativo;
+  btn.style.opacity = ativo ? '0.6' : '1';
+}
 function fuiMencionadoEm(postId){
   return PENDENCIAS.some(x=>x.motivo==='mencao' && String(x.post_id)===String(postId));
 }
@@ -8284,7 +8354,10 @@ function setupNav(){
   });
   document.getElementById('profile-btn').addEventListener('click',(e)=>{
     e.stopPropagation();
-    document.getElementById('profile-dropdown').classList.toggle('open');
+    const dropdown = document.getElementById('profile-dropdown');
+    const abrindo = !dropdown.classList.contains('open');
+    dropdown.classList.toggle('open');
+    if(abrindo) atualizarBotaoPush();
   });
   document.addEventListener('click',()=>document.getElementById('profile-dropdown').classList.remove('open'));
   document.querySelectorAll('#role-toggle [data-role]').forEach(btn=>{
@@ -8301,6 +8374,13 @@ function setupNav(){
     e.stopPropagation();
     document.getElementById('profile-dropdown').classList.remove('open');
     openSetNewPasswordModal('change');
+  });
+  atualizarBotaoPush();
+  document.getElementById('open-push-notif').addEventListener('click', async (e)=>{
+    e.stopPropagation();
+    const ok = await ativarPushNotifications();
+    await atualizarBotaoPush();
+    if(ok) alert('Notificações no celular ativadas! Você vai receber um alerta mesmo com o app fechado.');
   });
   document.getElementById('notif-btn').addEventListener('click',(e)=>{
     e.stopPropagation();

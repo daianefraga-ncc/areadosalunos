@@ -6,7 +6,7 @@
   notificações push do servidor e mostrá-las mesmo com o app/navegador fechado.
 */
 
-const CACHE_NAME = 'ncc-plat-shell-v4';
+const CACHE_NAME = 'ncc-plat-shell-v5';
 
 // Arquivos "estáticos" (bibliotecas, ícones, manifest): praticamente nunca mudam
 // de conteúdo sem que a gente troque o CACHE_NAME também, então é seguro servir
@@ -27,10 +27,16 @@ const STATIC_FILES = [
 
 // O HTML principal é o único arquivo que realmente precisa ser buscado na rede
 // primeiro (pra sempre pegar a versão mais nova do site assim que publicada),
-// com um limite de tempo generoso antes de desistir e cair pro cache.
+// com um limite de tempo generoso antes de desistir e cair pro cache. Por isso
+// ele NÃO entra na lista de pré-carregamento abaixo: se entrasse, o navegador
+// buscaria esse arquivo grande DUAS VEZES ao mesmo tempo assim que o site
+// abrisse — uma vez pela navegação normal (com limite de tempo, abaixo) e
+// outra vez aqui no install, essa segunda sem nenhum limite de tempo — as
+// duas competindo e podendo travar a página esperando por mais de um minuto.
+// Ele só é guardado em cache reativamente, pela função de 'fetch' abaixo.
 const APP_SHELL_HTML = './index.html';
 
-const SHELL_FILES = [APP_SHELL_HTML, ...STATIC_FILES];
+const SHELL_FILES = STATIC_FILES;
 
 function fetchComTempoLimite(request, ms) {
   return new Promise((resolve, reject) => {

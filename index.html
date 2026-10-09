@@ -1373,9 +1373,18 @@
   .ae-pill{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;}
   .ae-status-a_fazer{background:var(--bg-elev);color:var(--text-dim);}
   .ae-status-em_andamento{background:var(--individual-soft);color:var(--individual);}
-  .ae-status-em_revisao{background:var(--shared-soft);color:var(--shared);}
-  .ae-status-aprovado{background:var(--accent-soft);color:var(--accent);}
-  .ae-status-concluido{background:var(--success-soft);color:var(--success);}
+  .ae-status-aguardando_outra_pessoa{background:var(--shared-soft);color:var(--shared);}
+  .ae-status-concluida{background:var(--success-soft);color:var(--success);}
+  .ae-dominio-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--bg-elev);color:var(--text-mute);white-space:nowrap;}
+  .ae-dominio-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+  .ae-dominio-head h4{margin:0;font-size:15px;}
+  .ae-dominio-head .btn-mini.icon-only{flex-shrink:0;}
+  .ae-dominio-sub{color:var(--text-mute);font-size:11.5px;margin:-4px 0 10px;}
+  .ae-prazo-indefinido{color:var(--text-mute);font-style:italic;}
+  .ae-suporte-row{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .ae-suporte-row:last-child{border-bottom:none;}
+  .ae-livedata-line{font-size:12px;color:var(--text-dim);padding:4px 0;}
+  .ae-livedata-line strong{color:var(--text);}
   .ae-prio-normal{background:var(--bg-elev);color:var(--text-mute);}
   .ae-prio-alta{background:var(--individual-soft);color:var(--individual);}
   .ae-prio-urgente{background:var(--danger-soft);color:var(--danger);}
@@ -1399,20 +1408,20 @@
   .ae-cal-cell.ae-cal-outro-mes{opacity:0.4;}
   .ae-cal-cell .ae-cal-daynum{font-weight:700;font-size:11px;margin-bottom:3px;}
   .ae-cal-item{display:block;max-width:100%;background:var(--bg-card);border-radius:4px;padding:2px 4px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;box-sizing:border-box;}
-  .ae-cal-item.ae-cal-cat-prep{background:var(--individual-soft);color:var(--individual);}
-  .ae-cal-item.ae-cal-cat-grav{background:var(--shared-soft);color:var(--shared);}
-  .ae-cal-item.ae-cal-cat-revisar{background:var(--accent-soft);color:var(--accent-2,var(--accent));}
-  .ae-cal-item.ae-cal-cat-publicar{background:var(--success-soft);color:var(--success);}
+  .ae-cal-item.ae-cal-cat-gravacao{background:var(--shared-soft);color:var(--shared);}
+  .ae-cal-item.ae-cal-cat-publicacao{background:var(--success-soft);color:var(--success);}
   .ae-cal-item.ae-cal-cat-noticias{background:rgba(220,163,96,0.18);color:var(--stage-transformar);}
+  .ae-cal-item.ae-cal-cat-ncc_plat{background:var(--individual-soft);color:var(--individual);}
+  .ae-cal-item.ae-cal-cat-redes_sociais{background:var(--accent-soft);color:var(--accent);}
   .ae-cal-item.ae-cal-cat-outras{background:var(--bg-elev);color:var(--text-dim);}
   .ae-cal-legenda{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;font-size:10.5px;color:var(--text-mute);}
   .ae-cal-legenda-item{display:inline-flex;align-items:center;gap:4px;}
   .ae-cal-legenda-dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
-  .ae-cal-legenda-dot.ae-cal-cat-prep{background:var(--individual);}
-  .ae-cal-legenda-dot.ae-cal-cat-grav{background:var(--shared);}
-  .ae-cal-legenda-dot.ae-cal-cat-revisar{background:var(--accent);}
-  .ae-cal-legenda-dot.ae-cal-cat-publicar{background:var(--success);}
+  .ae-cal-legenda-dot.ae-cal-cat-gravacao{background:var(--shared);}
+  .ae-cal-legenda-dot.ae-cal-cat-publicacao{background:var(--success);}
   .ae-cal-legenda-dot.ae-cal-cat-noticias{background:var(--stage-transformar);}
+  .ae-cal-legenda-dot.ae-cal-cat-ncc_plat{background:var(--individual);}
+  .ae-cal-legenda-dot.ae-cal-cat-redes_sociais{background:var(--accent);}
   .ae-cal-legenda-dot.ae-cal-cat-outras{background:var(--text-mute);}
   .ae-cronograma{display:flex;flex-direction:column;gap:18px;}
   .ae-cron-modulo{border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
@@ -6532,33 +6541,39 @@ let AE_ATIVIDADES = [];
 let AE_RECORRENCIAS = [];
 let AE_MODELOS = [];
 let CRONOGRAMA_AULAS = []; // tabela por aula (tema/atualização/gravação/duração) — ver tabela cronograma_aulas
+let AE_SUPORTE = []; // tickets de suporte a alunos — ver tabela suporte_alunos
 let aeSubView = 'hoje'; // 'hoje' | 'semana' | 'calendario' | 'minhas' | 'quadro' | 'cronograma'
-let aeFiltro = { area:'todas', responsavel:'todos', status:'todos', prioridade:'todas' };
+let aeFiltro = { dominio:'todos', area:'todas', responsavel:'todos', status:'todos', prioridade:'todas' };
 let aeCalMonth = new Date();
 const AE_AREAS = {
   aulas_cursos:'Aulas e cursos', noticias_infancia:'Notícias da Infância', atualizacao_cientifica:'Atualização científica',
   redes_sociais:'Redes sociais', alunos_suporte:'Alunos e suporte', eventos_palestras:'Eventos e palestras',
-  gestao_plataforma:'Gestão da plataforma',
+  gestao_plataforma:'Gestão da plataforma', gestao_academica:'Gestão acadêmica', comercial:'Comercial',
+  financeiro_administrativo:'Financeiro e Administrativo',
 };
-const AE_STATUS = { a_fazer:'A fazer', em_andamento:'Em andamento', em_revisao:'Em revisão', aprovado:'Aprovado', concluido:'Concluído' };
+const AE_DOMINIOS = { ncc_plat:'NCC Plat', redes_sociais:'Redes Sociais', gestao_aulas:'Gestão de Aulas' };
+const AE_STATUS = { a_fazer:'A fazer', em_andamento:'Em andamento', aguardando_outra_pessoa:'Aguardando outra pessoa', concluida:'Concluída' };
 const AE_PRIORIDADE = { normal:'Normal', alta:'Alta', urgente:'Urgente' };
-const AE_STATUS_ORDEM = ['a_fazer','em_andamento','em_revisao','aprovado','concluido'];
+const AE_STATUS_ORDEM = ['a_fazer','em_andamento','aguardando_outra_pessoa','concluida'];
 const AE_FREQ = { diaria:'Diariamente', dias_uteis:'Dias úteis', semanal:'Semanalmente', mensal:'Mensalmente', personalizada:'Personalizada' };
 const AE_DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const AE_ETAPA_PIPELINE = { pesquisa:'Pesquisa', roteiro:'Roteiro', slides:'Slides', gravacao:'Gravação', edicao:'Edição', publicacao:'Publicação' };
 
 async function refreshAgendaEquipe(){
   try{
-    const [r1, r2, r3, r4] = await Promise.all([
+    const [r1, r2, r3, r4, r5] = await Promise.all([
       sb.from('equipe_atividades').select('*').order('prazo_entrega'),
       sb.from('equipe_recorrencias').select('*').order('created_at'),
       sb.from('equipe_modelos').select('*').order('created_at'),
       sb.from('cronograma_aulas').select('*').order('modulo_ordem').order('aula_num'),
+      sb.from('suporte_alunos').select('*').eq('arquivada', false).order('created_at',{ascending:false}),
     ]);
-    if(r1.error) throw r1.error; if(r2.error) throw r2.error; if(r3.error) throw r3.error; if(r4.error) throw r4.error;
+    if(r1.error) throw r1.error; if(r2.error) throw r2.error; if(r3.error) throw r3.error; if(r4.error) throw r4.error; if(r5.error) throw r5.error;
     AE_ATIVIDADES = r1.data || [];
     AE_RECORRENCIAS = r2.data || [];
     AE_MODELOS = r3.data || [];
     CRONOGRAMA_AULAS = r4.data || [];
+    AE_SUPORTE = r5.data || [];
   }catch(e){ console.error('Não foi possível carregar a Agenda da Equipe', e); }
 }
 async function aeAtualizarCronogramaAula(id, campos){
@@ -6568,16 +6583,19 @@ async function aeAtualizarCronogramaAula(id, campos){
   if(row) Object.assign(row, campos);
 }
 function aeNomeStaff(id){ if(!id) return '—'; const s = STAFF_LIST.find(x=>x.id===id); return s ? s.name : '—'; }
-function aeAtrasada(a){ return !['concluido','aprovado'].includes(a.status) && new Date(a.prazo_entrega) < new Date(); }
+function aeAtrasada(a){ return a.status!=='concluida' && !!a.prazo_entrega && new Date(a.prazo_entrega) < new Date(); }
 function aeHojeISO(){ return new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}); }
-function aeDiaISO(iso){ return new Date(iso).toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}); }
+function aeDiaISO(iso){ if(!iso) return null; return new Date(iso).toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}); }
 function aeFormatPrazo(iso){
+  if(!iso) return 'Prazo a definir';
   return new Date(iso).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
 }
 function aeFormatData(iso){
+  if(!iso) return 'Prazo a definir';
   return new Date(iso).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo', day:'2-digit', month:'2-digit', year:'numeric'});
 }
 function aePillStatus(a){ return `<span class="ae-pill ae-status-${a.status}">${AE_STATUS[a.status]}</span>`; }
+function aePillDominio(a){ return a.dominio && AE_DOMINIOS[a.dominio] ? `<span class="ae-dominio-pill">${AE_DOMINIOS[a.dominio]}</span>` : ''; }
 function aePillPrioridade(a){ return a.prioridade==='normal' ? '' : `<span class="ae-pill ae-prio-${a.prioridade}">${AE_PRIORIDADE[a.prioridade]}</span>`; }
 function aeChecklistProgresso(a){
   const lista = Array.isArray(a.checklist) ? a.checklist : [];
@@ -6587,6 +6605,7 @@ function aeChecklistProgresso(a){
 }
 function aeAplicaFiltros(lista){
   return lista.filter(a=>{
+    if(aeFiltro.dominio!=='todos' && a.dominio!==aeFiltro.dominio) return false;
     if(aeFiltro.area!=='todas' && a.area!==aeFiltro.area) return false;
     if(aeFiltro.responsavel!=='todos' && a.responsavel_id!==aeFiltro.responsavel) return false;
     if(aeFiltro.status!=='todos' && a.status!==aeFiltro.status) return false;
@@ -6598,11 +6617,11 @@ function aeNaoArquivadas(){ return AE_ATIVIDADES.filter(a=>!a.arquivada); }
 function aeIndicadores(){
   const ativas = aeNaoArquivadas();
   const hoje = aeHojeISO();
-  const entregasHoje = ativas.filter(a=> !['concluido','aprovado'].includes(a.status) && aeDiaISO(a.prazo_entrega)===hoje).length;
+  const entregasHoje = ativas.filter(a=> a.status!=='concluida' && aeDiaISO(a.prazo_entrega)===hoje).length;
   const atrasadas = ativas.filter(aeAtrasada).length;
-  const emRevisao = ativas.filter(a=>a.status==='em_revisao').length;
+  const aguardando = ativas.filter(a=>a.status==='aguardando_outra_pessoa').length;
   const proximasAulas = LIVE_SESSIONS.filter(ls=>ls.type==='upcoming').length;
-  return {entregasHoje, atrasadas, emRevisao, proximasAulas};
+  return {entregasHoje, atrasadas, aguardando, proximasAulas};
 }
 
 /* ---------- renderização principal ---------- */
@@ -6614,12 +6633,11 @@ function renderAgendaEquipe(){
     <div class="kpi-row" style="margin-bottom:16px">
       <div class="kpi-tile"><div class="label">Entregas hoje</div><div class="value">${ind.entregasHoje}</div></div>
       <div class="kpi-tile"><div class="label">Atividades atrasadas</div><div class="value" style="${ind.atrasadas>0?'color:var(--danger)':''}">${ind.atrasadas}</div></div>
-      <div class="kpi-tile"><div class="label">Materiais aguardando revisão</div><div class="value">${ind.emRevisao}</div></div>
+      <div class="kpi-tile"><div class="label">Aguardando outra pessoa</div><div class="value">${ind.aguardando}</div></div>
       <div class="kpi-tile"><div class="label">Próximas aulas e eventos</div><div class="value">${ind.proximasAulas}</div></div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
       <button class="btn-accent" id="ae-nova-btn">${icon('plus','tiny')} Nova atividade</button>
-      <button class="btn-outline" id="ae-rotinas-btn">${icon('calendar','tiny')} Rotinas recorrentes</button>
       <button class="btn-outline" id="ae-cronograma-aula-btn">${icon('film','tiny')} Gerar cronograma de aula</button>
     </div>
     <div class="ae-tabs">
@@ -6632,6 +6650,12 @@ function renderAgendaEquipe(){
     </div>
     ${aeSubView==='cronograma' ? '' : `
     <div class="add-form" style="margin-bottom:16px">
+      <div class="field"><label>Domínio</label>
+        <select class="ps-input" id="ae-f-dominio">
+          <option value="todos">Todos</option>
+          ${Object.entries(AE_DOMINIOS).map(([k,v])=>`<option value="${k}" ${aeFiltro.dominio===k?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
       <div class="field"><label>Área</label>
         <select class="ps-input" id="ae-f-area">
           <option value="todas">Todas</option>
@@ -6657,11 +6681,11 @@ function renderAgendaEquipe(){
     <div id="ae-subview-area"></div>
   `;
   document.getElementById('ae-nova-btn').addEventListener('click',()=>openAtividadeModal(null));
-  document.getElementById('ae-rotinas-btn').addEventListener('click',()=>openRecorrenciasModal());
   document.getElementById('ae-cronograma-aula-btn').addEventListener('click',()=>openCronogramaAulaModal());
   document.querySelectorAll('.ae-tab').forEach(t=>t.addEventListener('click',()=>{ aeSubView = t.dataset.sub; renderAgendaEquipe(); }));
   const elArea = document.getElementById('ae-f-area');
   if(elArea){
+    document.getElementById('ae-f-dominio').addEventListener('change',(e)=>{ aeFiltro.dominio=e.target.value; renderAgendaEquipeSubview(); });
     elArea.addEventListener('change',(e)=>{ aeFiltro.area=e.target.value; renderAgendaEquipeSubview(); });
     document.getElementById('ae-f-responsavel').addEventListener('change',(e)=>{ aeFiltro.responsavel=e.target.value; renderAgendaEquipeSubview(); });
     document.getElementById('ae-f-status').addEventListener('change',(e)=>{ aeFiltro.status=e.target.value; renderAgendaEquipeSubview(); });
@@ -6679,10 +6703,10 @@ function aeCardHtml(a){
     <div class="ae-card" data-ae-abrir="${a.id}">
       <p class="ae-card-title">${escapeHtml(a.titulo)} ${atrasada? `<span class="ae-atrasada">${icon('alert','tiny')} atrasada</span>`:''}</p>
       <div class="ae-card-meta">
-        ${aePillStatus(a)} ${aePillPrioridade(a)}
+        ${aePillStatus(a)} ${aePillPrioridade(a)} ${aePillDominio(a)}
         <span>${AE_AREAS[a.area]||a.area}</span>
         <span>${icon('idcard','tiny')} ${escapeHtml(aeNomeStaff(a.responsavel_id))}</span>
-        <span>${icon('clock','tiny')} ${aeFormatPrazo(a.prazo_entrega)}</span>
+        <span>${icon('clock','tiny')} ${a.prazo_entrega? aeFormatPrazo(a.prazo_entrega) : '<span class="ae-prazo-indefinido">Prazo a definir</span>'}</span>
         ${aeChecklistProgresso(a)}
       </div>
     </div>`;
@@ -6695,15 +6719,52 @@ function aeWireCards(containerEl){
 function aeRenderHoje(){
   const hoje = aeHojeISO();
   const lista = aeAplicaFiltros(aeNaoArquivadas()).filter(a=> aeDiaISO(a.prazo_entrega)===hoje || aeAtrasada(a));
-  lista.sort((x,y)=> new Date(x.prazo_entrega) - new Date(y.prazo_entrega));
-  const atrasadas = lista.filter(aeAtrasada);
-  const doDia = lista.filter(a=>!aeAtrasada(a));
+  lista.sort((x,y)=> new Date(x.prazo_entrega||0) - new Date(y.prazo_entrega||0));
+  const porDominio = { ncc_plat:[], redes_sociais:[], gestao_aulas:[] };
+  lista.forEach(a=>{ (porDominio[a.dominio] || (porDominio[a.dominio]=[])).push(a); });
+
+  const blocoDominio = (key, label, extraHtml, comGear)=>{
+    const itens = porDominio[key] || [];
+    const atrasadasD = itens.filter(aeAtrasada);
+    const hojeD = itens.filter(a=>!aeAtrasada(a));
+    return `
+      <div class="ae-dominio-head">
+        <h4>${escapeHtml(label)}</h4>
+        ${comGear? `<button class="btn-mini icon-only ae-dominio-config" data-dominio="${key}" title="Configurar rotinas deste domínio">${icon('sliders','tiny')}</button>`:''}
+      </div>
+      ${extraHtml||''}
+      ${atrasadasD.length? `<div class="ae-day-group"><div class="ae-day-label" style="color:var(--danger)">Atrasadas (${atrasadasD.length})</div>${atrasadasD.map(aeCardHtml).join('')}</div>`:''}
+      <div class="ae-day-group">${hojeD.length? hojeD.map(aeCardHtml).join('') : '<p style="color:var(--text-mute);font-size:12.5px">Nada previsto para hoje.</p>'}</div>
+    `;
+  };
+
+  const ticketsAbertos = AE_SUPORTE.filter(t=>!t.resolvido);
+  const vendasHoje = (typeof VENDA_SESSOES!=='undefined'? VENDA_SESSOES : []).filter(v=>v.dataSessao===hoje);
+  const financeiroHoje = (typeof FIN_LANCAMENTOS!=='undefined'? FIN_LANCAMENTOS : []).filter(l=>!l.pagou && l.dataVencimento===hoje);
+  const extrasDominio1 = `
+    <div class="ps-section" style="margin-bottom:10px">
+      <div class="ae-livedata-line">${icon('users','tiny')} <strong>${ticketsAbertos.length}</strong> ticket(s) de suporte em aberto. <a href="#" id="ae-suporte-abrir" style="font-weight:600">Ver / registrar atendimentos →</a></div>
+      <div class="ae-livedata-line">${icon('briefcase','tiny')} ${vendasHoje.length? `${vendasHoje.length} reunião(ões) de vendas agendada(s) hoje: ${vendasHoje.map(v=>escapeHtml(v.lead||'—')).join(', ')}` : 'Nenhuma reunião de vendas agendada para hoje.'}</div>
+      <div class="ae-livedata-line" style="${financeiroHoje.length?'color:var(--danger)':''}">${icon('money','tiny')} ${financeiroHoje.length? `${financeiroHoje.length} lançamento(s) com vencimento hoje` : 'Nenhum vencimento financeiro hoje.'}</div>
+    </div>`;
+  const extrasDominio2 = `
+    <div class="ps-section" style="margin-bottom:10px">
+      <a href="${escapeAttr(CONFIG_LINK_PRONTUARIO||'#')}" target="_blank" rel="noopener" class="btn-outline" style="display:inline-flex;width:fit-content">${icon('film','tiny')} Criar stories em Ferramentas NCC</a>
+    </div>`;
+  const avisoDominio3 = `<p class="ae-dominio-sub">Mostrando apenas as etapas previstas para hoje e as atrasadas. Etapas sem prazo definido ("Prazo a definir") aparecem no Quadro de status e no Cronograma de aulas.</p>`;
+
   const el = document.getElementById('ae-subview-area');
   el.innerHTML = `
-    ${atrasadas.length? `<div class="ae-day-group"><div class="ae-day-label" style="color:var(--danger)">Atrasadas (${atrasadas.length})</div>${atrasadas.map(aeCardHtml).join('')}</div>`:''}
-    <div class="ae-day-group"><div class="ae-day-label">Hoje</div>${doDia.length? doDia.map(aeCardHtml).join('') : '<p style="color:var(--text-mute)">Nada para hoje.</p>'}</div>
+    ${blocoDominio('ncc_plat', 'Domínio 1 — NCC Plat', extrasDominio1, true)}
+    ${blocoDominio('redes_sociais', 'Domínio 2 — Redes Sociais', extrasDominio2, true)}
+    ${blocoDominio('gestao_aulas', 'Domínio 3 — Gestão de Aulas', avisoDominio3, false)}
   `;
   aeWireCards(el);
+  document.querySelectorAll('.ae-dominio-config').forEach(btn=>{
+    btn.addEventListener('click', ()=>openRecorrenciasModal(btn.dataset.dominio));
+  });
+  const btnSuporte = document.getElementById('ae-suporte-abrir');
+  if(btnSuporte) btnSuporte.addEventListener('click', (e)=>{ e.preventDefault(); openSuporteModal(); });
 }
 function aeRenderSemana(){
   const base = new Date();
@@ -6720,17 +6781,17 @@ function aeRenderSemana(){
   aeWireCards(el);
 }
 const AE_CAL_CATEGORIAS = {
-  prep: 'Preparar materiais', grav: 'Gravar aula', revisar: 'Revisar gravação existente',
-  publicar: 'Publicar', noticias: 'Notícias da Infância', outras: 'Outras rotinas internas',
+  gravacao: 'Gravação de aula', publicacao: 'Publicação de aula', noticias: 'Notícias da Infância',
+  ncc_plat: 'NCC Plat (demais)', redes_sociais: 'Redes sociais (demais)', outras: 'Outras rotinas internas',
 };
 function aeCalCategoria(a){
-  if(a.area==='aulas_cursos'){
-    if(a.titulo.startsWith('Preparar materiais')) return 'prep';
-    if(a.titulo.startsWith('Gravar aula')) return 'grav';
-    if(a.titulo.startsWith('Revisar gravação existente')) return 'revisar';
-    if(a.titulo.startsWith('Publicar')) return 'publicar';
+  if(a.dominio==='gestao_aulas'){
+    if(a.etapa_pipeline==='gravacao') return 'gravacao';
+    if(a.etapa_pipeline==='publicacao') return 'publicacao';
   }
   if(a.area==='noticias_infancia') return 'noticias';
+  if(a.dominio==='ncc_plat') return 'ncc_plat';
+  if(a.dominio==='redes_sociais') return 'redes_sociais';
   return 'outras';
 }
 function aeRenderCalendario(){
@@ -6774,7 +6835,7 @@ function aeRenderCalendario(){
 }
 function aeRenderMinhas(){
   const lista = aeAplicaFiltros(aeNaoArquivadas()).filter(a=> a.responsavel_id===currentUser.id || a.revisor_id===currentUser.id);
-  lista.sort((x,y)=>new Date(x.prazo_entrega)-new Date(y.prazo_entrega));
+  lista.sort((x,y)=> (x.prazo_entrega? new Date(x.prazo_entrega).getTime() : Infinity) - (y.prazo_entrega? new Date(y.prazo_entrega).getTime() : Infinity));
   const el = document.getElementById('ae-subview-area');
   el.innerHTML = lista.length ? lista.map(aeCardHtml).join('') : '<p class="empty-state">Nenhuma tarefa atribuída a você.</p>';
   aeWireCards(el);
@@ -6873,7 +6934,7 @@ async function aePropagarRecorrencia(a, campos){
 function openAtividadeModal(id){
   const existente = id ? AE_ATIVIDADES.find(a=>a.id===id) : null;
   const d = existente ? Object.assign({}, existente) : {
-    titulo:'', area:'gestao_plataforma', responsavel_id: STAFF_LIST[0]?STAFF_LIST[0].id:'', revisor_id:'',
+    titulo:'', area:'gestao_plataforma', dominio:'ncc_plat', responsavel_id: STAFF_LIST[0]?STAFF_LIST[0].id:'', revisor_id:'',
     prazo_entrega:'', data_publicacao:'', prioridade:'normal', descricao:'', checklist:[],
   };
   const prazoLocal = d.prazo_entrega ? new Date(d.prazo_entrega) : null;
@@ -6886,6 +6947,9 @@ function openAtividadeModal(id){
       <h3>${existente? 'Editar atividade' : 'Nova atividade'}</h3>
       <div class="ps-section fin-form-grid">
         <div style="grid-column:1/-1"><label class="ps-label">Título *</label><input class="ps-input" id="ae-m-titulo" value="${escapeAttr(d.titulo)}"></div>
+        <div><label class="ps-label">Domínio *</label>
+          <select class="ps-input" id="ae-m-dominio">${Object.entries(AE_DOMINIOS).map(([k,v])=>`<option value="${k}" ${d.dominio===k?'selected':''}>${v}</option>`).join('')}</select>
+        </div>
         <div><label class="ps-label">Área *</label>
           <select class="ps-input" id="ae-m-area">${Object.entries(AE_AREAS).map(([k,v])=>`<option value="${k}" ${d.area===k?'selected':''}>${v}</option>`).join('')}</select>
         </div>
@@ -6916,10 +6980,11 @@ function openAtividadeModal(id){
   document.getElementById('ae-m-save').addEventListener('click', async ()=>{
     const titulo = document.getElementById('ae-m-titulo').value.trim();
     const area = document.getElementById('ae-m-area').value;
+    const dominio = document.getElementById('ae-m-dominio').value;
     const responsavel_id = document.getElementById('ae-m-responsavel').value;
     const dataPrazo = document.getElementById('ae-m-prazo-data').value;
     const horaPrazo = document.getElementById('ae-m-prazo-hora').value || '09:00';
-    if(!titulo || !area || !responsavel_id || !dataPrazo){ alert('Preencha título, área, responsável e prazo de entrega.'); return; }
+    if(!titulo || !area || !dominio || !responsavel_id || !dataPrazo){ alert('Preencha título, domínio, área, responsável e prazo de entrega.'); return; }
     const revisor_id = document.getElementById('ae-m-revisor').value || null;
     const prioridade = document.getElementById('ae-m-prioridade').value;
     const descricao = document.getElementById('ae-m-desc').value.trim();
@@ -6932,7 +6997,7 @@ function openAtividadeModal(id){
     const horaPub = document.getElementById('ae-m-pub-hora').value || '09:00';
     const prazo_entrega = new Date(`${dataPrazo}T${horaPrazo}:00-03:00`).toISOString();
     const data_publicacao = dataPub ? new Date(`${dataPub}T${horaPub}:00-03:00`).toISOString() : null;
-    const payload = { titulo, area, responsavel_id, revisor_id, prioridade, descricao, checklist, prazo_entrega, data_publicacao };
+    const payload = { titulo, area, dominio, responsavel_id, revisor_id, prioridade, descricao, checklist, prazo_entrega, data_publicacao };
     const btn = document.getElementById('ae-m-save'); btn.disabled = true;
     try{
       if(existente){
@@ -6985,7 +7050,7 @@ function aeRenderDetalheModal(a, materiais, comentarios, historico){
   const checklist = Array.isArray(a.checklist) ? a.checklist : [];
   document.getElementById('modal').innerHTML = `
     <div class="modal-body form-modal" style="max-width:560px">
-      <div class="cat">Agenda da Equipe — ${AE_AREAS[a.area]||a.area}</div>
+      <div class="cat">Agenda da Equipe — ${AE_DOMINIOS[a.dominio]||''}${a.dominio?' · ':''}${AE_AREAS[a.area]||a.area}</div>
       <h3>${escapeHtml(a.titulo)}</h3>
       <div class="ae-card-meta" style="margin-bottom:12px">
         ${aePillStatus(a)} ${aePillPrioridade(a)} ${atrasada? `<span class="ae-atrasada">${icon('alert','tiny')} atrasada</span>`:''}
@@ -7079,7 +7144,9 @@ function aeRenderDetalheModal(a, materiais, comentarios, historico){
   });
 }
 
-function openRecorrenciasModal(){
+function openRecorrenciasModal(dominioFiltro){
+  const recorrencias = dominioFiltro ? AE_RECORRENCIAS.filter(r=>r.dominio===dominioFiltro && r.ativo) : AE_RECORRENCIAS;
+  const titulo = dominioFiltro ? `Rotinas recorrentes — ${AE_DOMINIOS[dominioFiltro]||dominioFiltro}` : 'Rotinas recorrentes';
   const linha = (r)=>{
     const diasChk = AE_DIAS_SEMANA.map((lbl,i)=>`
       <label style="font-size:11px;display:inline-flex;align-items:center;gap:3px;margin-right:6px">
@@ -7106,9 +7173,9 @@ function openRecorrenciasModal(){
   document.getElementById('modal').innerHTML = `
     <div class="modal-body form-modal" style="max-width:640px">
       <div class="cat">Agenda da Equipe</div>
-      <h3>Rotinas recorrentes</h3>
+      <h3>${escapeHtml(titulo)}</h3>
       <p style="color:var(--text-mute);font-size:12.5px;margin-top:-6px">Configure o responsável de cada rotina para que ela comece a gerar tarefas automaticamente (sem responsável, nenhuma tarefa é criada).</p>
-      <div id="ae-rec-lista">${AE_RECORRENCIAS.map(linha).join('')}</div>
+      <div id="ae-rec-lista">${recorrencias.length? recorrencias.map(linha).join('') : '<p class="empty-state">Nenhuma rotina cadastrada para este domínio.</p>'}</div>
       <div class="modal-actions"><button class="btn-outline" id="ae-rec-fechar">Fechar</button></div>
     </div>`;
   modalReturnTo = null; modalCloseGuard = null;
@@ -7136,10 +7203,107 @@ function openRecorrenciasModal(){
         // job noturno — senão a rotina só apareceria em "Hoje" no dia seguinte.
         try{ await sb.rpc('gerar_atividades_recorrentes'); }catch(genErr){ console.error('gerar_atividades_recorrentes', genErr); }
         await refreshAgendaEquipe();
-        openRecorrenciasModal();
+        openRecorrenciasModal(dominioFiltro);
         renderAgendaEquipeSubview();
       }catch(e){ console.error(e); alert('Não foi possível salvar essa rotina.'); btn.disabled = false; }
     });
+  });
+}
+
+/* ---------- Suporte para alunos ---------- */
+function openSuporteModal(){
+  const linha = (t)=>`
+    <div class="ae-suporte-row">
+      <div style="flex:1;min-width:0">
+        <strong>${escapeHtml(t.aluno)}</strong> — ${escapeHtml(t.demanda)}
+        <div style="color:var(--text-mute);font-size:11px">
+          ${t.resolvido? `<span class="ae-pill ae-status-concluida">Resolvida</span>` : (t.depende_de_outra_pessoa? `<span class="ae-pill ae-status-aguardando_outra_pessoa">Aguardando: ${escapeHtml(t.quem_precisa_atuar||t.depende_de_outra_pessoa)}</span>` : `<span class="ae-pill ae-status-a_fazer">Em aberto</span>`)}
+          ${t.responsavel_id? ` · Responsável: ${escapeHtml(aeNomeStaff(t.responsavel_id))}`:''}
+          ${t.prazo_retorno? ` · Retorno até ${aeFormatData(t.prazo_retorno+'T12:00:00')}`:''}
+        </div>
+      </div>
+      <button class="btn-mini ae-suporte-editar" data-id="${t.id}">${icon('edit','tiny')}</button>
+    </div>`;
+  const abertos = AE_SUPORTE.filter(t=>!t.resolvido);
+  const resolvidos = AE_SUPORTE.filter(t=>t.resolvido);
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal" style="max-width:600px">
+      <div class="cat">Agenda da Equipe — NCC Plat</div>
+      <h3>Suporte para alunos</h3>
+      <div class="modal-actions" style="margin:0 0 10px"><button class="btn-accent" id="ae-sup-novo">${icon('plus','tiny')} Novo atendimento</button></div>
+      <div class="ps-section">
+        <label class="ps-label">Em aberto (${abertos.length})</label>
+        ${abertos.length? abertos.map(linha).join('') : '<p style="color:var(--text-mute);font-size:12px">Nenhum atendimento em aberto.</p>'}
+      </div>
+      ${resolvidos.length? `<div class="ps-section"><label class="ps-label">Resolvidos recentemente</label>${resolvidos.slice(0,10).map(linha).join('')}</div>`:''}
+      <div class="modal-actions"><button class="btn-outline" id="ae-sup-fechar">Fechar</button></div>
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('ae-sup-fechar').addEventListener('click', closeModal);
+  document.getElementById('ae-sup-novo').addEventListener('click', ()=>openSuporteFormModal(null));
+  document.querySelectorAll('.ae-suporte-editar').forEach(btn=>{
+    btn.addEventListener('click', ()=>openSuporteFormModal(btn.dataset.id));
+  });
+}
+function openSuporteFormModal(id){
+  const existente = id ? AE_SUPORTE.find(t=>t.id===id) : null;
+  const d = existente ? Object.assign({}, existente) : {
+    aluno:'', demanda:'', responsavel_id: currentUser?currentUser.id:'', resolvido:false,
+    depende_de_outra_pessoa:'', quem_precisa_atuar:'', prazo_retorno:'', observacoes:'',
+  };
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <div class="cat">Suporte para alunos</div>
+      <h3>${existente? 'Editar atendimento' : 'Novo atendimento'}</h3>
+      <div class="ps-section fin-form-grid">
+        <div style="grid-column:1/-1"><label class="ps-label">Aluno *</label><input class="ps-input" id="sup-aluno" value="${escapeAttr(d.aluno)}" placeholder="Nome do aluno"></div>
+        <div style="grid-column:1/-1"><label class="ps-label">Demanda *</label><textarea class="ps-input" id="sup-demanda" placeholder="O que o aluno precisa?">${escapeHtml(d.demanda||'')}</textarea></div>
+        <div><label class="ps-label">Responsável</label>
+          <select class="ps-input" id="sup-responsavel"><option value="">Nenhum</option>${STAFF_LIST.map(s=>`<option value="${s.id}" ${d.responsavel_id===s.id?'selected':''}>${escapeHtml(s.name)}</option>`).join('')}</select>
+        </div>
+        <div><label class="ps-label"><input type="checkbox" id="sup-resolvido" ${d.resolvido?'checked':''}> Já foi resolvida</label></div>
+        <div><label class="ps-label">Depende de outra pessoa?</label><input class="ps-input" id="sup-depende" value="${escapeAttr(d.depende_de_outra_pessoa||'')}" placeholder="Ex.: financeiro, professor X..."></div>
+        <div><label class="ps-label">Quem precisa atuar</label><input class="ps-input" id="sup-quematua" value="${escapeAttr(d.quem_precisa_atuar||'')}"></div>
+        <div><label class="ps-label">Prazo de retorno</label><input class="ps-input" type="date" id="sup-prazo" value="${escapeAttr(d.prazo_retorno||'')}"></div>
+        <div style="grid-column:1/-1"><label class="ps-label">Observações</label><textarea class="ps-input" id="sup-obs">${escapeHtml(d.observacoes||'')}</textarea></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-accent" id="sup-salvar">${existente? 'Salvar alterações' : 'Registrar atendimento'}</button>
+        <button class="btn-outline" id="sup-voltar">Voltar</button>
+      </div>
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('sup-voltar').addEventListener('click', ()=>openSuporteModal());
+  document.getElementById('sup-salvar').addEventListener('click', async ()=>{
+    const aluno = document.getElementById('sup-aluno').value.trim();
+    const demanda = document.getElementById('sup-demanda').value.trim();
+    if(!aluno || !demanda){ alert('Preencha o aluno e a demanda.'); return; }
+    const payload = {
+      aluno, demanda,
+      responsavel_id: document.getElementById('sup-responsavel').value || null,
+      resolvido: document.getElementById('sup-resolvido').checked,
+      depende_de_outra_pessoa: document.getElementById('sup-depende').value.trim() || null,
+      quem_precisa_atuar: document.getElementById('sup-quematua').value.trim() || null,
+      prazo_retorno: document.getElementById('sup-prazo').value || null,
+      observacoes: document.getElementById('sup-obs').value.trim() || null,
+    };
+    const btn = document.getElementById('sup-salvar'); btn.disabled = true;
+    try{
+      if(existente){
+        const { data, error } = await sb.from('suporte_alunos').update(payload).eq('id', existente.id).select().single();
+        if(error) throw error;
+        const idx = AE_SUPORTE.findIndex(t=>t.id===existente.id);
+        if(idx>=0) AE_SUPORTE[idx] = data;
+      } else {
+        const { data, error } = await sb.from('suporte_alunos').insert(payload).select().single();
+        if(error) throw error;
+        AE_SUPORTE.unshift(data);
+      }
+      openSuporteModal();
+      if(currentView==='agendaequipe') renderAgendaEquipeSubview();
+    }catch(e){ console.error(e); alert('Não foi possível salvar. Tente de novo.'); btn.disabled = false; }
   });
 }
 

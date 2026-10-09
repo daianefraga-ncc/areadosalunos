@@ -7102,7 +7102,12 @@ function openRecorrenciasModal(){
         if(error) throw error;
         const idx = AE_RECORRENCIAS.findIndex(r=>r.id===rid);
         if(idx>=0) AE_RECORRENCIAS[idx] = data;
+        // Gera na hora a tarefa de hoje (se a rotina já se aplicar a hoje), em vez de esperar o
+        // job noturno — senão a rotina só apareceria em "Hoje" no dia seguinte.
+        try{ await sb.rpc('gerar_atividades_recorrentes'); }catch(genErr){ console.error('gerar_atividades_recorrentes', genErr); }
+        await refreshAgendaEquipe();
         openRecorrenciasModal();
+        renderAgendaEquipeSubview();
       }catch(e){ console.error(e); alert('Não foi possível salvar essa rotina.'); btn.disabled = false; }
     });
   });

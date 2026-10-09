@@ -6,7 +6,7 @@
   e mostrá-las mesmo com o app/navegador fechado.
 */
 
-const CACHE_NAME = 'ncc-plat-shell-v2';
+const CACHE_NAME = 'ncc-plat-shell-v3';
 const SHELL_FILES = [
   './index.html',
   './manifest.webmanifest',
@@ -15,8 +15,12 @@ const SHELL_FILES = [
 ];
 
 // Busca na rede, mas sem esperar pra sempre: se a internet do aluno estiver
-// lenta/instável e a resposta não chegar em 8s, desiste e cai pro cache (ou
+// lenta/instável e a resposta não chegar em 35s, desiste e cai pro cache (ou
 // erro) em vez de deixar a página "carregando" ou em branco indefinidamente.
+// 35s (em vez de um valor mais curto) porque o arquivo principal do site é
+// grande e, numa conexão ruim, pode legitimamente demorar bastante — um
+// limite curto demais fazia o aluno cair num cache antigo antes mesmo da
+// versão nova terminar de chegar.
 function fetchComTempoLimite(request, ms) {
   return new Promise((resolve, reject) => {
     let resolvido = false;
@@ -66,7 +70,7 @@ self.addEventListener('fetch', (event) => {
   if (reqUrl.origin !== self.location.origin) return;
 
   event.respondWith(
-    fetchComTempoLimite(event.request, 8000)
+    fetchComTempoLimite(event.request, 35000)
       .then((response) => {
         const copy = response.clone();
         caches.open(CACHE_NAME).then((cache) => {

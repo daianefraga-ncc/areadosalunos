@@ -1393,12 +1393,28 @@
   .ae-kanban{display:grid;grid-template-columns:repeat(5,minmax(200px,1fr));gap:12px;overflow-x:auto;}
   .ae-kanban-col{background:var(--bg-elev);border-radius:var(--radius-sm);padding:10px;min-height:120px;}
   .ae-kanban-col-head{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;display:flex;justify-content:space-between;color:var(--text-dim);}
-  .ae-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .ae-cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;width:100%;min-width:0;}
   .ae-cal-head{font-size:10.5px;font-weight:800;text-transform:uppercase;color:var(--text-mute);text-align:center;padding:4px 0;}
-  .ae-cal-cell{min-height:76px;border:1px solid var(--border);border-radius:6px;padding:4px;font-size:10.5px;background:var(--bg-elev);}
+  .ae-cal-cell{min-height:76px;min-width:0;border:1px solid var(--border);border-radius:6px;padding:4px;font-size:10.5px;background:var(--bg-elev);overflow:hidden;}
   .ae-cal-cell.ae-cal-outro-mes{opacity:0.4;}
   .ae-cal-cell .ae-cal-daynum{font-weight:700;font-size:11px;margin-bottom:3px;}
-  .ae-cal-item{display:block;background:var(--bg-card);border-radius:4px;padding:2px 4px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;}
+  .ae-cal-item{display:block;max-width:100%;background:var(--bg-card);border-radius:4px;padding:2px 4px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;box-sizing:border-box;}
+  .ae-cronograma{display:flex;flex-direction:column;gap:18px;}
+  .ae-cron-modulo{border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
+  .ae-cron-modulo-head{background:var(--accent-soft);color:var(--accent-2,var(--accent));font-weight:800;font-size:13.5px;padding:9px 12px;}
+  .ae-cron-table{display:flex;flex-direction:column;width:100%;}
+  .ae-cron-row{display:grid;grid-template-columns:64px minmax(0,1fr) 150px 150px 86px;gap:8px;align-items:center;padding:7px 12px;border-top:1px solid var(--border);font-size:12.5px;min-width:0;}
+  .ae-cron-row > div{min-width:0;}
+  .ae-cron-row.ae-cron-header{border-top:none;background:var(--bg-elev);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--text-mute);}
+  .ae-cron-aulanum{font-weight:700;}
+  .ae-cron-tema{white-space:normal;word-break:break-word;}
+  .ae-cron-select{width:100%;border:1px solid transparent;border-radius:14px;padding:4px 8px;font-size:11.5px;font-weight:700;cursor:pointer;background:var(--individual-soft);color:var(--individual);}
+  .ae-cron-select.ae-cron-status-atualizada,.ae-cron-select.ae-cron-status-gravada{background:var(--success-soft);color:var(--success);}
+  .ae-cron-duracao{width:100%;border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-size:12px;background:var(--bg-elev);color:var(--text);box-sizing:border-box;}
+  @media (max-width:720px){
+    .ae-cron-row{grid-template-columns:1fr;row-gap:5px;}
+    .ae-cron-row.ae-cron-header{display:none;}
+  }
   .ae-checklist-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:13px;}
   .ae-checklist-item input{margin-top:2px;}
   .ae-checklist-item.feito label{text-decoration:line-through;color:var(--text-mute);}
@@ -6500,7 +6516,8 @@ let STAFF_LIST = []; // [{id,name}] — contas com role='staff', populado em boo
 let AE_ATIVIDADES = [];
 let AE_RECORRENCIAS = [];
 let AE_MODELOS = [];
-let aeSubView = 'hoje'; // 'hoje' | 'semana' | 'calendario' | 'minhas' | 'quadro'
+let CRONOGRAMA_AULAS = []; // tabela por aula (tema/atualização/gravação/duração) — ver tabela cronograma_aulas
+let aeSubView = 'hoje'; // 'hoje' | 'semana' | 'calendario' | 'minhas' | 'quadro' | 'cronograma'
 let aeFiltro = { area:'todas', responsavel:'todos', status:'todos', prioridade:'todas' };
 let aeCalMonth = new Date();
 const AE_AREAS = {
@@ -6516,16 +6533,24 @@ const AE_DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
 async function refreshAgendaEquipe(){
   try{
-    const [r1, r2, r3] = await Promise.all([
+    const [r1, r2, r3, r4] = await Promise.all([
       sb.from('equipe_atividades').select('*').order('prazo_entrega'),
       sb.from('equipe_recorrencias').select('*').order('created_at'),
       sb.from('equipe_modelos').select('*').order('created_at'),
+      sb.from('cronograma_aulas').select('*').order('modulo_ordem').order('aula_num'),
     ]);
-    if(r1.error) throw r1.error; if(r2.error) throw r2.error; if(r3.error) throw r3.error;
+    if(r1.error) throw r1.error; if(r2.error) throw r2.error; if(r3.error) throw r3.error; if(r4.error) throw r4.error;
     AE_ATIVIDADES = r1.data || [];
     AE_RECORRENCIAS = r2.data || [];
     AE_MODELOS = r3.data || [];
+    CRONOGRAMA_AULAS = r4.data || [];
   }catch(e){ console.error('Não foi possível carregar a Agenda da Equipe', e); }
+}
+async function aeAtualizarCronogramaAula(id, campos){
+  const { error } = await sb.from('cronograma_aulas').update(campos).eq('id', id);
+  if(error){ console.error(error); alert('Não foi possível salvar. Tente de novo.'); return; }
+  const row = CRONOGRAMA_AULAS.find(c=>c.id===id);
+  if(row) Object.assign(row, campos);
 }
 function aeNomeStaff(id){ if(!id) return '—'; const s = STAFF_LIST.find(x=>x.id===id); return s ? s.name : '—'; }
 function aeAtrasada(a){ return !['concluido','aprovado'].includes(a.status) && new Date(a.prazo_entrega) < new Date(); }
@@ -6588,7 +6613,9 @@ function renderAgendaEquipe(){
       <div class="ae-tab ${aeSubView==='calendario'?'active':''}" data-sub="calendario">Calendário mensal</div>
       <div class="ae-tab ${aeSubView==='minhas'?'active':''}" data-sub="minhas">Minhas tarefas</div>
       <div class="ae-tab ${aeSubView==='quadro'?'active':''}" data-sub="quadro">Quadro de status</div>
+      <div class="ae-tab ${aeSubView==='cronograma'?'active':''}" data-sub="cronograma">Cronograma de aulas</div>
     </div>
+    ${aeSubView==='cronograma' ? '' : `
     <div class="add-form" style="margin-bottom:16px">
       <div class="field"><label>Área</label>
         <select class="ps-input" id="ae-f-area">
@@ -6611,21 +6638,24 @@ function renderAgendaEquipe(){
           ${Object.entries(AE_PRIORIDADE).map(([k,v])=>`<option value="${k}" ${aeFiltro.prioridade===k?'selected':''}>${v}</option>`).join('')}
         </select>
       </div>
-    </div>
+    </div>`}
     <div id="ae-subview-area"></div>
   `;
   document.getElementById('ae-nova-btn').addEventListener('click',()=>openAtividadeModal(null));
   document.getElementById('ae-rotinas-btn').addEventListener('click',()=>openRecorrenciasModal());
   document.getElementById('ae-cronograma-aula-btn').addEventListener('click',()=>openCronogramaAulaModal());
   document.querySelectorAll('.ae-tab').forEach(t=>t.addEventListener('click',()=>{ aeSubView = t.dataset.sub; renderAgendaEquipe(); }));
-  document.getElementById('ae-f-area').addEventListener('change',(e)=>{ aeFiltro.area=e.target.value; renderAgendaEquipeSubview(); });
-  document.getElementById('ae-f-responsavel').addEventListener('change',(e)=>{ aeFiltro.responsavel=e.target.value; renderAgendaEquipeSubview(); });
-  document.getElementById('ae-f-status').addEventListener('change',(e)=>{ aeFiltro.status=e.target.value; renderAgendaEquipeSubview(); });
-  document.getElementById('ae-f-prioridade').addEventListener('change',(e)=>{ aeFiltro.prioridade=e.target.value; renderAgendaEquipeSubview(); });
+  const elArea = document.getElementById('ae-f-area');
+  if(elArea){
+    elArea.addEventListener('change',(e)=>{ aeFiltro.area=e.target.value; renderAgendaEquipeSubview(); });
+    document.getElementById('ae-f-responsavel').addEventListener('change',(e)=>{ aeFiltro.responsavel=e.target.value; renderAgendaEquipeSubview(); });
+    document.getElementById('ae-f-status').addEventListener('change',(e)=>{ aeFiltro.status=e.target.value; renderAgendaEquipeSubview(); });
+    document.getElementById('ae-f-prioridade').addEventListener('change',(e)=>{ aeFiltro.prioridade=e.target.value; renderAgendaEquipeSubview(); });
+  }
   renderAgendaEquipeSubview();
 }
 function renderAgendaEquipeSubview(){
-  const map = { hoje:aeRenderHoje, semana:aeRenderSemana, calendario:aeRenderCalendario, minhas:aeRenderMinhas, quadro:aeRenderQuadro };
+  const map = { hoje:aeRenderHoje, semana:aeRenderSemana, calendario:aeRenderCalendario, minhas:aeRenderMinhas, quadro:aeRenderQuadro, cronograma:aeRenderCronograma };
   map[aeSubView]();
 }
 function aeCardHtml(a){
@@ -6730,6 +6760,57 @@ function aeRenderQuadro(){
     </div>`;
   }).join('')}</div>`;
   aeWireCards(el);
+}
+const AE_CRON_ATUALIZACAO = { em_andamento:'Em andamento', atualizada:'Atualizada' };
+const AE_CRON_GRAVACAO = { em_andamento:'Em andamento', gravada:'Gravada' };
+function aeRenderCronograma(){
+  const porModulo = {};
+  CRONOGRAMA_AULAS.forEach(r=>{
+    if(!porModulo[r.modulo_nome]) porModulo[r.modulo_nome] = { ordem:r.modulo_ordem, aulas:[] };
+    porModulo[r.modulo_nome].aulas.push(r);
+  });
+  const modulos = Object.entries(porModulo).sort((a,b)=>a[1].ordem-b[1].ordem);
+  const el = document.getElementById('ae-subview-area');
+  if(!modulos.length){
+    el.innerHTML = '<p class="empty-state">Nenhuma aula cadastrada no cronograma ainda.</p>';
+    return;
+  }
+  el.innerHTML = `<div class="ae-cronograma">${modulos.map(([nome, info])=>`
+    <div class="ae-cron-modulo">
+      <div class="ae-cron-modulo-head">${escapeHtml(nome)}</div>
+      <div class="ae-cron-table">
+        <div class="ae-cron-row ae-cron-header"><div>Aula</div><div>Tema</div><div>Atualização</div><div>Gravação</div><div>Duração</div></div>
+        ${info.aulas.map(a=>`
+          <div class="ae-cron-row" data-id="${a.id}">
+            <div class="ae-cron-aulanum">Aula ${a.aula_num}</div>
+            <div class="ae-cron-tema">${escapeHtml(a.tema)}</div>
+            <div><select class="ae-cron-select ae-cron-status-${a.atualizacao}" data-campo="atualizacao">
+              ${Object.entries(AE_CRON_ATUALIZACAO).map(([k,v])=>`<option value="${k}" ${a.atualizacao===k?'selected':''}>${v}</option>`).join('')}
+            </select></div>
+            <div><select class="ae-cron-select ae-cron-status-${a.gravacao}" data-campo="gravacao">
+              ${Object.entries(AE_CRON_GRAVACAO).map(([k,v])=>`<option value="${k}" ${a.gravacao===k?'selected':''}>${v}</option>`).join('')}
+            </select></div>
+            <div><input class="ae-cron-duracao" data-campo="duracao" placeholder="--:--" value="${escapeAttr(a.duracao||'')}"></div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('')}</div>`;
+  el.querySelectorAll('.ae-cron-select').forEach(sel=>{
+    sel.addEventListener('change', async (e)=>{
+      const id = e.target.closest('.ae-cron-row').dataset.id;
+      const campo = e.target.dataset.campo;
+      const valor = e.target.value;
+      e.target.className = `ae-cron-select ae-cron-status-${valor}`;
+      await aeAtualizarCronogramaAula(id, { [campo]: valor });
+    });
+  });
+  el.querySelectorAll('.ae-cron-duracao').forEach(inp=>{
+    inp.addEventListener('change', async (e)=>{
+      const id = e.target.closest('.ae-cron-row').dataset.id;
+      await aeAtualizarCronogramaAula(id, { duracao: e.target.value.trim() });
+    });
+  });
 }
 
 /* ---------- CRUD ---------- */

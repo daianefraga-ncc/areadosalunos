@@ -8033,6 +8033,19 @@ function mapProfileRow(p){
   };
 }
 
+/* Dá um prazo máximo pra qualquer chamada à internet (login, carregar dados etc.).
+   Sem isso, se a conexão travar no meio do caminho, a tela fica "carregando" ou
+   "Entrando..." pra sempre, sem nunca mostrar erro nem liberar o botão de novo. */
+function withTimeout(promise, ms){
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(()=>{ const err = new Error('Tempo de espera esgotado'); err.isTimeout = true; reject(err); }, ms);
+    promise.then(
+      (v)=>{ clearTimeout(t); resolve(v); },
+      (e)=>{ clearTimeout(t); reject(e); }
+    );
+  });
+}
+
 async function bootstrapData(){
   const PROFILE_SELECT = '*, student_cadastro(*), diagnostico(*), module_progress(*), checklist_items(*), sessions(*), contatos(*), course_progress(*)';
   const { data: profiles, error: perr } = await sb.from('profiles').select(PROFILE_SELECT).order('name');
@@ -9208,21 +9221,24 @@ function renderLogin(){
     if(!email || !senha){ errEl.textContent='Informe e-mail e senha.'; errEl.style.display='block'; return; }
     const btn = document.getElementById('login-btn');
     btn.disabled = true; btn.textContent = 'Entrando...';
-    const { data, error } = await sb.auth.signInWithPassword({ email, password: senha });
-    if(error){
-      btn.disabled = false; btn.textContent = 'Entrar na plataforma';
-      errEl.textContent = 'E-mail ou senha inválidos.'; errEl.style.display='block'; return;
-    }
-    currentUser = data.user;
     try{
-      await tryRedeemPendingCode();
-      await bootstrapData();
+      const { data, error } = await withTimeout(sb.auth.signInWithPassword({ email, password: senha }), 20000);
+      if(error){
+        errEl.textContent = 'E-mail ou senha inválidos.'; errEl.style.display='block'; return;
+      }
+      currentUser = data.user;
+      await withTimeout(tryRedeemPendingCode(), 20000);
+      await withTimeout(bootstrapData(), 25000);
       await enterApp();
     }catch(e){
       console.error(e);
-      errEl.textContent = 'Não foi possível carregar seus dados. Tente novamente.'; errEl.style.display='block';
+      errEl.textContent = (e && e.isTimeout)
+        ? 'A conexão está demorando demais. Verifique sua internet e tente novamente.'
+        : 'Não foi possível carregar seus dados. Tente novamente.';
+      errEl.style.display='block';
+    }finally{
+      btn.disabled = false; btn.textContent = 'Entrar na plataforma';
     }
-    btn.disabled = false; btn.textContent = 'Entrar na plataforma';
   });
 
   document.getElementById('signup-btn').addEventListener('click', async ()=>{

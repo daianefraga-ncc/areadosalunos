@@ -8297,23 +8297,15 @@ async function bootstrapData(){
 async function enterApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('active');
-  console.time('DEBUG-setupNav');
   setupNav();
-  console.timeEnd('DEBUG-setupNav');
-  console.time('DEBUG-renderProfile-1');
   renderProfile();
-  console.timeEnd('DEBUG-renderProfile-1');
   if(currentUserRole==='vendas'){
     setRoleVendas();
     goTo('vendas');
     return;
   }
-  console.time('DEBUG-setRole');
   setRole(currentUserRole==='staff' ? 'staff' : 'aluno');
-  console.timeEnd('DEBUG-setRole');
-  console.time('DEBUG-goTo');
   goTo(currentUserRole==='staff' ? 'visaogeral' : 'inicio');
-  console.timeEnd('DEBUG-goTo');
 }
 
 /* ================= SYNC: grava mutações locais de volta no Supabase ================= */
@@ -9240,24 +9232,14 @@ function renderLogin(){
     const btn = document.getElementById('login-btn');
     btn.disabled = true; btn.textContent = 'Entrando...';
     try{
-      console.time('DEBUG-total-login');
-      console.time('DEBUG-signIn');
       const { data, error } = await withTimeout(sb.auth.signInWithPassword({ email, password: senha }), 20000);
-      console.timeEnd('DEBUG-signIn');
       if(error){
         errEl.textContent = 'E-mail ou senha inválidos.'; errEl.style.display='block'; return;
       }
       currentUser = data.user;
-      console.time('DEBUG-tryRedeemPendingCode');
       await withTimeout(tryRedeemPendingCode(), 20000);
-      console.timeEnd('DEBUG-tryRedeemPendingCode');
-      console.time('DEBUG-bootstrapData');
       await withTimeout(bootstrapData(), 25000);
-      console.timeEnd('DEBUG-bootstrapData');
-      console.time('DEBUG-enterApp');
       await enterApp();
-      console.timeEnd('DEBUG-enterApp');
-      console.timeEnd('DEBUG-total-login');
     }catch(e){
       console.error(e);
       errEl.textContent = (e && e.isTimeout)
@@ -9795,14 +9777,10 @@ function renderCurrentView(){
     document.getElementById('view-'+currentView).innerHTML = '<div class="empty-state">Nenhum mentorado cadastrado ainda. Assim que um aluno criar a conta, os dados aparecerão aqui.</div>';
     return;
   }
-  console.time('DEBUG-mapView-'+currentView);
   map[currentView]();
-  console.timeEnd('DEBUG-mapView-'+currentView);
   // O cartãozinho de aniversário acompanha a navegação: fica visível em qualquer tela, como nas redes
   // sociais, e leva em conta quem está sendo visto (comunidade do mentorado x comunidade do Curso).
-  console.time('DEBUG-renderAniversarioCanto');
   renderAniversarioCanto();
-  console.timeEnd('DEBUG-renderAniversarioCanto');
 }
 
 /* ================= HELPERS: DOWNLOAD & CALENDAR ================= */
@@ -18601,18 +18579,10 @@ function renderVisaoGeral(){
   // Mesma fonte do sininho (comunidade_pendencias no banco): a comunidade não é mais carregada
   // inteira no navegador, então contar varrendo COMMUNITY_POSTS daria um número menor que o real.
   const duvidas = PENDENCIAS.filter(x=>x.motivo==='duvida').length;
-  console.log('DEBUG-contagens', {STUDENTS: STUDENTS.length, mentorados: mentorados.length, formacao: formacaoAlunos.length, pgncc: pgnccAlunos.length, ACCESS_CODES: ACCESS_CODES.length, PENDENCIAS: PENDENCIAS.length});
-  console.time('DEBUG-rows-mentorados');
   const _rowsMentorados = alunosTableRowsHtml(mentorados);
-  console.timeEnd('DEBUG-rows-mentorados');
-  console.time('DEBUG-rows-formacao');
   const _rowsFormacao = alunosTableRowsHtml(formacaoAlunos);
-  console.timeEnd('DEBUG-rows-formacao');
-  console.time('DEBUG-rows-pgncc');
   const _rowsPgncc = alunosTableRowsHtml(pgnccAlunos, {pgnccExtras:true});
-  console.timeEnd('DEBUG-rows-pgncc');
 
-  console.time('DEBUG-innerHTML-visaogeral');
   document.getElementById('view-visaogeral').innerHTML = `
     <div class="staff-banner">${icon('lock')} Acesso restrito — visível apenas para a equipe interna. Visão consolidada de todos os mentorados/alunos do Neurociência do Comportamento da Criança.</div>
     ${(()=>{ const a = aniversariantesHoje(null); return a.length? `
@@ -18712,7 +18682,6 @@ function renderVisaoGeral(){
     </div>
     <div id="fotos-status" class="backup-status"></div>
   `;
-  console.timeEnd('DEBUG-innerHTML-visaogeral');
   document.getElementById('backup-btn').addEventListener('click', exportarBackup);
   document.getElementById('fotos-btn').addEventListener('click', otimizarFotosExistentes);
   document.getElementById('gen-code-btn').addEventListener('click', async ()=>{
@@ -18795,8 +18764,15 @@ function renderVisaoGeral(){
   }
   /* Carrega notas/frequência da Pós-NCC uma vez por sessão (sob demanda, só quando esta tela é aberta) —
      a tabela já aparece com "Carregando..." nessas duas colunas e se atualiza sozinha quando os dados
-     chegam, sem travar o resto da Visão Geral esperando essa consulta. */
-  if(PGNCC_DESEMPENHO===null && totalPgncc){
+     chegam, sem travar o resto da Visão Geral esperando essa consulta.
+     IMPORTANTE: só dispara se não tiver uma busca já em andamento (!pgnccDesempenhoCarregando). Sem essa
+     trava, like isto travava a aba inteira: enquanto a primeira busca ainda está em andamento,
+     carregarPgnccDesempenho() desiste na hora (vê pgnccDesempenhoCarregando=true e retorna); esse retorno
+     imediato disparava o .then() quase instantaneamente, que chamava renderVisaoGeral() de novo, que caía
+     nesse mesmo "if" de novo (PGNCC_DESEMPENHO continua null até a busca real terminar) — repetindo isso
+     centenas/milhares de vezes por segundo, sem nunca dar folga pro navegador responder a cliques, até a
+     busca real finalmente terminar. */
+  if(PGNCC_DESEMPENHO===null && totalPgncc && !pgnccDesempenhoCarregando){
     carregarPgnccDesempenho().then(()=>{ if(currentView==='visaogeral') renderVisaoGeral(); });
   }
 }

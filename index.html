@@ -543,6 +543,32 @@
   @media (max-width:680px){ .modulo-detail-list{grid-template-columns:repeat(2,minmax(0,1fr));} }
   @media (max-width:380px){ .modulo-detail-list{grid-template-columns:1fr;} }
   .modulo-empty{color:var(--text-mute);font-size:13px;padding:10px 0;}
+  /* Avaliação do módulo (pós-NCC) — resumo/CTA dentro do modal de módulo, tela de fazer a prova, e tela de resultado. */
+  .aval-card-aluno .ps-label, .aval-resumo-staff .ps-label{display:flex;align-items:center;gap:6px;}
+  .aval-resultado{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-sm);margin-bottom:10px;}
+  .aval-resultado.is-aprovado{background:var(--success-soft);color:var(--success);}
+  .aval-resultado.is-reprovado{background:var(--danger-soft);color:var(--danger);}
+  .aval-resultado .icon{width:28px;height:28px;}
+  .aval-nota{font-size:16px;font-weight:700;}
+  .aval-status-txt{font-size:12px;opacity:.85;}
+  .aval-mensagem{font-size:13px;line-height:1.5;background:var(--bg-card);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px;}
+  .aval-detalhes{display:flex;flex-direction:column;gap:10px;margin-bottom:6px;}
+  .aval-detalhe-item{font-size:12.5px;line-height:1.5;padding:10px 12px;border-radius:var(--radius-sm);background:var(--bg-card);border-left:3px solid var(--border);}
+  .aval-detalhe-item.is-certa{border-left-color:var(--success);}
+  .aval-detalhe-item.is-errada{border-left-color:var(--danger);}
+  .aval-detalhe-q{font-weight:600;margin-bottom:4px;display:flex;gap:6px;align-items:flex-start;}
+  .aval-detalhe-q .icon{flex-shrink:0;margin-top:2px;}
+  .aval-detalhe-resp{color:var(--text-dim);}
+  .aval-detalhe-correta{color:var(--success);}
+  .aval-detalhe-explicacao{color:var(--text-mute);margin-top:4px;font-style:italic;}
+  .aval-tomar-pergunta .ps-label{font-weight:600;color:var(--text);margin-top:0;}
+  .aval-tomar-opcao{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:6px;font-size:13px;cursor:pointer;}
+  .aval-tomar-opcao:hover{border-color:var(--shared);}
+  .aval-tomar-opcao input{flex-shrink:0;}
+  .aval-perg-row{display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .aval-perg-row:last-of-type{border-bottom:none;}
+  .aval-opcao-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .aval-opcao-row .aval-opcao-texto{flex:1;}
   .extra-programs{margin-top:6px;font-size:11px;color:var(--text-mute);display:flex;flex-direction:column;gap:2px;}
   .extra-programs label{display:flex;align-items:center;gap:5px;cursor:pointer;}
   .extra-programs input[disabled]{opacity:.5;}
@@ -6542,6 +6568,7 @@ let AE_RECORRENCIAS = [];
 let AE_MODELOS = [];
 let CRONOGRAMA_AULAS = []; // tabela por aula (tema/atualização/gravação/duração) — ver tabela cronograma_aulas
 let AE_SUPORTE = []; // tickets de suporte a alunos — ver tabela suporte_alunos
+let AVAL_PERGUNTAS_CACHE = []; // perguntas (+ opções) da avaliação sendo editada no momento pela equipe — ver openAvaliacaoStaffModal
 let aeSubView = 'hoje'; // 'hoje' | 'semana' | 'calendario' | 'minhas' | 'quadro' | 'cronograma'
 let aeFiltro = { dominio:'todos', area:'todas', responsavel:'todos', status:'todos', prioridade:'todas' };
 let aeCalMonth = new Date();
@@ -12380,7 +12407,7 @@ function renderAulas(){
    a aula (openCourseModal), só que primeiro mostra a "vitrine" do módulo. Os cliques nos cartões aqui
    dentro são ligados à parte (não usam bindCourseTiles, pra não duplicar os listeners das aulas do
    Método que continuam por trás, no fundo da tela). */
-function openCursoModuloModal(moduloId){
+async function openCursoModuloModal(moduloId){
   const modulo = getCursoModulo(moduloId);
   if(!modulo) return;
   const aulas = COURSES.filter(c=>c.moduloId===moduloId);
@@ -12394,6 +12421,7 @@ function openCursoModuloModal(moduloId){
       <div class="modulo-detail-list">
         ${aulas.length? aulas.map(c=>courseTileHtml(c,{hideCat:true})).join('') : `<p class="modulo-empty">Nenhuma aula publicada neste módulo ainda.</p>`}
       </div>
+      <div id="modulo-avaliacao-secao"><p class="modulo-empty">Carregando avaliação...</p></div>
       <div class="modal-actions"><button class="btn-outline" id="modal-close-2">Fechar</button></div>
     </div>`;
   document.getElementById('modal-close-2').addEventListener('click', closeModal);
@@ -12404,6 +12432,446 @@ function openCursoModuloModal(moduloId){
     });
   });
   document.getElementById('modal-backdrop').classList.add('open');
+  await refreshAvaliacaoSecaoModulo(modulo);
+}
+/* ===== Avaliação do módulo (pós-NCC) =====
+   currentRole==='staff' -> quem está vendo é a equipe: mostra um resumo + botão para cadastrar/editar a
+   avaliação (perguntas e alternativas são sempre digitadas pela Profa Daiane, nunca inventadas aqui).
+   currentRole==='aluno' -> mostra a situação do aluno na avaliação (se existir e estiver ativa): botão pra
+   fazer, ou nota + gabarito comentado + botão de refazer (se nota < nota_minima) + botão de dúvida direto
+   pra Profa Daiane (vira um ticket em suporte_alunos, que já aparece no painel da equipe). */
+async function refreshAvaliacaoSecaoModulo(modulo){
+  const el = document.getElementById('modulo-avaliacao-secao');
+  if(!el) return; // modal já foi fechado/trocado nesse meio tempo
+  try{
+    if(currentRole==='staff'){
+      const { data, error } = await sb.from('avaliacoes_modulo').select('*').eq('modulo_id', modulo.id).maybeSingle();
+      if(error) throw error;
+      const el2 = document.getElementById('modulo-avaliacao-secao');
+      if(!el2) return;
+      el2.innerHTML = avaliacaoStaffResumoHtml(data);
+      bindAvaliacaoStaffResumo(modulo);
+    } else {
+      const { data, error } = await sb.from('avaliacoes_modulo').select('*').eq('modulo_id', modulo.id).eq('ativo', true).maybeSingle();
+      if(error) throw error;
+      const el2 = document.getElementById('modulo-avaliacao-secao');
+      if(!el2) return;
+      if(!data){ el2.innerHTML = ''; return; }
+      await renderAvaliacaoAlunoCard(modulo, data);
+    }
+  }catch(e){
+    console.error(e);
+    const el3 = document.getElementById('modulo-avaliacao-secao');
+    if(el3) el3.innerHTML = `<p class="modulo-empty">Não foi possível carregar a avaliação deste módulo.</p>`;
+  }
+}
+function avaliacaoStaffResumoHtml(avaliacao){
+  if(!avaliacao){
+    return `
+      <div class="ps-section aval-resumo-staff">
+        <label class="ps-label">${icon('idcard','tiny')} Avaliação do módulo</label>
+        <p class="modulo-empty">Nenhuma avaliação cadastrada ainda para este módulo.</p>
+        <button class="btn-outline" id="avm-abrir">${icon('plus','tiny')} Criar avaliação</button>
+      </div>`;
+  }
+  return `
+    <div class="ps-section aval-resumo-staff">
+      <label class="ps-label">${icon('idcard','tiny')} Avaliação do módulo</label>
+      <p style="font-size:13px;color:var(--text-mute);margin:4px 0 10px">
+        ${escapeHtml(avaliacao.titulo)} · ${avaliacao.ativo? `<span class="ae-pill ae-status-concluida">Visível para alunos</span>` : `<span class="ae-pill ae-status-a_fazer">Oculta dos alunos</span>`} · Nota mínima ${avaliacao.nota_minima}
+      </p>
+      <button class="btn-outline" id="avm-abrir">${icon('edit','tiny')} Gerenciar avaliação</button>
+    </div>`;
+}
+function bindAvaliacaoStaffResumo(modulo){
+  const btn = document.getElementById('avm-abrir');
+  if(btn) btn.addEventListener('click', ()=>openAvaliacaoStaffModal(modulo.id));
+}
+/* ----- Lado da equipe: cadastro da avaliação e das perguntas/alternativas ----- */
+async function openAvaliacaoStaffModal(moduloId){
+  const modulo = getCursoModulo(moduloId);
+  if(!modulo) return;
+  document.getElementById('modal').innerHTML = `<div class="modal-body form-modal"><p style="color:var(--text-mute)">Carregando...</p></div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  let avaliacao = null;
+  try{
+    const { data, error } = await sb.from('avaliacoes_modulo').select('*').eq('modulo_id', moduloId).maybeSingle();
+    if(error) throw error;
+    avaliacao = data;
+    if(avaliacao){
+      const { data: perguntas, error: errP } = await sb.from('avaliacao_perguntas').select('*, avaliacao_opcoes(*)').eq('avaliacao_id', avaliacao.id).order('ordem');
+      if(errP) throw errP;
+      AVAL_PERGUNTAS_CACHE = perguntas || [];
+    } else {
+      AVAL_PERGUNTAS_CACHE = [];
+    }
+  }catch(e){
+    console.error(e);
+    document.getElementById('modal').innerHTML = `<div class="modal-body form-modal"><p class="modulo-empty">Não foi possível carregar a avaliação.</p><div class="modal-actions"><button class="btn-outline" id="avm-fechar-erro">Fechar</button></div></div>`;
+    document.getElementById('avm-fechar-erro').addEventListener('click', closeModal);
+    return;
+  }
+  renderAvaliacaoStaffModal(modulo, avaliacao);
+}
+function avaliacaoPerguntaStaffRowHtml(p, i){
+  const opcoes = (p.avaliacao_opcoes||[]).slice().sort((a,b)=>a.ordem-b.ordem);
+  return `
+    <div class="aval-perg-row">
+      <div style="flex:1;min-width:0">
+        <strong>${i+1}.</strong> ${escapeHtml(p.enunciado)}
+        <div style="color:var(--text-mute);font-size:12px;margin-top:3px">
+          ${opcoes.map(o=>`${o.correta? icon('check','tiny') : ''} ${escapeHtml(o.texto)}`).join(' &nbsp;·&nbsp; ')}
+        </div>
+      </div>
+      <button class="btn-mini avm-perg-editar" data-id="${p.id}">${icon('edit','tiny')}</button>
+      <button class="btn-mini avm-perg-excluir" data-id="${p.id}">${icon('trash','tiny')}</button>
+    </div>`;
+}
+function renderAvaliacaoStaffModal(modulo, avaliacao){
+  const d = avaliacao || { titulo: `Avaliação — ${modulo.nome}`, nota_minima: 7.0, mensagem_aprovado:'', mensagem_reprovado:'', ativo:false };
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <div class="cat">${escapeHtml(modulo.nome)}</div>
+      <h3>Avaliação do módulo</h3>
+      <div class="ps-section fin-form-grid">
+        <div style="grid-column:1/-1"><label class="ps-label">Título da avaliação</label><input class="ps-input" id="avm-titulo" value="${escapeAttr(d.titulo)}"></div>
+        <div><label class="ps-label">Nota mínima para aprovação</label><input class="ps-input" type="number" id="avm-nota" min="0" max="10" step="0.1" value="${d.nota_minima}"></div>
+        <div><label class="ps-label"><input type="checkbox" id="avm-ativo" ${d.ativo?'checked':''}> Visível para os alunos</label></div>
+        <div style="grid-column:1/-1"><label class="ps-label">Mensagem para quem for aprovado</label><textarea class="ps-input" id="avm-msg-aprovado" placeholder="Ex.: Parabéns, você foi aprovado(a) neste módulo!">${escapeHtml(d.mensagem_aprovado||'')}</textarea></div>
+        <div style="grid-column:1/-1"><label class="ps-label">Mensagem para quem for reprovado</label><textarea class="ps-input" id="avm-msg-reprovado" placeholder="Ex.: Revise o conteúdo do módulo e tente novamente.">${escapeHtml(d.mensagem_reprovado||'')}</textarea></div>
+      </div>
+      <div class="modal-actions" style="margin-bottom:18px">
+        <button class="btn-accent" id="avm-salvar">${avaliacao? 'Salvar configurações' : 'Criar avaliação'}</button>
+        <button class="btn-outline" id="avm-voltar">Voltar</button>
+      </div>
+      ${avaliacao? `
+        <div class="ps-section">
+          <label class="ps-label">Perguntas (${AVAL_PERGUNTAS_CACHE.length})</label>
+          ${AVAL_PERGUNTAS_CACHE.length? AVAL_PERGUNTAS_CACHE.map((p,i)=>avaliacaoPerguntaStaffRowHtml(p,i)).join('') : '<p class="modulo-empty">Nenhuma pergunta cadastrada ainda.</p>'}
+          <button class="btn-outline" id="avm-add-pergunta" style="margin-top:10px">${icon('plus','tiny')} Adicionar pergunta</button>
+        </div>
+      ` : `<p class="modulo-empty">Salve as configurações acima para poder cadastrar as perguntas.</p>`}
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('avm-voltar').addEventListener('click', ()=>openCursoModuloModal(modulo.id));
+  document.getElementById('avm-salvar').addEventListener('click', async ()=>{
+    const titulo = document.getElementById('avm-titulo').value.trim() || `Avaliação — ${modulo.nome}`;
+    const nota_minima = parseFloat(document.getElementById('avm-nota').value) || 7.0;
+    const ativo = document.getElementById('avm-ativo').checked;
+    const mensagem_aprovado = document.getElementById('avm-msg-aprovado').value.trim() || null;
+    const mensagem_reprovado = document.getElementById('avm-msg-reprovado').value.trim() || null;
+    const btn = document.getElementById('avm-salvar'); btn.disabled = true;
+    try{
+      if(avaliacao){
+        const { error } = await sb.from('avaliacoes_modulo').update({titulo, nota_minima, ativo, mensagem_aprovado, mensagem_reprovado}).eq('id', avaliacao.id);
+        if(error) throw error;
+      } else {
+        const { error } = await sb.from('avaliacoes_modulo').insert({modulo_id: modulo.id, curso_id: modulo.cursoId, titulo, nota_minima, ativo, mensagem_aprovado, mensagem_reprovado, created_by: currentUser.id});
+        if(error) throw error;
+      }
+      await openAvaliacaoStaffModal(modulo.id);
+    }catch(e){ console.error(e); alert('Não foi possível salvar. Tente de novo.'); btn.disabled = false; }
+  });
+  if(avaliacao){
+    document.getElementById('avm-add-pergunta').addEventListener('click', ()=>openAvaliacaoPerguntaModal(avaliacao.id, null, modulo.id));
+    document.querySelectorAll('.avm-perg-editar').forEach(btn=>{
+      btn.addEventListener('click', ()=>openAvaliacaoPerguntaModal(avaliacao.id, btn.dataset.id, modulo.id));
+    });
+    document.querySelectorAll('.avm-perg-excluir').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if(!confirm('Excluir esta pergunta?')) return;
+        try{
+          const { error } = await sb.from('avaliacao_perguntas').delete().eq('id', btn.dataset.id);
+          if(error) throw error;
+          await openAvaliacaoStaffModal(modulo.id);
+        }catch(e){ console.error(e); alert('Não foi possível excluir a pergunta.'); }
+      });
+    });
+  }
+}
+function openAvaliacaoPerguntaModal(avaliacaoId, perguntaId, moduloId){
+  const existente = perguntaId ? AVAL_PERGUNTAS_CACHE.find(p=>p.id===perguntaId) : null;
+  const state = {
+    enunciado: existente ? existente.enunciado : '',
+    explicacao: existente ? (existente.explicacao||'') : '',
+    opcoes: existente && existente.avaliacao_opcoes && existente.avaliacao_opcoes.length
+      ? existente.avaliacao_opcoes.slice().sort((a,b)=>a.ordem-b.ordem).map(o=>({texto:o.texto, correta:!!o.correta}))
+      : [ {texto:'',correta:true}, {texto:'',correta:false}, {texto:'',correta:false}, {texto:'',correta:false} ],
+  };
+  function syncOpcoesFromDom(){
+    document.querySelectorAll('.aval-opcao-texto').forEach(inp=>{
+      const idx = Number(inp.dataset.idx);
+      if(state.opcoes[idx]) state.opcoes[idx].texto = inp.value;
+    });
+  }
+  function render(){
+    document.getElementById('modal').innerHTML = `
+      <div class="modal-body form-modal">
+        <div class="cat">Avaliação do módulo</div>
+        <h3>${existente? 'Editar pergunta' : 'Nova pergunta'}</h3>
+        <div class="ps-section">
+          <label class="ps-label">Enunciado da pergunta *</label>
+          <textarea class="ps-input" id="avp-enunciado" placeholder="Digite a pergunta...">${escapeHtml(state.enunciado)}</textarea>
+        </div>
+        <div class="ps-section">
+          <label class="ps-label">Alternativas * (marque qual é a correta)</label>
+          <div id="avp-opcoes">
+            ${state.opcoes.map((o,i)=>`
+              <div class="aval-opcao-row">
+                <input type="radio" name="avp-correta" data-idx="${i}" ${o.correta?'checked':''}>
+                <input type="text" class="ps-input aval-opcao-texto" data-idx="${i}" placeholder="Alternativa ${i+1}" value="${escapeAttr(o.texto)}">
+                ${state.opcoes.length>2? `<button type="button" class="btn-mini aval-opcao-remover" data-idx="${i}">${icon('trash','tiny')}</button>` : ''}
+              </div>`).join('')}
+          </div>
+          <button type="button" class="btn-outline" id="avp-add-opcao" style="margin-top:4px">${icon('plus','tiny')} Adicionar alternativa</button>
+        </div>
+        <div class="ps-section">
+          <label class="ps-label">Explicação (mostrada ao aluno depois da correção)</label>
+          <textarea class="ps-input" id="avp-explicacao" placeholder="Explique por que essa é a resposta certa...">${escapeHtml(state.explicacao)}</textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-accent" id="avp-salvar">${existente? 'Salvar alterações' : 'Adicionar pergunta'}</button>
+          <button class="btn-outline" id="avp-voltar">Voltar</button>
+        </div>
+      </div>`;
+    modalReturnTo = null; modalCloseGuard = null;
+    document.getElementById('modal-backdrop').classList.add('open');
+    document.getElementById('avp-voltar').addEventListener('click', ()=>openAvaliacaoStaffModal(moduloId));
+    document.getElementById('avp-add-opcao').addEventListener('click', ()=>{
+      state.enunciado = document.getElementById('avp-enunciado').value;
+      state.explicacao = document.getElementById('avp-explicacao').value;
+      syncOpcoesFromDom();
+      state.opcoes.push({texto:'', correta:false});
+      render();
+    });
+    document.querySelectorAll('.aval-opcao-remover').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        state.enunciado = document.getElementById('avp-enunciado').value;
+        state.explicacao = document.getElementById('avp-explicacao').value;
+        syncOpcoesFromDom();
+        const idx = Number(btn.dataset.idx);
+        const eraCorreta = state.opcoes[idx].correta;
+        state.opcoes.splice(idx,1);
+        if(eraCorreta && state.opcoes.length) state.opcoes[0].correta = true;
+        render();
+      });
+    });
+    document.querySelectorAll('input[name="avp-correta"]').forEach(r=>{
+      r.addEventListener('change', ()=>{
+        state.enunciado = document.getElementById('avp-enunciado').value;
+        state.explicacao = document.getElementById('avp-explicacao').value;
+        syncOpcoesFromDom();
+        const idx = Number(r.dataset.idx);
+        state.opcoes.forEach((o,i)=>{ o.correta = (i===idx); });
+        render();
+      });
+    });
+    document.getElementById('avp-salvar').addEventListener('click', async ()=>{
+      state.enunciado = document.getElementById('avp-enunciado').value.trim();
+      state.explicacao = document.getElementById('avp-explicacao').value.trim();
+      syncOpcoesFromDom();
+      if(!state.enunciado){ alert('Escreva o enunciado da pergunta.'); return; }
+      const validas = state.opcoes.filter(o=>o.texto.trim());
+      if(validas.length<2){ alert('Cadastre pelo menos 2 alternativas com texto.'); return; }
+      if(!validas.some(o=>o.correta)){ alert('Marque qual alternativa é a correta.'); return; }
+      const btn = document.getElementById('avp-salvar'); btn.disabled = true;
+      try{
+        let pergId = existente ? existente.id : null;
+        if(existente){
+          const { error } = await sb.from('avaliacao_perguntas').update({enunciado: state.enunciado, explicacao: state.explicacao || null}).eq('id', existente.id);
+          if(error) throw error;
+        } else {
+          const ordem = AVAL_PERGUNTAS_CACHE.filter(p=>p.avaliacao_id===avaliacaoId).length;
+          const { data, error } = await sb.from('avaliacao_perguntas').insert({avaliacao_id: avaliacaoId, enunciado: state.enunciado, explicacao: state.explicacao || null, ordem}).select().single();
+          if(error) throw error;
+          pergId = data.id;
+        }
+        const { error: errDel } = await sb.from('avaliacao_opcoes').delete().eq('pergunta_id', pergId);
+        if(errDel) throw errDel;
+        const rows = validas.map((o,i)=>({pergunta_id: pergId, texto:o.texto.trim(), correta:!!o.correta, ordem:i}));
+        const { error: errOpc } = await sb.from('avaliacao_opcoes').insert(rows);
+        if(errOpc) throw errOpc;
+        await openAvaliacaoStaffModal(moduloId);
+      }catch(e){ console.error(e); alert('Não foi possível salvar a pergunta. Tente de novo.'); btn.disabled = false; }
+    });
+  }
+  render();
+}
+/* ----- Lado do aluno: ver situação, fazer/refazer a avaliação, enviar dúvida ----- */
+function avaliacaoResultadoBlocoHtml(resultado){
+  const aprovado = resultado.aprovado;
+  const detalhes = resultado.detalhes || [];
+  return `
+    <div class="aval-resultado ${aprovado?'is-aprovado':'is-reprovado'}">
+      ${icon(aprovado?'check':'xcircle')}
+      <div>
+        <div class="aval-nota">Nota: ${resultado.nota}</div>
+        <div class="aval-status-txt">${aprovado? 'Aprovado(a)' : `Nota mínima para aprovação: ${resultado.nota_minima}`}</div>
+      </div>
+    </div>
+    ${resultado.mensagem? `<p class="aval-mensagem">${escapeHtml(resultado.mensagem)}</p>` : ''}
+    <div class="aval-detalhes">
+      ${detalhes.map((d,i)=>`
+        <div class="aval-detalhe-item ${d.correta?'is-certa':'is-errada'}">
+          <div class="aval-detalhe-q">${icon(d.correta?'check':'xcircle','tiny')} <span><strong>${i+1}.</strong> ${escapeHtml(d.enunciado)}</span></div>
+          <div class="aval-detalhe-resp">Sua resposta: ${escapeHtml(d.escolhida_texto||'—')}</div>
+          ${!d.correta? `<div class="aval-detalhe-correta">Resposta correta: ${escapeHtml(d.correta_opcao_texto||'—')}</div>` : ''}
+          ${d.explicacao? `<div class="aval-detalhe-explicacao">${escapeHtml(d.explicacao)}</div>` : ''}
+        </div>`).join('')}
+    </div>`;
+}
+async function renderAvaliacaoAlunoCard(modulo, avaliacao){
+  const el = document.getElementById('modulo-avaliacao-secao');
+  if(!el) return;
+  let situacao = { total_tentativas:0, ultima_tentativa:null };
+  try{
+    const { data, error } = await sb.rpc('fn_avaliacao_minha_situacao', { p_avaliacao_id: avaliacao.id });
+    if(error) throw error;
+    situacao = data || situacao;
+  }catch(e){
+    console.error(e);
+    const el2 = document.getElementById('modulo-avaliacao-secao');
+    if(el2) el2.innerHTML = `<p class="modulo-empty">Não foi possível carregar sua situação nesta avaliação.</p>`;
+    return;
+  }
+  const el3 = document.getElementById('modulo-avaliacao-secao');
+  if(!el3) return;
+  const ult = situacao.ultima_tentativa;
+  el3.innerHTML = `
+    <div class="ps-section aval-card-aluno">
+      <label class="ps-label">${icon('idcard','tiny')} ${escapeHtml(avaliacao.titulo)}</label>
+      ${!ult? `
+        <p style="font-size:13px;color:var(--text-mute);margin:6px 0 10px">Avaliação deste módulo — responda e veja sua nota e o gabarito comentado na hora.</p>
+        <button class="btn-accent" id="aval-comecar">Fazer avaliação</button>
+      ` : `
+        ${avaliacaoResultadoBlocoHtml(ult)}
+        <div class="modal-actions" style="margin-top:12px">
+          ${!ult.aprovado? `<button class="btn-accent" id="aval-refazer">${icon('next','tiny')} Solicitar nova avaliação</button>` : ''}
+          <button class="btn-outline" id="aval-duvida">${icon('help','tiny')} Dúvida? Fale com a Profa Daiane</button>
+        </div>
+      `}
+    </div>`;
+  const btnComecar = document.getElementById('aval-comecar');
+  if(btnComecar) btnComecar.addEventListener('click', ()=>openAvaliacaoTomarModal(modulo, avaliacao));
+  const btnRefazer = document.getElementById('aval-refazer');
+  if(btnRefazer) btnRefazer.addEventListener('click', ()=>openAvaliacaoTomarModal(modulo, avaliacao));
+  const btnDuvida = document.getElementById('aval-duvida');
+  if(btnDuvida) btnDuvida.addEventListener('click', ()=>openAvaliacaoDuvidaModal(modulo, avaliacao));
+}
+async function openAvaliacaoTomarModal(modulo, avaliacao){
+  document.getElementById('modal').innerHTML = `<div class="modal-body form-modal"><p style="color:var(--text-mute)">Carregando perguntas...</p></div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  let perguntas = [];
+  try{
+    const { data, error } = await sb.rpc('fn_avaliacao_perguntas_aluno', { p_avaliacao_id: avaliacao.id });
+    if(error) throw error;
+    perguntas = data || [];
+  }catch(e){
+    console.error(e);
+    document.getElementById('modal').innerHTML = `<div class="modal-body form-modal"><p class="modulo-empty">Não foi possível carregar as perguntas desta avaliação.</p><div class="modal-actions"><button class="btn-outline" id="avt-fechar-erro">Fechar</button></div></div>`;
+    document.getElementById('avt-fechar-erro').addEventListener('click', closeModal);
+    return;
+  }
+  if(!perguntas.length){
+    document.getElementById('modal').innerHTML = `<div class="modal-body form-modal"><p class="modulo-empty">Esta avaliação ainda não tem perguntas cadastradas. Fale com a equipe.</p><div class="modal-actions"><button class="btn-outline" id="avt-fechar-vazio">Fechar</button></div></div>`;
+    document.getElementById('avt-fechar-vazio').addEventListener('click', closeModal);
+    return;
+  }
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <div class="cat">${escapeHtml(modulo.nome)}</div>
+      <h3>${escapeHtml(avaliacao.titulo)}</h3>
+      <div class="aval-tomar-lista">
+        ${perguntas.map((p,i)=>`
+          <div class="ps-section aval-tomar-pergunta">
+            <label class="ps-label">${i+1}. ${escapeHtml(p.enunciado)}</label>
+            ${(p.opcoes||[]).map(o=>`
+              <label class="aval-tomar-opcao">
+                <input type="radio" name="avt-p-${p.pergunta_id}" value="${o.opcao_id}">
+                <span>${escapeHtml(o.texto)}</span>
+              </label>`).join('')}
+          </div>`).join('')}
+      </div>
+      <div class="modal-actions">
+        <button class="btn-accent" id="avt-enviar">Enviar respostas</button>
+        <button class="btn-outline" id="avt-cancelar">Cancelar</button>
+      </div>
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('avt-cancelar').addEventListener('click', ()=>openCursoModuloModal(modulo.id));
+  document.getElementById('avt-enviar').addEventListener('click', async ()=>{
+    const respostas = [];
+    for(const p of perguntas){
+      const sel = document.querySelector(`input[name="avt-p-${p.pergunta_id}"]:checked`);
+      if(!sel){ alert('Responda todas as perguntas antes de enviar.'); return; }
+      respostas.push({ pergunta_id: p.pergunta_id, opcao_id: sel.value });
+    }
+    const btn = document.getElementById('avt-enviar'); btn.disabled = true;
+    try{
+      const { data, error } = await sb.rpc('fn_avaliacao_submeter', { p_avaliacao_id: avaliacao.id, p_respostas: respostas });
+      if(error) throw error;
+      renderAvaliacaoResultadoModal(modulo, avaliacao, data);
+    }catch(e){ console.error(e); alert('Não foi possível enviar suas respostas. Tente de novo.'); btn.disabled = false; }
+  });
+}
+function renderAvaliacaoResultadoModal(modulo, avaliacao, resultado){
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <div class="cat">${escapeHtml(modulo.nome)}</div>
+      <h3>${escapeHtml(avaliacao.titulo)}</h3>
+      ${avaliacaoResultadoBlocoHtml(resultado)}
+      <div class="modal-actions" style="margin-top:12px">
+        ${!resultado.aprovado? `<button class="btn-accent" id="avr-refazer">${icon('next','tiny')} Solicitar nova avaliação</button>` : ''}
+        <button class="btn-outline" id="avr-duvida">${icon('help','tiny')} Dúvida? Fale com a Profa Daiane</button>
+        <button class="btn-outline" id="avr-voltar">Voltar ao módulo</button>
+      </div>
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('avr-voltar').addEventListener('click', ()=>openCursoModuloModal(modulo.id));
+  const btnRefazer = document.getElementById('avr-refazer');
+  if(btnRefazer) btnRefazer.addEventListener('click', ()=>openAvaliacaoTomarModal(modulo, avaliacao));
+  document.getElementById('avr-duvida').addEventListener('click', ()=>openAvaliacaoDuvidaModal(modulo, avaliacao));
+}
+function openAvaliacaoDuvidaModal(modulo, avaliacao){
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <div class="cat">${escapeHtml(modulo.nome)}</div>
+      <h3>Dúvida na avaliação</h3>
+      <p style="font-size:13px;color:var(--text-mute);margin-bottom:10px">Conte pra Profa Daiane qual foi sua dúvida nas perguntas de "${escapeHtml(avaliacao.titulo)}". Ela recebe no painel de suporte e te responde por aqui.</p>
+      <div class="ps-section">
+        <label class="ps-label">Sua dúvida *</label>
+        <textarea class="ps-input" id="avd-texto" placeholder="Descreva sua dúvida..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-accent" id="avd-enviar">Enviar</button>
+        <button class="btn-outline" id="avd-cancelar">Cancelar</button>
+      </div>
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('avd-cancelar').addEventListener('click', ()=>openCursoModuloModal(modulo.id));
+  document.getElementById('avd-enviar').addEventListener('click', async ()=>{
+    const texto = document.getElementById('avd-texto').value.trim();
+    if(!texto){ alert('Escreva sua dúvida antes de enviar.'); return; }
+    const btn = document.getElementById('avd-enviar'); btn.disabled = true;
+    try{
+      const s = getStudent(currentStudentId);
+      const { error } = await sb.from('suporte_alunos').insert({
+        aluno: s ? s.name : (currentUser.email || 'Aluno'),
+        aluno_id: currentUser.id,
+        demanda: `Dúvida na avaliação do módulo "${modulo.nome}" (${avaliacao.titulo}): ${texto}`,
+        resolvido: false,
+      });
+      if(error) throw error;
+      alert('Sua dúvida foi enviada para a Profa Daiane. Em breve você recebe uma resposta.');
+      openCursoModuloModal(modulo.id);
+    }catch(e){ console.error(e); alert('Não foi possível enviar sua dúvida. Tente de novo.'); btn.disabled = false; }
+  });
 }
 /* Setas de navegação + conversão do scroll vertical do mouse em rolagem horizontal — nem todo mouse tem
    scroll lateral, então isso permite navegar pelas fileiras de aulas sem depender só da barra de rolagem. */

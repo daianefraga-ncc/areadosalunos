@@ -1369,6 +1369,45 @@
   .status-pill.status-Pendente{background:var(--individual-soft);color:var(--individual);}
   .status-pill.status-Atrasada{background:var(--danger-soft);color:var(--danger);}
   .resp-pill{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--bg-elev);color:var(--text-dim);white-space:nowrap;}
+  /* Agenda da Equipe */
+  .ae-pill{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;}
+  .ae-status-a_fazer{background:var(--bg-elev);color:var(--text-dim);}
+  .ae-status-em_andamento{background:var(--individual-soft);color:var(--individual);}
+  .ae-status-em_revisao{background:var(--shared-soft);color:var(--shared);}
+  .ae-status-aprovado{background:var(--accent-soft);color:var(--accent);}
+  .ae-status-concluido{background:var(--success-soft);color:var(--success);}
+  .ae-prio-normal{background:var(--bg-elev);color:var(--text-mute);}
+  .ae-prio-alta{background:var(--individual-soft);color:var(--individual);}
+  .ae-prio-urgente{background:var(--danger-soft);color:var(--danger);}
+  .ae-atrasada{color:var(--danger);font-weight:700;}
+  .ae-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:10px;}
+  .ae-tab{padding:7px 13px;border-radius:20px;font-size:12.5px;font-weight:700;background:var(--bg-elev);color:var(--text-dim);cursor:pointer;border:1px solid transparent;}
+  .ae-tab:hover{border-color:var(--border);}
+  .ae-tab.active{background:var(--accent);color:var(--bg);}
+  .ae-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;cursor:pointer;transition:border-color .12s;}
+  .ae-card:hover{border-color:var(--accent);}
+  .ae-card .ae-card-title{font-weight:700;font-size:13.5px;margin:0 0 6px;}
+  .ae-card .ae-card-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:11.5px;color:var(--text-mute);}
+  .ae-day-group{margin-bottom:18px;}
+  .ae-day-group .ae-day-label{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-mute);margin-bottom:8px;}
+  .ae-kanban{display:grid;grid-template-columns:repeat(5,minmax(200px,1fr));gap:12px;overflow-x:auto;}
+  .ae-kanban-col{background:var(--bg-elev);border-radius:var(--radius-sm);padding:10px;min-height:120px;}
+  .ae-kanban-col-head{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px;display:flex;justify-content:space-between;color:var(--text-dim);}
+  .ae-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .ae-cal-head{font-size:10.5px;font-weight:800;text-transform:uppercase;color:var(--text-mute);text-align:center;padding:4px 0;}
+  .ae-cal-cell{min-height:76px;border:1px solid var(--border);border-radius:6px;padding:4px;font-size:10.5px;background:var(--bg-elev);}
+  .ae-cal-cell.ae-cal-outro-mes{opacity:0.4;}
+  .ae-cal-cell .ae-cal-daynum{font-weight:700;font-size:11px;margin-bottom:3px;}
+  .ae-cal-item{display:block;background:var(--bg-card);border-radius:4px;padding:2px 4px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;}
+  .ae-checklist-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:13px;}
+  .ae-checklist-item input{margin-top:2px;}
+  .ae-checklist-item.feito label{text-decoration:line-through;color:var(--text-mute);}
+  .ae-comment{padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .ae-comment:last-child{border-bottom:none;}
+  .ae-comment .ae-comment-meta{color:var(--text-mute);font-size:10.5px;margin-bottom:2px;}
+  .ae-hist-row{font-size:11.5px;color:var(--text-dim);padding:4px 0;border-bottom:1px solid var(--border);}
+  .ae-hist-row:last-child{border-bottom:none;}
+  .ae-material-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12.5px;}
   .tag-chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px;}
   .tag-chip{border:1px solid var(--border);border-radius:20px;padding:7px 13px;font-size:12.5px;font-weight:600;cursor:pointer;background:var(--bg-elev);color:var(--text);user-select:none;transition:all .12s;}
   .tag-chip:hover{border-color:var(--accent);}
@@ -1541,6 +1580,7 @@
     <button class="nav-item restrict" id="nav-analise" data-view="analise" style="display:none"></button>
     <button class="nav-item restrict" id="nav-clientes" data-view="clientes" style="display:none"></button>
     <button class="nav-item restrict" id="nav-financeiro" data-view="financeiro" style="display:none"></button>
+    <button class="nav-item restrict" id="nav-agendaequipe" data-view="agendaequipe" style="display:none"></button>
 
     <div class="sidebar-footer">
       <button class="nav-item" id="logout-btn"></button>
@@ -1615,6 +1655,7 @@
       <div class="view" id="view-analise"></div>
       <div class="view" id="view-clientes"></div>
       <div class="view" id="view-financeiro"></div>
+      <div class="view" id="view-agendaequipe"></div>
     </div>
   </div>
 </div>
@@ -1731,6 +1772,12 @@ const ICONS = {
   mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 17v4M9 21h6"/>',
   alert:'<path d="M12 3 2 20h20L12 3z"/><path d="M12 9.5v4.5"/><circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none"/>',
   whatsapp:'<path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z"/><path d="M8.4 8.2c.2-.5.4-.5.6-.5h.5c.2 0 .4 0 .5.4.2.5.7 1.6.7 1.7.1.1.1.3 0 .4-.1.2-.2.3-.3.4-.1.1-.3.3-.4.4-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2 1.2 1 2.1 1.4 2.5 1.6.2.1.4.1.5-.1.1-.2.6-.7.8-.9.2-.2.3-.2.5-.1l1.6.8c.2.1.3.1.4.2.1.1.1.6-.1 1.1-.2.5-1.3 1.1-1.8 1.1-.5 0-1.1.1-3.5-1.3-2-1.3-3.3-3.1-3.4-3.3-.1-.2-.9-1.2-.9-2.3 0-1.1.6-1.6.8-1.8z" fill="currentColor" stroke="none"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+  flag:'<path d="M5 3v18"/><path d="M5 4h12l-2.5 4L17 12H5"/>',
+  list:'<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.2" cy="6" r="1.1" fill="currentColor" stroke="none"/><circle cx="4.2" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="4.2" cy="18" r="1.1" fill="currentColor" stroke="none"/>',
+  filter:'<path d="M4 5h16l-6 7.5V19l-4 2v-8.5z"/>',
+  kanban:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M9 4v17M15 4v10"/>',
+  link2:'<path d="M9 15l6-6"/><path d="M13 5.5l1.5-1.5a3.5 3.5 0 0 1 5 5L18 10.5"/><path d="M11 18.5L9.5 20a3.5 3.5 0 0 1-5-5L6 13.5"/>',
 };
 function icon(name,cls){return `<svg class="icon ${cls||''}" viewBox="0 0 24 24">${ICONS[name]}</svg>`;}
 function fillIcon(name,cls){return `<svg class="icon ${cls||''}" viewBox="0 0 24 24" fill="currentColor" stroke="none">${ICONS[name]}</svg>`;}
@@ -1754,11 +1801,13 @@ const NAV_LABELS = {
   analise:['chart','Análise Sessões 1:1'],
   clientes:['idcard','Registro de Clientes'],
   financeiro:['money','Financeiro'],
+  agendaequipe:['kanban','Agenda da Equipe'],
 };
 const BADGE = {
   painel:'shared', biblioteca:'shared', palestras:'shared', projetoacademico:'shared',
   dashboard:'individual', dashboardmentoria:'individual', sessoes:'individual', metas:'individual',
   interno:'restrict', conteudo:'restrict', visaogeral:'restrict', vendas:'restrict', clientes:'restrict',
+  agendaequipe:'restrict',
 };
 const BADGE_TEXT = { shared:'Painel Profissional e Mentoria', individual:'Minha Área', restrict:'Acesso Restrito' };
 
@@ -6443,6 +6492,618 @@ function fuiMencionadoEm(postId){
   return PENDENCIAS.some(x=>x.motivo==='mencao' && String(x.post_id)===String(postId));
 }
 
+/* ================================================================
+   AGENDA DA EQUIPE — tarefas, prazos, aulas, publicações e revisões internas.
+   Só carregado/visível pra equipe interna (role='staff'), ver bootstrapData e RLS equipe_*_staff.
+   ================================================================ */
+let STAFF_LIST = []; // [{id,name}] — contas com role='staff', populado em bootstrapData
+let AE_ATIVIDADES = [];
+let AE_RECORRENCIAS = [];
+let AE_MODELOS = [];
+let aeSubView = 'hoje'; // 'hoje' | 'semana' | 'calendario' | 'minhas' | 'quadro'
+let aeFiltro = { area:'todas', responsavel:'todos', status:'todos', prioridade:'todas' };
+let aeCalMonth = new Date();
+const AE_AREAS = {
+  aulas_cursos:'Aulas e cursos', noticias_infancia:'Notícias da Infância', atualizacao_cientifica:'Atualização científica',
+  redes_sociais:'Redes sociais', alunos_suporte:'Alunos e suporte', eventos_palestras:'Eventos e palestras',
+  gestao_plataforma:'Gestão da plataforma',
+};
+const AE_STATUS = { a_fazer:'A fazer', em_andamento:'Em andamento', em_revisao:'Em revisão', aprovado:'Aprovado', concluido:'Concluído' };
+const AE_PRIORIDADE = { normal:'Normal', alta:'Alta', urgente:'Urgente' };
+const AE_STATUS_ORDEM = ['a_fazer','em_andamento','em_revisao','aprovado','concluido'];
+const AE_FREQ = { diaria:'Diariamente', dias_uteis:'Dias úteis', semanal:'Semanalmente', mensal:'Mensalmente', personalizada:'Personalizada' };
+const AE_DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+async function refreshAgendaEquipe(){
+  try{
+    const [r1, r2, r3] = await Promise.all([
+      sb.from('equipe_atividades').select('*').order('prazo_entrega'),
+      sb.from('equipe_recorrencias').select('*').order('created_at'),
+      sb.from('equipe_modelos').select('*').order('created_at'),
+    ]);
+    if(r1.error) throw r1.error; if(r2.error) throw r2.error; if(r3.error) throw r3.error;
+    AE_ATIVIDADES = r1.data || [];
+    AE_RECORRENCIAS = r2.data || [];
+    AE_MODELOS = r3.data || [];
+  }catch(e){ console.error('Não foi possível carregar a Agenda da Equipe', e); }
+}
+function aeNomeStaff(id){ if(!id) return '—'; const s = STAFF_LIST.find(x=>x.id===id); return s ? s.name : '—'; }
+function aeAtrasada(a){ return !['concluido','aprovado'].includes(a.status) && new Date(a.prazo_entrega) < new Date(); }
+function aeHojeISO(){ return new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}); }
+function aeDiaISO(iso){ return new Date(iso).toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}); }
+function aeFormatPrazo(iso){
+  return new Date(iso).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+}
+function aeFormatData(iso){
+  return new Date(iso).toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo', day:'2-digit', month:'2-digit', year:'numeric'});
+}
+function aePillStatus(a){ return `<span class="ae-pill ae-status-${a.status}">${AE_STATUS[a.status]}</span>`; }
+function aePillPrioridade(a){ return a.prioridade==='normal' ? '' : `<span class="ae-pill ae-prio-${a.prioridade}">${AE_PRIORIDADE[a.prioridade]}</span>`; }
+function aeChecklistProgresso(a){
+  const lista = Array.isArray(a.checklist) ? a.checklist : [];
+  if(!lista.length) return '';
+  const feitos = lista.filter(c=>c.feito).length;
+  return `${icon('tick','tiny')} ${feitos}/${lista.length}`;
+}
+function aeAplicaFiltros(lista){
+  return lista.filter(a=>{
+    if(aeFiltro.area!=='todas' && a.area!==aeFiltro.area) return false;
+    if(aeFiltro.responsavel!=='todos' && a.responsavel_id!==aeFiltro.responsavel) return false;
+    if(aeFiltro.status!=='todos' && a.status!==aeFiltro.status) return false;
+    if(aeFiltro.prioridade!=='todas' && a.prioridade!==aeFiltro.prioridade) return false;
+    return true;
+  });
+}
+function aeNaoArquivadas(){ return AE_ATIVIDADES.filter(a=>!a.arquivada); }
+function aeIndicadores(){
+  const ativas = aeNaoArquivadas();
+  const hoje = aeHojeISO();
+  const entregasHoje = ativas.filter(a=> !['concluido','aprovado'].includes(a.status) && aeDiaISO(a.prazo_entrega)===hoje).length;
+  const atrasadas = ativas.filter(aeAtrasada).length;
+  const emRevisao = ativas.filter(a=>a.status==='em_revisao').length;
+  const proximasAulas = LIVE_SESSIONS.filter(ls=>ls.type==='upcoming').length;
+  return {entregasHoje, atrasadas, emRevisao, proximasAulas};
+}
+
+/* ---------- renderização principal ---------- */
+function renderAgendaEquipe(){
+  const ind = aeIndicadores();
+  const resp = STAFF_LIST.map(s=>`<option value="${s.id}" ${aeFiltro.responsavel===s.id?'selected':''}>${escapeHtml(s.name)}</option>`).join('');
+  document.getElementById('view-agendaequipe').innerHTML = `
+    <div class="staff-banner">${icon('lock')} Acesso restrito — visível apenas para a equipe interna.</div>
+    <div class="kpi-row" style="margin-bottom:16px">
+      <div class="kpi-tile"><div class="label">Entregas hoje</div><div class="value">${ind.entregasHoje}</div></div>
+      <div class="kpi-tile"><div class="label">Atividades atrasadas</div><div class="value" style="${ind.atrasadas>0?'color:var(--danger)':''}">${ind.atrasadas}</div></div>
+      <div class="kpi-tile"><div class="label">Materiais aguardando revisão</div><div class="value">${ind.emRevisao}</div></div>
+      <div class="kpi-tile"><div class="label">Próximas aulas e eventos</div><div class="value">${ind.proximasAulas}</div></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn-accent" id="ae-nova-btn">${icon('plus','tiny')} Nova atividade</button>
+      <button class="btn-outline" id="ae-rotinas-btn">${icon('calendar','tiny')} Rotinas recorrentes</button>
+      <button class="btn-outline" id="ae-cronograma-aula-btn">${icon('film','tiny')} Gerar cronograma de aula</button>
+    </div>
+    <div class="ae-tabs">
+      <div class="ae-tab ${aeSubView==='hoje'?'active':''}" data-sub="hoje">Hoje</div>
+      <div class="ae-tab ${aeSubView==='semana'?'active':''}" data-sub="semana">Semana</div>
+      <div class="ae-tab ${aeSubView==='calendario'?'active':''}" data-sub="calendario">Calendário mensal</div>
+      <div class="ae-tab ${aeSubView==='minhas'?'active':''}" data-sub="minhas">Minhas tarefas</div>
+      <div class="ae-tab ${aeSubView==='quadro'?'active':''}" data-sub="quadro">Quadro de status</div>
+    </div>
+    <div class="add-form" style="margin-bottom:16px">
+      <div class="field"><label>Área</label>
+        <select class="ps-input" id="ae-f-area">
+          <option value="todas">Todas</option>
+          ${Object.entries(AE_AREAS).map(([k,v])=>`<option value="${k}" ${aeFiltro.area===k?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Responsável</label>
+        <select class="ps-input" id="ae-f-responsavel"><option value="todos">Todos</option>${resp}</select>
+      </div>
+      <div class="field"><label>Status</label>
+        <select class="ps-input" id="ae-f-status">
+          <option value="todos">Todos</option>
+          ${AE_STATUS_ORDEM.map(k=>`<option value="${k}" ${aeFiltro.status===k?'selected':''}>${AE_STATUS[k]}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Prioridade</label>
+        <select class="ps-input" id="ae-f-prioridade">
+          <option value="todas">Todas</option>
+          ${Object.entries(AE_PRIORIDADE).map(([k,v])=>`<option value="${k}" ${aeFiltro.prioridade===k?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div id="ae-subview-area"></div>
+  `;
+  document.getElementById('ae-nova-btn').addEventListener('click',()=>openAtividadeModal(null));
+  document.getElementById('ae-rotinas-btn').addEventListener('click',()=>openRecorrenciasModal());
+  document.getElementById('ae-cronograma-aula-btn').addEventListener('click',()=>openCronogramaAulaModal());
+  document.querySelectorAll('.ae-tab').forEach(t=>t.addEventListener('click',()=>{ aeSubView = t.dataset.sub; renderAgendaEquipe(); }));
+  document.getElementById('ae-f-area').addEventListener('change',(e)=>{ aeFiltro.area=e.target.value; renderAgendaEquipeSubview(); });
+  document.getElementById('ae-f-responsavel').addEventListener('change',(e)=>{ aeFiltro.responsavel=e.target.value; renderAgendaEquipeSubview(); });
+  document.getElementById('ae-f-status').addEventListener('change',(e)=>{ aeFiltro.status=e.target.value; renderAgendaEquipeSubview(); });
+  document.getElementById('ae-f-prioridade').addEventListener('change',(e)=>{ aeFiltro.prioridade=e.target.value; renderAgendaEquipeSubview(); });
+  renderAgendaEquipeSubview();
+}
+function renderAgendaEquipeSubview(){
+  const map = { hoje:aeRenderHoje, semana:aeRenderSemana, calendario:aeRenderCalendario, minhas:aeRenderMinhas, quadro:aeRenderQuadro };
+  map[aeSubView]();
+}
+function aeCardHtml(a){
+  const atrasada = aeAtrasada(a);
+  return `
+    <div class="ae-card" data-ae-abrir="${a.id}">
+      <p class="ae-card-title">${escapeHtml(a.titulo)} ${atrasada? `<span class="ae-atrasada">${icon('alert','tiny')} atrasada</span>`:''}</p>
+      <div class="ae-card-meta">
+        ${aePillStatus(a)} ${aePillPrioridade(a)}
+        <span>${AE_AREAS[a.area]||a.area}</span>
+        <span>${icon('idcard','tiny')} ${escapeHtml(aeNomeStaff(a.responsavel_id))}</span>
+        <span>${icon('clock','tiny')} ${aeFormatPrazo(a.prazo_entrega)}</span>
+        ${aeChecklistProgresso(a)}
+      </div>
+    </div>`;
+}
+function aeWireCards(containerEl){
+  containerEl.querySelectorAll('[data-ae-abrir]').forEach(el=>{
+    el.addEventListener('click',()=>openAtividadeDetalheModal(el.dataset.aeAbrir));
+  });
+}
+function aeRenderHoje(){
+  const hoje = aeHojeISO();
+  const lista = aeAplicaFiltros(aeNaoArquivadas()).filter(a=> aeDiaISO(a.prazo_entrega)===hoje || aeAtrasada(a));
+  lista.sort((x,y)=> new Date(x.prazo_entrega) - new Date(y.prazo_entrega));
+  const atrasadas = lista.filter(aeAtrasada);
+  const doDia = lista.filter(a=>!aeAtrasada(a));
+  const el = document.getElementById('ae-subview-area');
+  el.innerHTML = `
+    ${atrasadas.length? `<div class="ae-day-group"><div class="ae-day-label" style="color:var(--danger)">Atrasadas (${atrasadas.length})</div>${atrasadas.map(aeCardHtml).join('')}</div>`:''}
+    <div class="ae-day-group"><div class="ae-day-label">Hoje</div>${doDia.length? doDia.map(aeCardHtml).join('') : '<p style="color:var(--text-mute)">Nada para hoje.</p>'}</div>
+  `;
+  aeWireCards(el);
+}
+function aeRenderSemana(){
+  const base = new Date();
+  const dias = [];
+  for(let i=0;i<7;i++){ const d = new Date(base); d.setDate(base.getDate()+i); dias.push(d); }
+  const lista = aeAplicaFiltros(aeNaoArquivadas());
+  const el = document.getElementById('ae-subview-area');
+  el.innerHTML = dias.map(d=>{
+    const iso = d.toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'});
+    const doDia = lista.filter(a=>aeDiaISO(a.prazo_entrega)===iso).sort((x,y)=>new Date(x.prazo_entrega)-new Date(y.prazo_entrega));
+    const label = d.toLocaleDateString('pt-BR',{weekday:'long', day:'2-digit', month:'2-digit'});
+    return `<div class="ae-day-group"><div class="ae-day-label">${label}</div>${doDia.length? doDia.map(aeCardHtml).join('') : '<p style="color:var(--text-mute);font-size:12.5px">Sem entregas.</p>'}</div>`;
+  }).join('');
+  aeWireCards(el);
+}
+function aeRenderCalendario(){
+  const ano = aeCalMonth.getFullYear(), mes = aeCalMonth.getMonth();
+  const primeiroDia = new Date(ano, mes, 1);
+  const ultimoDia = new Date(ano, mes+1, 0);
+  const inicioGrid = new Date(primeiroDia); inicioGrid.setDate(primeiroDia.getDate() - primeiroDia.getDay());
+  const fimGrid = new Date(ultimoDia); fimGrid.setDate(ultimoDia.getDate() + (6 - ultimoDia.getDay()));
+  const lista = aeAplicaFiltros(aeNaoArquivadas());
+  let cel = ''; let cursor = new Date(inicioGrid);
+  while(cursor <= fimGrid){
+    const iso = cursor.toLocaleDateString('en-CA');
+    const doDia = lista.filter(a=>{
+      const diaPub = a.data_publicacao ? aeDiaISO(a.data_publicacao) : null;
+      return aeDiaISO(a.prazo_entrega)===iso || diaPub===iso;
+    });
+    const outroMes = cursor.getMonth()!==mes;
+    cel += `<div class="ae-cal-cell ${outroMes?'ae-cal-outro-mes':''}">
+      <div class="ae-cal-daynum">${cursor.getDate()}</div>
+      ${doDia.slice(0,4).map(a=>`<span class="ae-cal-item" data-ae-abrir="${a.id}" title="${escapeAttr(a.titulo)}">${escapeHtml(a.titulo)}</span>`).join('')}
+      ${doDia.length>4? `<span style="font-size:10px;color:var(--text-mute)">+${doDia.length-4}</span>`:''}
+    </div>`;
+    cursor.setDate(cursor.getDate()+1);
+  }
+  const el = document.getElementById('ae-subview-area');
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <button class="btn-mini icon-only" id="ae-cal-prev">${icon('back','tiny')}</button>
+      <strong>${aeCalMonth.toLocaleDateString('pt-BR',{month:'long', year:'numeric'})}</strong>
+      <button class="btn-mini icon-only" id="ae-cal-next">${icon('next','tiny')}</button>
+    </div>
+    <div class="ae-cal-grid">
+      ${AE_DIAS_SEMANA.map(d=>`<div class="ae-cal-head">${d}</div>`).join('')}
+      ${cel}
+    </div>
+  `;
+  document.getElementById('ae-cal-prev').addEventListener('click',()=>{ aeCalMonth = new Date(ano, mes-1, 1); aeRenderCalendario(); });
+  document.getElementById('ae-cal-next').addEventListener('click',()=>{ aeCalMonth = new Date(ano, mes+1, 1); aeRenderCalendario(); });
+  aeWireCards(el);
+}
+function aeRenderMinhas(){
+  const lista = aeAplicaFiltros(aeNaoArquivadas()).filter(a=> a.responsavel_id===currentUser.id || a.revisor_id===currentUser.id);
+  lista.sort((x,y)=>new Date(x.prazo_entrega)-new Date(y.prazo_entrega));
+  const el = document.getElementById('ae-subview-area');
+  el.innerHTML = lista.length ? lista.map(aeCardHtml).join('') : '<p class="empty-state">Nenhuma tarefa atribuída a você.</p>';
+  aeWireCards(el);
+}
+function aeRenderQuadro(){
+  const lista = aeAplicaFiltros(aeNaoArquivadas());
+  const el = document.getElementById('ae-subview-area');
+  el.innerHTML = `<div class="ae-kanban">${AE_STATUS_ORDEM.map(st=>{
+    const doStatus = lista.filter(a=>a.status===st);
+    return `<div class="ae-kanban-col">
+      <div class="ae-kanban-col-head"><span>${AE_STATUS[st]}</span><span>${doStatus.length}</span></div>
+      ${doStatus.map(aeCardHtml).join('')}
+    </div>`;
+  }).join('')}</div>`;
+  aeWireCards(el);
+}
+
+/* ---------- CRUD ---------- */
+async function aeInserir(payload){
+  const { data, error } = await sb.from('equipe_atividades').insert(payload).select().single();
+  if(error) throw error;
+  AE_ATIVIDADES.push(data);
+  return data;
+}
+async function aeAtualizar(id, payload){
+  const { data, error } = await sb.from('equipe_atividades').update(payload).eq('id', id).select().single();
+  if(error) throw error;
+  const idx = AE_ATIVIDADES.findIndex(a=>a.id===id);
+  if(idx>=0) AE_ATIVIDADES[idx] = data;
+  return data;
+}
+async function aePropagarRecorrencia(a, campos){
+  // Aplica os mesmos campos (ex.: responsavel_id/revisor_id/prioridade/descricao) às próximas
+  // ocorrências ainda não feitas da mesma rotina — nunca altera o histórico das anteriores.
+  if(!a.recorrencia_id) return;
+  await sb.from('equipe_recorrencias').update({
+    responsavel_id: campos.responsavel_id, revisor_id: campos.revisor_id,
+  }).eq('id', a.recorrencia_id);
+  const hoje = aeHojeISO();
+  await sb.from('equipe_atividades').update(campos)
+    .eq('recorrencia_id', a.recorrencia_id).eq('status','a_fazer').gte('data_ocorrencia', hoje).neq('id', a.id);
+  await refreshAgendaEquipe();
+}
+
+function openAtividadeModal(id){
+  const existente = id ? AE_ATIVIDADES.find(a=>a.id===id) : null;
+  const d = existente ? Object.assign({}, existente) : {
+    titulo:'', area:'gestao_plataforma', responsavel_id: STAFF_LIST[0]?STAFF_LIST[0].id:'', revisor_id:'',
+    prazo_entrega:'', data_publicacao:'', prioridade:'normal', descricao:'', checklist:[],
+  };
+  const prazoLocal = d.prazo_entrega ? new Date(d.prazo_entrega) : null;
+  const pubLocal = d.data_publicacao ? new Date(d.data_publicacao) : null;
+  const toDateInput = (dt)=> dt ? dt.toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}) : '';
+  const toTimeInput = (dt)=> dt ? dt.toLocaleTimeString('pt-BR',{timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit'}) : '09:00';
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <div class="cat">Agenda da Equipe</div>
+      <h3>${existente? 'Editar atividade' : 'Nova atividade'}</h3>
+      <div class="ps-section fin-form-grid">
+        <div style="grid-column:1/-1"><label class="ps-label">Título *</label><input class="ps-input" id="ae-m-titulo" value="${escapeAttr(d.titulo)}"></div>
+        <div><label class="ps-label">Área *</label>
+          <select class="ps-input" id="ae-m-area">${Object.entries(AE_AREAS).map(([k,v])=>`<option value="${k}" ${d.area===k?'selected':''}>${v}</option>`).join('')}</select>
+        </div>
+        <div><label class="ps-label">Responsável *</label>
+          <select class="ps-input" id="ae-m-responsavel">${STAFF_LIST.map(s=>`<option value="${s.id}" ${d.responsavel_id===s.id?'selected':''}>${escapeHtml(s.name)}</option>`).join('')}</select>
+        </div>
+        <div><label class="ps-label">Revisor/aprovador</label>
+          <select class="ps-input" id="ae-m-revisor"><option value="">Nenhum</option>${STAFF_LIST.map(s=>`<option value="${s.id}" ${d.revisor_id===s.id?'selected':''}>${escapeHtml(s.name)}</option>`).join('')}</select>
+        </div>
+        <div><label class="ps-label">Prioridade</label>
+          <select class="ps-input" id="ae-m-prioridade">${Object.entries(AE_PRIORIDADE).map(([k,v])=>`<option value="${k}" ${d.prioridade===k?'selected':''}>${v}</option>`).join('')}</select>
+        </div>
+        <div><label class="ps-label">Prazo de entrega — data *</label><input class="ps-input" type="date" id="ae-m-prazo-data" value="${toDateInput(prazoLocal)}"></div>
+        <div><label class="ps-label">Prazo de entrega — hora *</label><input class="ps-input" type="time" id="ae-m-prazo-hora" value="${toTimeInput(prazoLocal)}"></div>
+        <div><label class="ps-label">Publicação/realização — data</label><input class="ps-input" type="date" id="ae-m-pub-data" value="${toDateInput(pubLocal)}"></div>
+        <div><label class="ps-label">Publicação/realização — hora</label><input class="ps-input" type="time" id="ae-m-pub-hora" value="${pubLocal?toTimeInput(pubLocal):'09:00'}"></div>
+        <div style="grid-column:1/-1"><label class="ps-label">Descrição</label><textarea class="ps-input" id="ae-m-desc">${escapeHtml(d.descricao||'')}</textarea></div>
+        <div style="grid-column:1/-1"><label class="ps-label">Checklist (um item por linha)</label><textarea class="ps-input" id="ae-m-checklist" placeholder="Um item por linha">${(d.checklist||[]).map(c=>c.texto||c).join('\n')}</textarea></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-accent" id="ae-m-save">${existente? 'Salvar alterações' : 'Criar atividade'}</button>
+        <button class="btn-outline" id="ae-m-cancel">Cancelar</button>
+      </div>
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('ae-m-cancel').addEventListener('click', closeModal);
+  document.getElementById('ae-m-save').addEventListener('click', async ()=>{
+    const titulo = document.getElementById('ae-m-titulo').value.trim();
+    const area = document.getElementById('ae-m-area').value;
+    const responsavel_id = document.getElementById('ae-m-responsavel').value;
+    const dataPrazo = document.getElementById('ae-m-prazo-data').value;
+    const horaPrazo = document.getElementById('ae-m-prazo-hora').value || '09:00';
+    if(!titulo || !area || !responsavel_id || !dataPrazo){ alert('Preencha título, área, responsável e prazo de entrega.'); return; }
+    const revisor_id = document.getElementById('ae-m-revisor').value || null;
+    const prioridade = document.getElementById('ae-m-prioridade').value;
+    const descricao = document.getElementById('ae-m-desc').value.trim();
+    const checklistTxt = document.getElementById('ae-m-checklist').value.split('\n').map(s=>s.trim()).filter(Boolean);
+    const checklist = checklistTxt.map((texto,i)=>{
+      const prev = (d.checklist||[]).find(c=>(c.texto||c)===texto);
+      return { id: (prev&&prev.id) || ('c'+Date.now()+i), texto, feito: prev? !!prev.feito : false };
+    });
+    const dataPub = document.getElementById('ae-m-pub-data').value;
+    const horaPub = document.getElementById('ae-m-pub-hora').value || '09:00';
+    const prazo_entrega = new Date(`${dataPrazo}T${horaPrazo}:00-03:00`).toISOString();
+    const data_publicacao = dataPub ? new Date(`${dataPub}T${horaPub}:00-03:00`).toISOString() : null;
+    const payload = { titulo, area, responsavel_id, revisor_id, prioridade, descricao, checklist, prazo_entrega, data_publicacao };
+    const btn = document.getElementById('ae-m-save'); btn.disabled = true;
+    try{
+      if(existente){
+        let aplicarProximas = false;
+        if(existente.recorrencia_id){
+          aplicarProximas = confirm('Esta tarefa faz parte de uma rotina recorrente.\n\nOK = aplicar essa mudança de responsável/revisor também às próximas ocorrências ainda não feitas.\nCancelar = alterar só esta ocorrência.');
+        }
+        await aeAtualizar(existente.id, payload);
+        if(aplicarProximas) await aePropagarRecorrencia(existente, {responsavel_id, revisor_id, prioridade, descricao});
+      } else {
+        await aeInserir(Object.assign({created_by: currentUser.id}, payload));
+      }
+      closeModal();
+      if(currentView==='agendaequipe') renderAgendaEquipe();
+    }catch(e){ console.error(e); alert('Não foi possível salvar. Tente de novo.'); btn.disabled = false; }
+  });
+}
+
+async function openAtividadeDetalheModal(id){
+  const a = AE_ATIVIDADES.find(x=>x.id===id);
+  if(!a) return;
+  document.getElementById('modal').innerHTML = `<div class="modal-body form-modal"><p style="color:var(--text-mute)">Carregando...</p></div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  let materiais = [], comentarios = [], historico = [];
+  try{
+    const [r1,r2,r3] = await Promise.all([
+      sb.from('equipe_materiais').select('*').eq('atividade_id', id).order('created_at'),
+      sb.from('equipe_comentarios').select('*').eq('atividade_id', id).order('created_at'),
+      sb.from('equipe_historico').select('*').eq('atividade_id', id).order('created_at',{ascending:false}),
+    ]);
+    materiais = r1.data || []; comentarios = r2.data || []; historico = r3.data || [];
+  }catch(e){ console.error(e); }
+  aeRenderDetalheModal(a, materiais, comentarios, historico);
+}
+function aeHistLabel(h){
+  const campos = { status:'Status', responsavel_id:'Responsável', prazo_entrega:'Prazo de entrega', prioridade:'Prioridade' };
+  const fmt = (campo,v)=>{
+    if(!v) return '—';
+    if(campo==='status') return AE_STATUS[v]||v;
+    if(campo==='prioridade') return AE_PRIORIDADE[v]||v;
+    if(campo==='responsavel_id') return aeNomeStaff(v);
+    if(campo==='prazo_entrega') return aeFormatPrazo(v);
+    return v;
+  };
+  return `${campos[h.campo]||h.campo}: ${escapeHtml(fmt(h.campo,h.valor_anterior))} → ${escapeHtml(fmt(h.campo,h.valor_novo))}`;
+}
+function aeRenderDetalheModal(a, materiais, comentarios, historico){
+  const atrasada = aeAtrasada(a);
+  const checklist = Array.isArray(a.checklist) ? a.checklist : [];
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal" style="max-width:560px">
+      <div class="cat">Agenda da Equipe — ${AE_AREAS[a.area]||a.area}</div>
+      <h3>${escapeHtml(a.titulo)}</h3>
+      <div class="ae-card-meta" style="margin-bottom:12px">
+        ${aePillStatus(a)} ${aePillPrioridade(a)} ${atrasada? `<span class="ae-atrasada">${icon('alert','tiny')} atrasada</span>`:''}
+      </div>
+      <div class="ps-section" style="font-size:13px;line-height:1.6">
+        <p><strong>Responsável:</strong> ${escapeHtml(aeNomeStaff(a.responsavel_id))}</p>
+        <p><strong>Revisor/aprovador:</strong> ${escapeHtml(aeNomeStaff(a.revisor_id))}</p>
+        <p><strong>Prazo de entrega:</strong> ${aeFormatPrazo(a.prazo_entrega)}</p>
+        ${a.data_publicacao? `<p><strong>Publicação/realização:</strong> ${aeFormatPrazo(a.data_publicacao)}</p>`:''}
+        ${a.descricao? `<p><strong>Descrição:</strong> ${escapeHtml(a.descricao)}</p>`:''}
+      </div>
+      <div class="ps-section">
+        <label class="ps-label">Status</label>
+        <select class="ps-input" id="ae-d-status">${AE_STATUS_ORDEM.map(k=>`<option value="${k}" ${a.status===k?'selected':''}>${AE_STATUS[k]}</option>`).join('')}</select>
+      </div>
+      ${checklist.length? `
+      <div class="ps-section">
+        <label class="ps-label">Checklist</label>
+        ${checklist.map((c,i)=>`
+          <div class="ae-checklist-item ${c.feito?'feito':''}">
+            <input type="checkbox" id="ae-chk-${i}" ${c.feito?'checked':''}>
+            <label for="ae-chk-${i}">${escapeHtml(c.texto||c)}</label>
+          </div>`).join('')}
+      </div>`:''}
+      <div class="ps-section">
+        <label class="ps-label">Materiais</label>
+        ${materiais.map(m=>`<div class="ae-material-row">${icon('link2','tiny')} <a href="${escapeAttr(m.url)}" target="_blank" rel="noopener">${escapeHtml(m.titulo)}</a></div>`).join('') || '<p style="color:var(--text-mute);font-size:12px">Nenhum material anexado.</p>'}
+        <div class="add-form" style="margin-top:8px">
+          <div class="field"><label>Título</label><input class="ps-input" id="ae-d-mat-titulo" placeholder="Ex.: Slides da aula"></div>
+          <div class="field"><label>Link</label><input class="ps-input" id="ae-d-mat-url" placeholder="https://..."></div>
+          <div class="actions"><button class="btn-outline" id="ae-d-mat-add">${icon('plus','tiny')} Anexar</button></div>
+        </div>
+      </div>
+      <div class="ps-section">
+        <label class="ps-label">Comentários</label>
+        <div id="ae-d-comentarios">
+          ${comentarios.map(c=>`<div class="ae-comment"><div class="ae-comment-meta">${escapeHtml(aeNomeStaff(c.autor_id))} · ${aeFormatPrazo(c.created_at)}</div>${escapeHtml(c.texto)}</div>`).join('') || '<p style="color:var(--text-mute);font-size:12px">Sem comentários ainda.</p>'}
+        </div>
+        <div class="add-form" style="margin-top:8px">
+          <div class="field full"><textarea class="ps-input" id="ae-d-comentario-novo" placeholder="Escrever um comentário..."></textarea></div>
+          <div class="actions"><button class="btn-outline" id="ae-d-comentario-add">Comentar</button></div>
+        </div>
+      </div>
+      ${historico.length? `
+      <div class="ps-section">
+        <label class="ps-label">Histórico</label>
+        ${historico.map(h=>`<div class="ae-hist-row">${aeFormatPrazo(h.created_at)} — ${escapeHtml(aeNomeStaff(h.autor_id))} — ${aeHistLabel(h)}</div>`).join('')}
+      </div>`:''}
+      <div class="modal-actions">
+        <button class="btn-accent" id="ae-d-editar">${icon('edit','tiny')} Editar</button>
+        ${!a.arquivada? `<button class="btn-outline" id="ae-d-arquivar">${icon('folder','tiny')} Arquivar</button>`:''}
+        <button class="btn-outline" id="ae-d-fechar">Fechar</button>
+      </div>
+    </div>`;
+  document.getElementById('ae-d-fechar').addEventListener('click', closeModal);
+  document.getElementById('ae-d-editar').addEventListener('click', ()=>openAtividadeModal(a.id));
+  document.getElementById('ae-d-status').addEventListener('change', async (e)=>{
+    try{ await aeAtualizar(a.id, {status: e.target.value}); if(currentView==='agendaequipe') renderAgendaEquipe(); }
+    catch(err){ console.error(err); alert('Não foi possível atualizar o status.'); }
+  });
+  checklist.forEach((c,i)=>{
+    const chk = document.getElementById(`ae-chk-${i}`);
+    if(chk) chk.addEventListener('change', async ()=>{
+      const novoChecklist = checklist.map((cc,ii)=> ii===i? Object.assign({}, cc, {feito: chk.checked}) : cc);
+      try{ await aeAtualizar(a.id, {checklist: novoChecklist}); openAtividadeDetalheModal(a.id); }
+      catch(err){ console.error(err); alert('Não foi possível salvar o checklist.'); }
+    });
+  });
+  document.getElementById('ae-d-mat-add').addEventListener('click', async ()=>{
+    const titulo = document.getElementById('ae-d-mat-titulo').value.trim();
+    const url = document.getElementById('ae-d-mat-url').value.trim();
+    if(!titulo || !url) return;
+    try{
+      await sb.from('equipe_materiais').insert({atividade_id: a.id, titulo, url, created_by: currentUser.id});
+      openAtividadeDetalheModal(a.id);
+    }catch(e){ console.error(e); alert('Não foi possível anexar o material.'); }
+  });
+  document.getElementById('ae-d-comentario-add').addEventListener('click', async ()=>{
+    const texto = document.getElementById('ae-d-comentario-novo').value.trim();
+    if(!texto) return;
+    try{
+      await sb.from('equipe_comentarios').insert({atividade_id: a.id, autor_id: currentUser.id, texto});
+      openAtividadeDetalheModal(a.id);
+    }catch(e){ console.error(e); alert('Não foi possível enviar o comentário.'); }
+  });
+  const btnArq = document.getElementById('ae-d-arquivar');
+  if(btnArq) btnArq.addEventListener('click', async ()=>{
+    if(!confirm('Arquivar esta atividade? O histórico continua guardado.')) return;
+    try{ await aeAtualizar(a.id, {arquivada: true}); closeModal(); if(currentView==='agendaequipe') renderAgendaEquipe(); }
+    catch(e){ console.error(e); alert('Não foi possível arquivar.'); }
+  });
+}
+
+function openRecorrenciasModal(){
+  const linha = (r)=>{
+    const diasChk = AE_DIAS_SEMANA.map((lbl,i)=>`
+      <label style="font-size:11px;display:inline-flex;align-items:center;gap:3px;margin-right:6px">
+        <input type="checkbox" class="ae-rec-dia" data-rec="${r.id}" value="${i}" ${(r.dias_semana||[]).includes(i)?'checked':''}> ${lbl}
+      </label>`).join('');
+    return `
+    <div class="ae-card" style="cursor:default">
+      <p class="ae-card-title">${escapeHtml(r.titulo_base)} <span class="resp-pill">${AE_FREQ[r.frequencia]}</span> ${!r.responsavel_id? '<span class="ae-pill ae-prio-alta">sem responsável — não gera tarefas ainda</span>':''}</p>
+      <div class="add-form" style="margin-top:8px">
+        <div class="field"><label>Responsável</label>
+          <select class="ps-input ae-rec-resp" data-rec="${r.id}"><option value="">Nenhum (não gera)</option>${STAFF_LIST.map(s=>`<option value="${s.id}" ${r.responsavel_id===s.id?'selected':''}>${escapeHtml(s.name)}</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>Revisor</label>
+          <select class="ps-input ae-rec-revisor" data-rec="${r.id}"><option value="">Nenhum</option>${STAFF_LIST.map(s=>`<option value="${s.id}" ${r.revisor_id===s.id?'selected':''}>${escapeHtml(s.name)}</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>Horário</label><input class="ps-input ae-rec-horario" data-rec="${r.id}" type="time" value="${(r.horario||'09:00').slice(0,5)}"></div>
+        ${r.frequencia==='mensal'? `<div class="field"><label>Dia do mês</label><input class="ps-input ae-rec-diames" data-rec="${r.id}" type="number" min="1" max="28" value="${r.dia_mes||1}"></div>` : ''}
+        <div class="field"><label><input type="checkbox" class="ae-rec-ativo" data-rec="${r.id}" ${r.ativo?'checked':''}> Ativa</label></div>
+        ${(r.frequencia==='semanal'||r.frequencia==='personalizada')? `<div class="field full"><label>Dias da semana</label><div>${diasChk}</div></div>`:''}
+        <div class="actions"><button class="btn-outline ae-rec-save" data-rec="${r.id}">Salvar</button></div>
+      </div>
+    </div>`;
+  };
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal" style="max-width:640px">
+      <div class="cat">Agenda da Equipe</div>
+      <h3>Rotinas recorrentes</h3>
+      <p style="color:var(--text-mute);font-size:12.5px;margin-top:-6px">Configure o responsável de cada rotina para que ela comece a gerar tarefas automaticamente (sem responsável, nenhuma tarefa é criada).</p>
+      <div id="ae-rec-lista">${AE_RECORRENCIAS.map(linha).join('')}</div>
+      <div class="modal-actions"><button class="btn-outline" id="ae-rec-fechar">Fechar</button></div>
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('ae-rec-fechar').addEventListener('click', closeModal);
+  document.querySelectorAll('.ae-rec-save').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const rid = btn.dataset.rec;
+      const resp = document.querySelector(`.ae-rec-resp[data-rec="${rid}"]`).value || null;
+      const revisor = document.querySelector(`.ae-rec-revisor[data-rec="${rid}"]`).value || null;
+      const horario = document.querySelector(`.ae-rec-horario[data-rec="${rid}"]`).value || '09:00';
+      const ativo = document.querySelector(`.ae-rec-ativo[data-rec="${rid}"]`).checked;
+      const diaMesInput = document.querySelector(`.ae-rec-diames[data-rec="${rid}"]`);
+      const payload = { responsavel_id: resp, revisor_id: revisor, horario, ativo };
+      if(diaMesInput) payload.dia_mes = parseInt(diaMesInput.value,10) || 1;
+      const diasChks = document.querySelectorAll(`.ae-rec-dia[data-rec="${rid}"]`);
+      if(diasChks.length) payload.dias_semana = Array.from(diasChks).filter(c=>c.checked).map(c=>parseInt(c.value,10));
+      btn.disabled = true;
+      try{
+        const { data, error } = await sb.from('equipe_recorrencias').update(payload).eq('id', rid).select().single();
+        if(error) throw error;
+        const idx = AE_RECORRENCIAS.findIndex(r=>r.id===rid);
+        if(idx>=0) AE_RECORRENCIAS[idx] = data;
+        openRecorrenciasModal();
+      }catch(e){ console.error(e); alert('Não foi possível salvar essa rotina.'); btn.disabled = false; }
+    });
+  });
+}
+
+function openCronogramaAulaModal(){
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <div class="cat">Agenda da Equipe</div>
+      <h3>Gerar cronograma de entrega de aula</h3>
+      <div class="ps-section fin-form-grid">
+        <div style="grid-column:1/-1"><label class="ps-label">Título da aula *</label><input class="ps-input" id="ca-titulo" placeholder="Ex.: Módulo 3 — Aula 2"></div>
+        <div><label class="ps-label">Tipo *</label>
+          <select class="ps-input" id="ca-tipo">
+            <option value="entrega_aula_gravada">Aula gravada</option>
+            <option value="entrega_aula_viva">Aula ao vivo</option>
+          </select>
+        </div>
+        <div><label class="ps-label">Data de publicação/realização *</label><input class="ps-input" type="date" id="ca-data"></div>
+        <div><label class="ps-label">Responsável (padrão para todas as etapas)*</label>
+          <select class="ps-input" id="ca-resp">${STAFF_LIST.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select>
+        </div>
+        <div><label class="ps-label">Revisor/aprovador</label>
+          <select class="ps-input" id="ca-revisor"><option value="">Nenhum</option>${STAFF_LIST.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select>
+        </div>
+        <div style="grid-column:1/-1"><label class="ps-label">Curso/aula vinculada (opcional)</label><input class="ps-input" id="ca-curso" placeholder="Nome ou ID do curso, se já estiver cadastrado"></div>
+      </div>
+      <div id="ca-preview"></div>
+      <div class="modal-actions">
+        <button class="btn-accent" id="ca-ver">Ver cronograma</button>
+        <button class="btn-outline" id="ca-cancelar">Cancelar</button>
+      </div>
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('ca-cancelar').addEventListener('click', closeModal);
+  document.getElementById('ca-ver').addEventListener('click', ()=>{
+    const titulo = document.getElementById('ca-titulo').value.trim();
+    const tipo = document.getElementById('ca-tipo').value;
+    const dataPub = document.getElementById('ca-data').value;
+    const resp = document.getElementById('ca-resp').value;
+    const revisor = document.getElementById('ca-revisor').value || null;
+    const curso = document.getElementById('ca-curso').value.trim() || null;
+    if(!titulo || !dataPub || !resp){ alert('Preencha título, data de publicação e responsável.'); return; }
+    const modelo = AE_MODELOS.find(m=>m.tipo===tipo);
+    if(!modelo){ alert('Modelo não encontrado.'); return; }
+    const etapas = modelo.etapas.map(et=>{
+      const dt = new Date(`${dataPub}T${et.horario}:00-03:00`);
+      dt.setDate(dt.getDate() + et.offset_dias);
+      return { chave: et.chave, nome: et.nome, prazo: dt, atrasada: dt < new Date() };
+    });
+    const temAtrasada = etapas.some(e=>e.atrasada);
+    document.getElementById('ca-preview').innerHTML = `
+      <div class="ps-section">
+        <label class="ps-label">Cronograma — confira antes de criar</label>
+        ${etapas.map(e=>`<div class="ae-hist-row ${e.atrasada?'ae-atrasada':''}">${e.atrasada? icon('alert','tiny')+' ':''}${aeFormatPrazo(e.prazo.toISOString())} — ${escapeHtml(e.nome)}</div>`).join('')}
+        ${temAtrasada? `<p style="color:var(--danger);font-size:12px;margin-top:8px">${icon('alert','tiny')} Algum prazo calculado já passou — ajuste a data de publicação ou os prazos individuais depois de criar.</p>`:''}
+      </div>
+      <div class="modal-actions">
+        <button class="btn-accent" id="ca-criar">Criar ${etapas.length} tarefas</button>
+        <button class="btn-outline" id="ca-voltar">Voltar</button>
+      </div>`;
+    document.getElementById('ca-voltar').addEventListener('click', ()=>{ document.getElementById('ca-preview').innerHTML=''; });
+    document.getElementById('ca-criar').addEventListener('click', async (ev)=>{
+      ev.target.disabled = true;
+      try{
+        const grupo_id = crypto.randomUUID ? crypto.randomUUID() : ('g'+Date.now());
+        const dataPublicacaoISO = new Date(`${dataPub}T09:00:00-03:00`).toISOString();
+        for(const e of etapas){
+          await aeInserir({
+            titulo: `${titulo} — ${e.nome}`, area:'aulas_cursos', responsavel_id: resp, revisor_id: revisor,
+            prazo_entrega: e.prazo.toISOString(), data_publicacao: dataPublicacaoISO, status:'a_fazer', prioridade:'normal',
+            modelo_id: modelo.id, etapa_chave: e.chave, grupo_id, curso_id: curso, created_by: currentUser.id,
+          });
+        }
+        closeModal();
+        if(currentView==='agendaequipe') renderAgendaEquipe();
+      }catch(err){ console.error(err); alert('Não foi possível criar o cronograma.'); ev.target.disabled = false; }
+    });
+  });
+}
+
 let LIVE_SESSIONS = []; // populado em runtime a partir do Supabase (ver bootstrapData)
 let VENDA_SESSOES = []; // Registro de Sessões 1:1 (vendas) — só carregado/visível pra equipe interna, ver bootstrapData
 let ANALISE_SESSOES = []; // Análise Sessões 1:1 — uma linha por sessão registrada (ver bootstrapData)
@@ -7276,6 +7937,11 @@ async function bootstrapData(){
     FIN_LANCAMENTOS.length = 0;
     const { data: flRows } = await sb.from('fin_lancamentos').select('*').order('data_vencimento').order('created_at').order('parcela_num');
     (flRows||[]).forEach(r=>FIN_LANCAMENTOS.push(mapFinLancamentoRow(r)));
+
+    // Agenda da Equipe — tarefas/rotinas internas, só pra equipe interna (ver RLS equipe_*_staff).
+    STAFF_LIST.length = 0;
+    profiles.filter(p=>p.role==='staff').forEach(p=>STAFF_LIST.push({id:p.id, name:p.name}));
+    await refreshAgendaEquipe();
   }
 
   STUDENT_POINTS = {};
@@ -8480,6 +9146,8 @@ function updateNotifBadge(){
    (ver função icon()). */
 const NOTIF_TIPO_ICON = {
   novidade:'newspaper', aula:'film', evento:'calendar', conclusao:'award', lembrete_evento:'bell',
+  equipe_tarefa_nova:'flag', equipe_prazo_proximo:'clock', equipe_prazo_hoje:'clock',
+  equipe_atrasada:'alert', equipe_revisao:'comment', equipe_ajuste:'edit', equipe_aprovada:'check',
 };
 function notifTempoAtras(iso){
   return timeAgo(iso);
@@ -8599,6 +9267,7 @@ function setRole(role){
   document.getElementById('nav-clientes').style.display = staffNav ? 'flex' : 'none';
   document.getElementById('nav-analise').style.display = staffNav ? 'flex' : 'none';
   document.getElementById('nav-financeiro').style.display = staffNav ? 'flex' : 'none';
+  document.getElementById('nav-agendaequipe').style.display = staffNav ? 'flex' : 'none';
   /* Enquanto a equipe interna estiver no modo "Equipe Interna", a barra lateral mostra só o que é dela —
      os itens que são a experiência do próprio aluno (Área Coletiva, Painel Profissional e Mentoria,
      Minha Área, NCC Integração) ficam escondidos. Eles voltam a aparecer só quando a equipe interna
@@ -8689,7 +9358,7 @@ function setRole(role){
     : `${icon('idcard')}<span>${currentUserRole==='staff'? 'Dados do Aluno Selecionado' : 'Meus Dados Cadastrais'}</span>`;
   renderProfile();
   updateNotifBadge();
-  if(role==='aluno' && ['interno','conteudo','visaogeral','vendas','clientes','financeiro'].includes(currentView)){ goTo('inicio'); }
+  if(role==='aluno' && ['interno','conteudo','visaogeral','vendas','clientes','financeiro','agendaequipe'].includes(currentView)){ goTo('inicio'); }
   /* Painel/Palestras/Projeto Acadêmico/Biblioteca/Dashboard da Mentoria NÃO redirecionam mais quem não
      é mentorado — o item continua clicável (com cadeado) e a própria tela mostra o aviso de bloqueio
      (renderBloqueioMentorados), então currentView pode ficar nelas mesmo fora da Mentoria. Dashboard do
@@ -8767,7 +9436,8 @@ function renderCurrentView(){
                painel:renderPainel, biblioteca:renderBiblioteca,
                estudos:renderEstudos, palestras:renderPalestras, projetoacademico:renderProjetoAcademico,
                sessoes:renderSessoes, metas:renderMetas, interno:renderInterno, conteudo:renderConteudo, visaogeral:renderVisaoGeral,
-               vendas:renderVendas, analise:renderAnalise, clientes:renderClientes, financeiro:renderFinanceiro};
+               vendas:renderVendas, analise:renderAnalise, clientes:renderClientes, financeiro:renderFinanceiro,
+               agendaequipe:renderAgendaEquipe};
   const NEEDS_STUDENT = ['inicio','dashboard','dashboardmentoria','painel','sessoes','metas','interno','estudos','palestras','projetoacademico'];
   if(NEEDS_STUDENT.includes(currentView) && !getStudent(currentStudentId)){
     document.getElementById('view-'+currentView).innerHTML = '<div class="empty-state">Nenhum mentorado cadastrado ainda. Assim que um aluno criar a conta, os dados aparecerão aqui.</div>';

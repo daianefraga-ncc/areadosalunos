@@ -12435,59 +12435,31 @@ async function openCursoModuloModal(moduloId){
   await refreshAvaliacaoSecaoModulo(modulo);
 }
 /* ===== Avaliação do módulo (pós-NCC) =====
-   currentRole==='staff' -> quem está vendo é a equipe: mostra um resumo + botão para cadastrar/editar a
-   avaliação (perguntas e alternativas são sempre digitadas pela Profa Daiane, nunca inventadas aqui).
-   currentRole==='aluno' -> mostra a situação do aluno na avaliação (se existir e estiver ativa): botão pra
-   fazer, ou nota + gabarito comentado + botão de refazer (se nota < nota_minima) + botão de dúvida direto
-   pra Profa Daiane (vira um ticket em suporte_alunos, que já aparece no painel da equipe). */
+   Este modal (openCursoModuloModal) só é alcançável pela tela de Aulas, que só existe no modo "Aluno" —
+   inclusive quando é a própria equipe navegando em modo de visualização ("Modo Aluno"), igual a qualquer
+   outro cadeado/trava já existente (ex.: isLessonLocked). Por isso aqui mostra sempre a experiência do
+   aluno: situação na avaliação (se existir e estiver ativa), botão pra fazer, nota + gabarito comentado +
+   botão de refazer (se nota < nota_minima) + botão de dúvida direto pra Profa Daiane (vira um ticket em
+   suporte_alunos, que já aparece no painel da equipe). O cadastro da avaliação pela equipe (perguntas e
+   alternativas são sempre digitadas pela Profa Daiane, nunca inventadas aqui) fica em Conteúdo → Formação
+   e Pós-Graduação → botão "Avaliação" de cada módulo (ver openAvaliacaoStaffModal). */
 async function refreshAvaliacaoSecaoModulo(modulo){
   const el = document.getElementById('modulo-avaliacao-secao');
   if(!el) return; // modal já foi fechado/trocado nesse meio tempo
   try{
-    if(currentRole==='staff'){
-      const { data, error } = await sb.from('avaliacoes_modulo').select('*').eq('modulo_id', modulo.id).maybeSingle();
-      if(error) throw error;
-      const el2 = document.getElementById('modulo-avaliacao-secao');
-      if(!el2) return;
-      el2.innerHTML = avaliacaoStaffResumoHtml(data);
-      bindAvaliacaoStaffResumo(modulo);
-    } else {
-      const { data, error } = await sb.from('avaliacoes_modulo').select('*').eq('modulo_id', modulo.id).eq('ativo', true).maybeSingle();
-      if(error) throw error;
-      const el2 = document.getElementById('modulo-avaliacao-secao');
-      if(!el2) return;
-      if(!data){ el2.innerHTML = ''; return; }
-      await renderAvaliacaoAlunoCard(modulo, data);
-    }
+    const { data, error } = await sb.from('avaliacoes_modulo').select('*').eq('modulo_id', modulo.id).eq('ativo', true).maybeSingle();
+    if(error) throw error;
+    const el2 = document.getElementById('modulo-avaliacao-secao');
+    if(!el2) return;
+    if(!data){ el2.innerHTML = ''; return; }
+    await renderAvaliacaoAlunoCard(modulo, data);
   }catch(e){
     console.error(e);
     const el3 = document.getElementById('modulo-avaliacao-secao');
     if(el3) el3.innerHTML = `<p class="modulo-empty">Não foi possível carregar a avaliação deste módulo.</p>`;
   }
 }
-function avaliacaoStaffResumoHtml(avaliacao){
-  if(!avaliacao){
-    return `
-      <div class="ps-section aval-resumo-staff">
-        <label class="ps-label">${icon('idcard','tiny')} Avaliação do módulo</label>
-        <p class="modulo-empty">Nenhuma avaliação cadastrada ainda para este módulo.</p>
-        <button class="btn-outline" id="avm-abrir">${icon('plus','tiny')} Criar avaliação</button>
-      </div>`;
-  }
-  return `
-    <div class="ps-section aval-resumo-staff">
-      <label class="ps-label">${icon('idcard','tiny')} Avaliação do módulo</label>
-      <p style="font-size:13px;color:var(--text-mute);margin:4px 0 10px">
-        ${escapeHtml(avaliacao.titulo)} · ${avaliacao.ativo? `<span class="ae-pill ae-status-concluida">Visível para alunos</span>` : `<span class="ae-pill ae-status-a_fazer">Oculta dos alunos</span>`} · Nota mínima ${avaliacao.nota_minima}
-      </p>
-      <button class="btn-outline" id="avm-abrir">${icon('edit','tiny')} Gerenciar avaliação</button>
-    </div>`;
-}
-function bindAvaliacaoStaffResumo(modulo){
-  const btn = document.getElementById('avm-abrir');
-  if(btn) btn.addEventListener('click', ()=>openAvaliacaoStaffModal(modulo.id));
-}
-/* ----- Lado da equipe: cadastro da avaliação e das perguntas/alternativas ----- */
+/* ----- Lado da equipe: cadastro da avaliação e das perguntas/alternativas (acessado de Conteúdo) ----- */
 async function openAvaliacaoStaffModal(moduloId){
   const modulo = getCursoModulo(moduloId);
   if(!modulo) return;
@@ -12543,7 +12515,7 @@ function renderAvaliacaoStaffModal(modulo, avaliacao){
       </div>
       <div class="modal-actions" style="margin-bottom:18px">
         <button class="btn-accent" id="avm-salvar">${avaliacao? 'Salvar configurações' : 'Criar avaliação'}</button>
-        <button class="btn-outline" id="avm-voltar">Voltar</button>
+        <button class="btn-outline" id="avm-voltar">Fechar</button>
       </div>
       ${avaliacao? `
         <div class="ps-section">
@@ -12555,7 +12527,7 @@ function renderAvaliacaoStaffModal(modulo, avaliacao){
     </div>`;
   modalReturnTo = null; modalCloseGuard = null;
   document.getElementById('modal-backdrop').classList.add('open');
-  document.getElementById('avm-voltar').addEventListener('click', ()=>openCursoModuloModal(modulo.id));
+  document.getElementById('avm-voltar').addEventListener('click', closeModal);
   document.getElementById('avm-salvar').addEventListener('click', async ()=>{
     const titulo = document.getElementById('avm-titulo').value.trim() || `Avaliação — ${modulo.nome}`;
     const nota_minima = parseFloat(document.getElementById('avm-nota').value) || 7.0;
@@ -17071,6 +17043,7 @@ function moduloAdminRowHtml(modulo, isFirst, isLast){
         <button class="reorder-btn" data-move-up-modulo="${modulo.id}" ${isFirst?'disabled':''} title="Mover para cima">${icon('up')}</button>
         <button class="reorder-btn" data-move-down-modulo="${modulo.id}" ${isLast?'disabled':''} title="Mover para baixo">${icon('down')}</button>
         <span class="cm-count">${aulaCount} aula${aulaCount===1?'':'s'}</span>
+        <button class="btn-mini" data-avaliacao-modulo="${modulo.id}">${icon('idcard','tiny')} Avaliação</button>
         <button class="btn-mini danger" data-del-modulo="${modulo.id}">${icon('trash')} Remover</button>
       </div>
     </div>`;
@@ -17141,6 +17114,9 @@ function cursoAdminBlockHtml(curso){
     </div>`;
 }
 function bindCursoModuloAdmin(){
+  document.querySelectorAll('[data-avaliacao-modulo]').forEach(btn=>{
+    btn.addEventListener('click',()=>openAvaliacaoStaffModal(btn.dataset.avaliacaoModulo));
+  });
   document.querySelectorAll('[data-add-modulo]').forEach(btn=>{
     btn.addEventListener('click',()=>{
       const cursoId = btn.dataset.addModulo;

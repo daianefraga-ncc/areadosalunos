@@ -1399,6 +1399,21 @@
   .ae-cal-cell.ae-cal-outro-mes{opacity:0.4;}
   .ae-cal-cell .ae-cal-daynum{font-weight:700;font-size:11px;margin-bottom:3px;}
   .ae-cal-item{display:block;max-width:100%;background:var(--bg-card);border-radius:4px;padding:2px 4px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;box-sizing:border-box;}
+  .ae-cal-item.ae-cal-cat-prep{background:var(--individual-soft);color:var(--individual);}
+  .ae-cal-item.ae-cal-cat-grav{background:var(--shared-soft);color:var(--shared);}
+  .ae-cal-item.ae-cal-cat-revisar{background:var(--accent-soft);color:var(--accent-2,var(--accent));}
+  .ae-cal-item.ae-cal-cat-publicar{background:var(--success-soft);color:var(--success);}
+  .ae-cal-item.ae-cal-cat-noticias{background:rgba(220,163,96,0.18);color:var(--stage-transformar);}
+  .ae-cal-item.ae-cal-cat-outras{background:var(--bg-elev);color:var(--text-dim);}
+  .ae-cal-legenda{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;font-size:10.5px;color:var(--text-mute);}
+  .ae-cal-legenda-item{display:inline-flex;align-items:center;gap:4px;}
+  .ae-cal-legenda-dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .ae-cal-legenda-dot.ae-cal-cat-prep{background:var(--individual);}
+  .ae-cal-legenda-dot.ae-cal-cat-grav{background:var(--shared);}
+  .ae-cal-legenda-dot.ae-cal-cat-revisar{background:var(--accent);}
+  .ae-cal-legenda-dot.ae-cal-cat-publicar{background:var(--success);}
+  .ae-cal-legenda-dot.ae-cal-cat-noticias{background:var(--stage-transformar);}
+  .ae-cal-legenda-dot.ae-cal-cat-outras{background:var(--text-mute);}
   .ae-cronograma{display:flex;flex-direction:column;gap:18px;}
   .ae-cron-modulo{border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
   .ae-cron-modulo-head{background:var(--accent-soft);color:var(--accent-2,var(--accent));font-weight:800;font-size:13.5px;padding:9px 12px;}
@@ -6704,6 +6719,20 @@ function aeRenderSemana(){
   }).join('');
   aeWireCards(el);
 }
+const AE_CAL_CATEGORIAS = {
+  prep: 'Preparar materiais', grav: 'Gravar aula', revisar: 'Revisar gravação existente',
+  publicar: 'Publicar', noticias: 'Notícias da Infância', outras: 'Outras rotinas internas',
+};
+function aeCalCategoria(a){
+  if(a.area==='aulas_cursos'){
+    if(a.titulo.startsWith('Preparar materiais')) return 'prep';
+    if(a.titulo.startsWith('Gravar aula')) return 'grav';
+    if(a.titulo.startsWith('Revisar gravação existente')) return 'revisar';
+    if(a.titulo.startsWith('Publicar')) return 'publicar';
+  }
+  if(a.area==='noticias_infancia') return 'noticias';
+  return 'outras';
+}
 function aeRenderCalendario(){
   const ano = aeCalMonth.getFullYear(), mes = aeCalMonth.getMonth();
   const primeiroDia = new Date(ano, mes, 1);
@@ -6721,7 +6750,7 @@ function aeRenderCalendario(){
     const outroMes = cursor.getMonth()!==mes;
     cel += `<div class="ae-cal-cell ${outroMes?'ae-cal-outro-mes':''}">
       <div class="ae-cal-daynum">${cursor.getDate()}</div>
-      ${doDia.slice(0,4).map(a=>`<span class="ae-cal-item" data-ae-abrir="${a.id}" title="${escapeAttr(a.titulo)}">${escapeHtml(a.titulo)}</span>`).join('')}
+      ${doDia.slice(0,4).map(a=>`<span class="ae-cal-item ae-cal-cat-${aeCalCategoria(a)}" data-ae-abrir="${a.id}" title="${escapeAttr(a.titulo)}">${escapeHtml(a.titulo)}</span>`).join('')}
       ${doDia.length>4? `<span style="font-size:10px;color:var(--text-mute)">+${doDia.length-4}</span>`:''}
     </div>`;
     cursor.setDate(cursor.getDate()+1);
@@ -6733,6 +6762,7 @@ function aeRenderCalendario(){
       <strong>${aeCalMonth.toLocaleDateString('pt-BR',{month:'long', year:'numeric'})}</strong>
       <button class="btn-mini icon-only" id="ae-cal-next">${icon('next','tiny')}</button>
     </div>
+    <div class="ae-cal-legenda">${Object.entries(AE_CAL_CATEGORIAS).map(([k,v])=>`<span class="ae-cal-legenda-item"><span class="ae-cal-legenda-dot ae-cal-cat-${k}"></span>${v}</span>`).join('')}</div>
     <div class="ae-cal-grid">
       ${AE_DIAS_SEMANA.map(d=>`<div class="ae-cal-head">${d}</div>`).join('')}
       ${cel}

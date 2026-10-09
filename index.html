@@ -7439,6 +7439,7 @@ const TIPO_ENCONTRO_LABELS = {
   consultorio_simulado: 'Consultório Simulado',
   individual: 'Encontro 1:1',
 };
+const LIVE_AUDIENCE_LABELS = { mentorado:'Mentoria', curso:'Método', pgncc:'Pós-Graduação NCC' };
 function formatHoraBR(hhmm){
   if(!hhmm) return '';
   const [h,m] = hhmm.split(':');
@@ -17520,7 +17521,7 @@ function renderConteudo(){
             <tr>
               <td style="min-width:200px">${escapeHtml(l.title)}</td>
               <td><span class="resp-pill">${tipoLabel}</span></td>
-              <td>${l.studentId? '—' : (l.audience==='curso' ? '<span class="resp-pill">Método</span>' : '<span class="resp-pill">Mentoria</span>')}</td>
+              <td>${l.studentId? '—' : `<span class="resp-pill">${LIVE_AUDIENCE_LABELS[l.audience]||'Mentoria'}</span>`}</td>
               <td style="white-space:nowrap">${para}</td>
               <td style="white-space:nowrap">${l.date}</td>
               <td style="min-width:140px">${escapeHtml(l.time||'—')}</td>
@@ -17546,6 +17547,7 @@ function renderConteudo(){
         <select class="ps-input" id="new-live-audience">
           <option value="mentorado">Mentoria (mentorados)</option>
           <option value="curso">Método (curso gravado)</option>
+          <option value="pgncc">Pós-Graduação NCC</option>
         </select>
       </div>
       <div class="field" id="new-live-student-wrap" style="display:none">
@@ -18372,8 +18374,11 @@ function bindTierSelects(root, afterChange){
 }
 /* Linhas de tabela reaproveitadas entre Mentorados, Alunos Formação e Alunos PGNCC — os três
    tipos de acesso que hoje têm a experiência completa de mentoria (só o Curso Gravado é diferente,
-   com sua própria tabela de progresso nas aulas). */
-function alunosTableRowsHtml(list){
+   com sua própria tabela de progresso nas aulas). A tabela de Alunos PGNCC pede duas colunas a mais —
+   Notas (por módulo, ver PGNCC_DESEMPENHO/carregarPgnccDesempenho) e Frequência nas aulas ao vivo da
+   Pós-NCC (ver live_sessions com audience='pgncc') — por isso aceita opts.pgnccExtras. */
+function alunosTableRowsHtml(list, opts){
+  const pgnccExtras = !!(opts && opts.pgnccExtras);
   return list.map(s=>{
     const pct = overallProgress(s);
     const nextTask = s.checklist.find(t=>t.responsavel==='Mentorado' && t.status!=='Concluída');
@@ -18395,6 +18400,7 @@ function alunosTableRowsHtml(list){
         <td style="min-width:140px">${nextTask? `<button type="button" class="link-btn" data-open-meta="${s.id}">Meta pendente</button>` : '<span style="color:var(--text-mute)">Tudo em dia</span>'}</td>
         <td style="white-space:nowrap">${dias<0? `<span style="color:var(--danger)">encerrada</span>` : dias+'d'}</td>
         <td><span class="stage-tag ${estagio.cls}">${estagio.label}</span></td>
+        ${pgnccExtras? pgnccNotasFreqCellsHtml(s) : ''}
         <td style="min-width:140px">${tierSelectHtml(s)}</td>
         <td style="white-space:nowrap">
           <button class="btn-mini" data-open-staff="${s.id}">${icon('idcard')} Abrir</button>
@@ -18402,6 +18408,117 @@ function alunosTableRowsHtml(list){
         </td>
       </tr>`;
   }).join('');
+}
+/* ----- Notas (por módulo) e Frequência (aulas ao vivo) dos Alunos PGNCC, no painel de Visão Geral -----
+   PGNCC_DESEMPENHO é um cache em memória (carregado uma vez por sessão da equipe, sob demanda, só
+   quando a tabela de Alunos PGNCC é exibida) — evita consultar o banco pra cada aluno a cada render,
+   e evita pesar o carregamento inicial do app com algo que só a equipe interna usa. */
+let PGNCC_DESEMPENHO = null; // null = ainda não carregado nesta sessão
+let pgnccDesempenhoCarregando = false; // evita disparar a mesma consulta duas vezes em paralelo
+async function carregarPgnccDesempenho(){
+  if(pgnccDesempenhoCarregando) return;
+  pgnccDesempenhoCarregando = true;
+  const pgnccAlunos = STUDENTS.filter(s=>s.tier==='pgncc');
+  if(!pgnccAlunos.length){ PGNCC_DESEMPENHO = {}; pgnccDesempenhoCarregando = false; return; }
+  const studentIds = pgnccAlunos.map(s=>s.id);
+  try{
+    const { data: avData, error: avError } = await sb.from('avaliacoes_modulo').select('id, modulo_id, titulo, nota_minima, ativo').eq('curso_id','pgncc');
+    if(avError) throw avError;
+    const avaliacoes = (avData||[]).filter(a=>a.ativo);
+    const avaliacaoIds = avaliacoes.map(a=>a.id);
+    /* "past"/"upcoming" não existe como coluna no banco — é calculado em runtime em mapLiveSessionRow a
+       partir de event_date/event_hour. LIVE_SESSIONS já está carregado em memória com isso pronto, então
+       usamos esse array em vez de consultar live_sessions de novo (e refazer a conta aqui seria repetir
+       lógica e arriscar divergir dela). */
+    const liveIds = LIVE_SESSIONS.filter(l=>l.audience==='pgncc' && l.type==='past' && l.studentId==null).map(l=>l.id);
+
+    let tentativas = [];
+    if(avaliacaoIds.length){
+      const { data, error } = await sb.from('avaliacao_tentativas').select('avaliacao_id, student_id, tentativa_num, nota')
+        .in('avaliacao_id', avaliacaoIds).in('student_id', studentIds).not('nota','is',null);
+      if(error) throw error;
+      tentativas = data || [];
+    }
+    let watched = [];
+    if(liveIds.length){
+      const { data, error } = await sb.from('live_session_watched').select('student_id, live_session_id')
+        .in('live_session_id', liveIds).in('student_id', studentIds);
+      if(error) throw error;
+      watched = data || [];
+    }
+
+    const resumo = {};
+    pgnccAlunos.forEach(s=>{
+      const minhasTentativas = tentativas.filter(t=>t.student_id===s.id);
+      const notas = avaliacoes.map(a=>{
+        const doAluno = minhasTentativas.filter(t=>t.avaliacao_id===a.id).sort((x,y)=>y.tentativa_num-x.tentativa_num);
+        const ultima = doAluno[0];
+        const modulo = getCursoModulo(a.modulo_id);
+        return {
+          moduloNome: modulo? modulo.nome : a.titulo,
+          nota: ultima? Number(ultima.nota) : null,
+          aprovado: ultima? Number(ultima.nota) >= Number(a.nota_minima) : null,
+        };
+      });
+      const watchedCount = watched.filter(w=>w.student_id===s.id).length;
+      resumo[s.id] = {
+        notas,
+        notasFeitas: notas.filter(n=>n.nota!=null).length,
+        notasTotal: notas.length,
+        freqFeitas: watchedCount,
+        freqTotal: liveIds.length,
+      };
+    });
+    PGNCC_DESEMPENHO = resumo;
+  }catch(e){
+    console.error('carregarPgnccDesempenho', e);
+    PGNCC_DESEMPENHO = {}; // evita ficar preso em "Carregando..." pra sempre — mostra "—" e a equipe pode clicar em Atualizar
+  }finally{
+    pgnccDesempenhoCarregando = false;
+  }
+}
+function pgnccNotasFreqCellsHtml(s){
+  if(PGNCC_DESEMPENHO===null){
+    return `<td style="color:var(--text-mute);font-size:12px;white-space:nowrap">Carregando...</td><td style="color:var(--text-mute);font-size:12px;white-space:nowrap">Carregando...</td>`;
+  }
+  const d = PGNCC_DESEMPENHO[s.id] || {notas:[], notasFeitas:0, notasTotal:0, freqFeitas:0, freqTotal:0};
+  const notasCell = d.notasTotal
+    ? `<button type="button" class="link-btn" data-ver-notas="${s.id}">${d.notasFeitas}/${d.notasTotal} módulo${d.notasTotal===1?'':'s'}</button>`
+    : `<span style="color:var(--text-mute)">Sem avaliações ainda</span>`;
+  const freqCell = d.freqTotal
+    ? `${Math.round((d.freqFeitas/d.freqTotal)*100)}% <span style="color:var(--text-mute);font-size:11px">(${d.freqFeitas}/${d.freqTotal})</span>`
+    : `<span style="color:var(--text-mute)">—</span>`;
+  return `<td style="white-space:nowrap">${notasCell}</td><td style="white-space:nowrap">${freqCell}</td>`;
+}
+function openNotasPgnccModal(studentId){
+  const s = getStudent(studentId);
+  if(!s) return;
+  const d = PGNCC_DESEMPENHO && PGNCC_DESEMPENHO[studentId];
+  const notas = (d && d.notas) || [];
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <div class="cat">Pós-Graduação NCC</div>
+      <h3>Notas de ${escapeHtml(s.name)}</h3>
+      ${notas.length? `
+        <div class="ps-section">
+          ${notas.map(n=>`
+            <div class="aval-perg-row">
+              <div style="flex:1;min-width:0">
+                <strong>${escapeHtml(n.moduloNome)}</strong>
+                <div style="color:var(--text-mute);font-size:12px;margin-top:2px">
+                  ${n.nota==null
+                    ? 'Ainda não fez a avaliação'
+                    : `Nota ${n.nota} — ${n.aprovado? `<span style="color:var(--success)">Aprovado(a)</span>` : `<span style="color:var(--danger)">Reprovado(a)</span>`}`}
+                </div>
+              </div>
+            </div>`).join('')}
+        </div>
+      ` : `<p class="modulo-empty">Nenhuma avaliação ativa cadastrada ainda na Pós-NCC.</p>`}
+      <div class="modal-actions"><button class="btn-outline" id="notas-fechar">Fechar</button></div>
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('notas-fechar').addEventListener('click', closeModal);
 }
 /* Apaga a conta do aluno por completo — login, progresso, diagnóstico, checklist, tudo (a função
    staff_delete_student no banco cuida da cascata). Ação irreversível, por isso a confirmação dupla
@@ -18473,13 +18590,15 @@ function renderVisaoGeral(){
       </table>
     </div>
 
-    <h2 class="section-title" style="margin-top:28px">${icon('users')} Alunos PGNCC</h2>
-    <p class="section-sub" style="margin-top:-6px">Clique em "Abrir" para ver a plataforma como esse aluno vê.</p>
+    <h2 class="section-title" style="margin-top:28px">${icon('users')} Alunos PGNCC
+      <button type="button" class="btn-mini" id="pgncc-atualizar-desempenho" style="margin-left:10px;font-weight:600">${icon('upload','tiny')} Atualizar notas/frequência</button>
+    </h2>
+    <p class="section-sub" style="margin-top:-6px">Clique em "Abrir" para ver a plataforma como esse aluno vê. "Notas" mostra quantos módulos com avaliação ativa o aluno já fez (clique para ver a nota de cada um); "Frequência" é a proporção de aulas ao vivo da Pós-NCC que o aluno marcou como assistida.</p>
     <div class="table-wrap">
       <table class="check-table vg-table">
-        <thead><tr><th>Aluno</th><th>Turma / Nicho</th><th>Progresso</th><th>Meta pendente</th><th>Dias restantes</th><th>Estágio</th><th>Acesso</th><th></th></tr></thead>
+        <thead><tr><th>Aluno</th><th>Turma / Nicho</th><th>Progresso</th><th>Meta pendente</th><th>Dias restantes</th><th>Estágio</th><th>Notas</th><th>Frequência</th><th>Acesso</th><th></th></tr></thead>
         <tbody>
-          ${alunosTableRowsHtml(pgnccAlunos) || `<tr><td colspan="8" style="color:var(--text-mute)">Nenhum aluno PGNCC ainda.</td></tr>`}
+          ${alunosTableRowsHtml(pgnccAlunos, {pgnccExtras:true}) || `<tr><td colspan="10" style="color:var(--text-mute)">Nenhum aluno PGNCC ainda.</td></tr>`}
         </tbody>
       </table>
     </div>
@@ -18602,6 +18721,24 @@ function renderVisaoGeral(){
       renderVisaoGeral();
     });
   });
+  document.querySelectorAll('[data-ver-notas]').forEach(btn=>{
+    btn.addEventListener('click', ()=>openNotasPgnccModal(btn.dataset.verNotas));
+  });
+  const btnAtualizarPgncc = document.getElementById('pgncc-atualizar-desempenho');
+  if(btnAtualizarPgncc){
+    btnAtualizarPgncc.addEventListener('click', async ()=>{
+      btnAtualizarPgncc.disabled = true;
+      PGNCC_DESEMPENHO = null;
+      await carregarPgnccDesempenho();
+      if(currentView==='visaogeral') renderVisaoGeral();
+    });
+  }
+  /* Carrega notas/frequência da Pós-NCC uma vez por sessão (sob demanda, só quando esta tela é aberta) —
+     a tabela já aparece com "Carregando..." nessas duas colunas e se atualiza sozinha quando os dados
+     chegam, sem travar o resto da Visão Geral esperando essa consulta. */
+  if(PGNCC_DESEMPENHO===null && totalPgncc){
+    carregarPgnccDesempenho().then(()=>{ if(currentView==='visaogeral') renderVisaoGeral(); });
+  }
 }
 
 /* ================= VIEW: REGISTRO DE CLIENTES (somente equipe interna) =================

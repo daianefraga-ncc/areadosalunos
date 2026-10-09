@@ -6,13 +6,30 @@
   e mostrá-las mesmo com o app/navegador fechado.
 */
 
-const CACHE_NAME = 'ncc-plat-shell-v1';
+const CACHE_NAME = 'ncc-plat-shell-v2';
 const SHELL_FILES = [
   './index.html',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png'
 ];
+
+// Busca na rede, mas sem esperar pra sempre: se a internet do aluno estiver
+// lenta/instável e a resposta não chegar em 8s, desiste e cai pro cache (ou
+// erro) em vez de deixar a página "carregando" ou em branco indefinidamente.
+function fetchComTempoLimite(request, ms) {
+  return new Promise((resolve, reject) => {
+    let resolvido = false;
+    const timer = setTimeout(() => {
+      if (!resolvido) { resolvido = true; reject(new Error('timeout')); }
+    }, ms);
+    fetch(request).then((response) => {
+      if (!resolvido) { resolvido = true; clearTimeout(timer); resolve(response); }
+    }).catch((err) => {
+      if (!resolvido) { resolvido = true; clearTimeout(timer); reject(err); }
+    });
+  });
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -35,12 +52,21 @@ self.addEventListener('activate', (event) => {
 });
 
 // Estratégia "network-first": sempre tenta buscar a versão mais nova online;
-// só usa o que está salvo (cache) se o aluno estiver sem internet.
+// só usa o que está salvo (cache) se o aluno estiver sem internet ou se a
+// rede demorar demais pra responder.
+//
+// Só entra em ação para arquivos do próprio site (HTML, manifest, ícones).
+// Chamadas pra API (Supabase) NUNCA passam por aqui — isso evita cache de
+// dados do aluno e evita que uma instabilidade na API trave o carregamento
+// da página.
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
+  const reqUrl = new URL(event.request.url);
+  if (reqUrl.origin !== self.location.origin) return;
+
   event.respondWith(
-    fetch(event.request)
+    fetchComTempoLimite(event.request, 8000)
       .then((response) => {
         const copy = response.clone();
         caches.open(CACHE_NAME).then((cache) => {

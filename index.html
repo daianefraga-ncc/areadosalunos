@@ -1550,6 +1550,9 @@
   .conteudo-accordion-chevron{display:inline-flex;transition:transform .15s;}
   .conteudo-accordion-h.open .conteudo-accordion-chevron{transform:rotate(90deg);}
   .conteudo-accordion-titulo{flex:1;}
+  .conteudo-section-chevron{display:inline-flex;margin-left:auto;color:var(--text-mute);transition:transform .15s;flex-shrink:0;}
+  h2.section-title.conteudo-accordion-h.open .conteudo-section-chevron{transform:rotate(90deg);}
+  h2.section-title.conteudo-accordion-h:hover{color:var(--accent);}
   .curso-modulo-row-collapsed{padding:7px 12px;}
   .cm-collapsed-nome{flex:1;font-size:13px;font-weight:600;color:var(--text);min-width:120px;}
   .pm-admin-collapsed-nome{font-size:12px;font-weight:700;text-align:center;}
@@ -18256,6 +18259,13 @@ function conteudoAccordionHeaderHtml(key, titulo, contagemLabel){
     ${contagemLabel? `<span class="cm-count">${escapeHtml(contagemLabel)}</span>` : ''}
   </div>`;
 }
+/* Cabeçalho de SEÇÃO inteira de Conteúdo (ex.: "Comunicado no Início", "Clube do Livro") — o h2 vira o
+   próprio botão de encolher/expandir, com a setinha à direita (ver captura que a Daiane mandou). Tudo
+   começa recolhido, então a página de Conteúdo abre como uma lista curta de títulos pra escanear. */
+function conteudoSectionHeaderHtml(key, iconName, titulo){
+  const aberto = conteudoAberto(key);
+  return `<h2 class="section-title conteudo-accordion-h ${aberto?'open':''}" data-conteudo-toggle="${escapeAttr(key)}">${icon(iconName)} ${titulo}<span class="conteudo-section-chevron">${icon('next','tiny')}</span></h2>`;
+}
 function bindConteudoToggleEvents(){
   document.querySelectorAll('#view-conteudo [data-conteudo-toggle]').forEach(el=>{
     el.addEventListener('click', (e)=>{
@@ -18790,7 +18800,8 @@ function renderConteudo(){
   document.getElementById('view-conteudo').innerHTML = `
     <div class="staff-banner">${icon('lock')} Acesso restrito — visível apenas para a equipe interna. O que for publicado aqui aparece na hora em Aulas e Materiais, para todos os alunos.</div>
 
-    <h2 class="section-title">${icon('bell')} Comunicado no Início</h2>
+    ${conteudoSectionHeaderHtml('sec-comunicado', 'bell', 'Comunicado no Início')}
+    ${conteudoAberto('sec-comunicado')? `
     <p class="section-sub" style="margin-top:-6px">Um recado só, em destaque, logo abaixo da saudação na tela de Início de todo aluno — atualize quando quiser (ex.: "Atualizamos a aula 1 do módulo 1", "Boa semana a todos!", "Feliz Natal 🎄"). Desligue a chave pra tirar do ar sem perder o texto.</p>
     <div class="ps-section">
       <textarea class="ps-input" id="comunicado-texto" placeholder="Escreva aqui o recado para os alunos...">${escapeHtml(COMUNICADO_ALUNO.texto||'')}</textarea>
@@ -18801,9 +18812,10 @@ function renderConteudo(){
         <button class="btn-accent" id="comunicado-save-btn">${icon('upload')} Salvar comunicado</button>
         ${COMUNICADO_ALUNO.updatedAt? `<span style="font-size:12px;color:var(--text-mute);margin-left:10px">Atualizado em ${new Date(COMUNICADO_ALUNO.updatedAt).toLocaleDateString('pt-BR')} às ${new Date(COMUNICADO_ALUNO.updatedAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</span>` : ''}
       </div>
-    </div>
+    </div>` : ''}
 
-    <h2 class="section-title">${icon('newspaper')} Mural — O que está acontecendo no mundo sobre a Infância</h2>
+    ${conteudoSectionHeaderHtml('sec-mural', 'newspaper', 'Mural — O que está acontecendo no mundo sobre a Infância')}
+    ${conteudoAberto('sec-mural')? `
     <p class="section-sub" style="margin-top:-6px">Publique aqui notícias, artigos ou conteúdos curtos sobre infância — aparece na tela de Início de todos os alunos, na ordem do mais novo pro mais antigo. Use "Pausar" para tirar algo do ar sem apagar.</p>
     <div class="table-wrap">
       <table class="check-table">
@@ -18832,9 +18844,10 @@ function renderConteudo(){
       <div class="field"><label>Fonte da notícia (opcional)</label><input class="ps-input" type="text" id="new-novidade-fonte" placeholder="Ex.: Revista Pediatria, G1, UOL..."></div>
       <div class="field"><label>Link (opcional)</label><input class="ps-input" type="text" id="new-novidade-link" placeholder="https://..."></div>
       <div class="actions"><button class="btn-accent" id="add-novidade-btn">${icon('upload')} Publicar no mural</button></div>
-    </div>
+    </div>` : ''}
 
-    <h2 class="section-title">${icon('film')} Aulas</h2>
+    ${conteudoSectionHeaderHtml('sec-aulas', 'film', 'Aulas')}
+    ${conteudoAberto('sec-aulas')? `
     <p class="section-sub" style="margin-top:-6px">Arraste pelo ícone ⠿ ou use as setas para reordenar as aulas dentro de cada módulo.</p>
     ${MODULES.map(mod=>{
       const modCourses = COURSES.filter(c=>c.modId===mod.id);
@@ -18858,13 +18871,15 @@ function renderConteudo(){
         <div class="field-error" id="new-course-link-error" style="display:none">Informe um link válido de vídeo do YouTube ou da Panda Video.</div>
       </div>
       <div class="actions"><button class="btn-accent" id="add-course-btn">${icon('upload')} Publicar aula</button></div>
-    </div>
+    </div>` : ''}
 
-    <h2 class="section-title">${icon('idcard')} Formação e Pós-Graduação</h2>
+    ${conteudoSectionHeaderHtml('sec-formacao-pos', 'idcard', 'Formação e Pós-Graduação')}
+    ${conteudoAberto('sec-formacao-pos')? `
     <p class="section-sub" style="margin-top:-6px">Conteúdo exclusivo por programa — cada bloco abaixo só aparece em Aulas para quem tem acesso àquele programa (definido na ficha do aluno, em Visão Geral). "Conteúdo Formação + Pós-Graduação" aparece pros dois grupos ao mesmo tempo.</p>
-    ${CURSOS.map(curso=>cursoAdminBlockHtml(curso)).join('')}
+    ${CURSOS.map(curso=>cursoAdminBlockHtml(curso)).join('')}` : ''}
 
-    <h2 class="section-title">${icon('folder')} Materiais</h2>
+    ${conteudoSectionHeaderHtml('sec-materiais', 'folder', 'Materiais')}
+    ${conteudoAberto('sec-materiais')? `
     <div class="table-wrap">
       <table class="check-table">
         <thead><tr><th>Título</th><th>Tipo</th><th>Link</th><th></th></tr></thead>
@@ -18889,9 +18904,10 @@ function renderConteudo(){
       </div>
       <div class="field full"><label>Link (PDF, planilha, página, etc.)</label><input class="ps-input" type="text" id="new-material-link" placeholder="https://..."></div>
       <div class="actions"><button class="btn-accent" id="add-material-btn">${icon('upload')} Publicar material</button></div>
-    </div>
+    </div>` : ''}
 
-    <h2 class="section-title">${icon('film')} Modelos de Apresentação (Estúdio de Palestras)</h2>
+    ${conteudoSectionHeaderHtml('sec-modelos', 'film', 'Modelos de Apresentação (Estúdio de Palestras)')}
+    ${conteudoAberto('sec-modelos')? `
     <p class="section-sub" style="margin-top:-6px">O aluno escolhe uma identidade visual no Briefing da palestra, dentre todos os modelos cadastrados aqui. Envie a capa (obrigatória) e, se quiser, imagens dos layouts internos como referência visual; nome e ordem de exibição dá pra editar a qualquer momento. O campo "Estilo de exportação" é o que faz o PDF e o PowerPoint gerados realmente terem essa cara — por enquanto só existem os estilos já programados na lista; um modelo novo que você cadastrar sem programar o estilo sai com a aparência padrão da NCC.</p>
     <div class="pm-grupo-admin">
       <div class="pm-grupo-admin-grid">
@@ -18935,9 +18951,10 @@ function renderConteudo(){
           <button type="button" class="btn-accent btn-mini" data-pm-add style="margin-top:8px">${icon('upload','tiny')} Adicionar modelo</button>
         </div>
       </div>
-    </div>
+    </div>` : ''}
 
-    <h2 class="section-title">${icon('calendar')} Eventos / Aulas ao Vivo</h2>
+    ${conteudoSectionHeaderHtml('sec-eventos', 'calendar', 'Eventos / Aulas ao Vivo')}
+    ${conteudoAberto('sec-eventos')? `
     <p class="section-sub" style="margin-top:-6px">Agende aqui qualquer encontro ao vivo — coletivo (Mastermind, Plantão de Dúvidas, Consultório Simulado, visível na Agenda ao Vivo de todos) ou 1:1 com um mentorado específico (visível só pra ele). 1h depois do horário marcado, o encontro sai de "Próximos encontros" automaticamente: os coletivos vão para as gravações da Agenda ao Vivo, separadas por tipo; os 1:1 vão para Minhas Sessões 1:1 do mentorado. Reuniões 1:1 também podem ser agendadas direto do Acompanhamento Interno do aluno, na aba "Registro de Contatos Futuros".</p>
     <div class="table-wrap">
       <table class="check-table">
@@ -18991,9 +19008,10 @@ function renderConteudo(){
       <div class="field full"><label>Descrição</label><textarea class="ps-input" id="new-live-desc" placeholder="Do que trata este encontro..."></textarea></div>
       <div class="field full"><label>Link da gravação (pode deixar em branco e adicionar depois)</label><input class="ps-input" type="text" id="new-live-link" placeholder="https://..."></div>
       <div class="actions"><button class="btn-accent" id="add-live-btn">${icon('upload')} Publicar evento</button></div>
-    </div>
+    </div>` : ''}
 
-    <h2 class="section-title">${icon('book')} Clube do Livro</h2>
+    ${conteudoSectionHeaderHtml('sec-clube', 'book', 'Clube do Livro')}
+    ${conteudoAberto('sec-clube')? `
     <p class="section-sub" style="margin-top:-6px">Cadastre o livro em estudo, os capítulos, os materiais de apoio e os encontros ao vivo do Clube. Quem está matriculado só no Clube do Livro vê apenas este espaço; Formação, Pós-Graduação e Mentoria têm acesso gratuito a ele também.</p>
     <div class="table-wrap">
       <table class="check-table">
@@ -19182,6 +19200,7 @@ function renderConteudo(){
         </table>
       </div>`;
     })()}
+    ` : ''}
     ` : ''}
   `;
   bindConteudoCourseEvents();

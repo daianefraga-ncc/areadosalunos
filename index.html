@@ -1542,6 +1542,18 @@
      dentro, mas pointer-events:none impede qualquer clique/foco/seleção chegar nela. */
   .locked-preview{pointer-events:none;user-select:none;opacity:.5;filter:grayscale(.15);margin-top:28px;}
 
+  /* ---- "Encolher/expandir" itens das listas de Conteúdo (ver conteudoExpandidos no JS) ---- */
+  .conteudo-toggle-btn{flex-shrink:0;}
+  .conteudo-toggle-btn .icon{transition:transform .15s;}
+  .conteudo-toggle-btn.open .icon{transform:rotate(90deg);}
+  .conteudo-accordion-h{cursor:pointer;user-select:none;}
+  .conteudo-accordion-chevron{display:inline-flex;transition:transform .15s;}
+  .conteudo-accordion-h.open .conteudo-accordion-chevron{transform:rotate(90deg);}
+  .conteudo-accordion-titulo{flex:1;}
+  .curso-modulo-row-collapsed{padding:7px 12px;}
+  .cm-collapsed-nome{flex:1;font-size:13px;font-weight:600;color:var(--text);min-width:120px;}
+  .pm-admin-collapsed-nome{font-size:12px;font-weight:700;text-align:center;}
+
   /* ---- Clube do Livro ---- */
   .clube-tag{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--bg-elev);color:var(--text-dim);white-space:nowrap;}
   .clube-tag-gratuito{background:var(--success-soft);color:var(--success);}
@@ -1555,6 +1567,7 @@
   .clube-hero-info{flex:1;min-width:0;}
   .clube-hero-info h2{margin:8px 0 4px;font-size:21px;}
   .clube-hero-info p{margin:0 0 14px;color:var(--text-mute);font-size:13.5px;}
+  .clube-hero-sobre{color:var(--text-dim)!important;line-height:1.6;}
   .clube-hero-actions{display:flex;gap:10px;flex-wrap:wrap;}
   .clube-biblioteca-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;}
   .clube-biblioteca-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;cursor:pointer;transition:border-color .12s;}
@@ -14571,8 +14584,8 @@ function renderClubeLivro(viewId){
         ${livro.status==='em_estudo'? `<span class="clube-tag">Livro em estudo</span>` : ''}
         <h2>${escapeHtml(livro.titulo)}</h2>
         ${livro.subtitulo? `<p>${escapeHtml(livro.subtitulo)}</p>` : ''}
+        ${livro.sobre_livro? `<p class="clube-hero-sobre">${escapeHtml(livro.sobre_livro)}</p>` : ''}
         <div class="clube-hero-actions">
-          ${livro.sobre_livro? `<button type="button" class="btn-accent" id="clube-sobre-btn">${icon('book','tiny')} Sobre o livro</button>` : ''}
           ${livro.onde_comprar_url? `<a class="btn-outline" href="${escapeAttr(livro.onde_comprar_url)}" target="_blank" rel="noopener">${icon('externallink','tiny')} Onde comprar</a>` : ''}
         </div>
       </div>
@@ -14589,8 +14602,6 @@ function renderClubeLivro(viewId){
   if(bcBtn) bcBtn.addEventListener('click', ()=>{
     if(CLUBE_LIVROS.length>1){ clubeMostrandoBiblioteca = true; renderClubeLivro(viewId); }
   });
-  const sobreBtn = document.getElementById('clube-sobre-btn');
-  if(sobreBtn) sobreBtn.addEventListener('click', ()=>openClubeSobreLivroModal(livro));
   container.querySelectorAll('#clube-tabs .ae-tab').forEach(t=>{
     t.addEventListener('click', ()=>{
       clubeSubView = t.dataset.sub;
@@ -14604,23 +14615,6 @@ function renderClubeLivro(viewId){
 function renderClubeSubview(viewId){
   const map = { capitulos:clubeRenderCapitulos, materiais:clubeRenderMateriais, mesa:clubeRenderMesa, caderno:clubeRenderCaderno };
   map[clubeSubView](viewId);
-}
-
-function openClubeSobreLivroModal(livro){
-  document.getElementById('modal').innerHTML = `
-    <div class="modal-body form-modal">
-      <div class="cat">Clube do Livro</div>
-      <h3>${escapeHtml(livro.titulo)}</h3>
-      ${livro.subtitulo? `<p style="color:var(--text-mute);margin-top:-8px">${escapeHtml(livro.subtitulo)}</p>`:''}
-      <div class="ps-section" style="font-size:13.5px;line-height:1.7">${formatEstudoTexto(livro.sobre_livro||'')}</div>
-      <div class="modal-actions">
-        ${livro.onde_comprar_url? `<a class="btn-accent" href="${escapeAttr(livro.onde_comprar_url)}" target="_blank" rel="noopener">${icon('externallink','tiny')} Onde comprar</a>`:''}
-        <button class="btn-outline" id="clube-sobre-fechar">Fechar</button>
-      </div>
-    </div>`;
-  modalReturnTo = null; modalCloseGuard = null;
-  document.getElementById('modal-backdrop').classList.add('open');
-  document.getElementById('clube-sobre-fechar').addEventListener('click', closeModal);
 }
 
 function openClubeProximoEncontroModal(livro, cap){
@@ -18240,6 +18234,38 @@ function moveCourseInModule(courseId, dir){
 }
 let draggedCourseId = null;
 let conteudoClubeLivroId = null; // livro do Clube do Livro selecionado no admin de Conteúdo
+/* ---- "Encolher/expandir" itens das listas de Conteúdo ----
+   Tudo começa recolhido, pra área de Conteúdo virar uma lista enxuta de títulos — só expande o
+   conteúdo (textos longos, capa, campos extras) do item que a pessoa clicar, facilitando achar
+   o item certo pra editar em meio a listas compridas. */
+let conteudoExpandidos = new Set();
+function conteudoAberto(key){ return conteudoExpandidos.has(key); }
+/* Botão de seta (só o ícone), usado quando o resto da linha do item já fica visível e só uma parte
+   (um bloco de campos extras) precisa ser escondida/revelada. */
+function conteudoToggleBtnHtml(key){
+  const aberto = conteudoAberto(key);
+  return `<button type="button" class="btn-mini icon-only conteudo-toggle-btn ${aberto?'open':''}" data-conteudo-toggle="${escapeAttr(key)}" title="${aberto?'Encolher':'Expandir'}">${icon('next','tiny')}</button>`;
+}
+/* Cabeçalho inteiro clicável (tipo acordeão), usado pra recolher/expandir um grupo inteiro (ex.: todas
+   as aulas de um módulo) — contagemLabel é opcional, mostrado ao lado do título quando fornecido. */
+function conteudoAccordionHeaderHtml(key, titulo, contagemLabel){
+  const aberto = conteudoAberto(key);
+  return `<div class="module-block-h conteudo-accordion-h ${aberto?'open':''}" data-conteudo-toggle="${escapeAttr(key)}">
+    <span class="conteudo-accordion-chevron">${icon('next','tiny')}</span>
+    <span class="conteudo-accordion-titulo">${escapeHtml(titulo)}</span>
+    ${contagemLabel? `<span class="cm-count">${escapeHtml(contagemLabel)}</span>` : ''}
+  </div>`;
+}
+function bindConteudoToggleEvents(){
+  document.querySelectorAll('#view-conteudo [data-conteudo-toggle]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const key = el.dataset.conteudoToggle;
+      if(conteudoExpandidos.has(key)) conteudoExpandidos.delete(key); else conteudoExpandidos.add(key);
+      renderConteudo();
+    });
+  });
+}
 /* Converte um timestamptz (ISO, vindo do Supabase) para o formato que o input type="datetime-local"
    espera ("AAAA-MM-DDTHH:mm", em horário local do navegador) — e vice-versa, lendo o value de volta
    com new Date(), que interpreta uma string sem fuso como horário local. */
@@ -18400,8 +18426,24 @@ function openEditCourseModal(courseId){
    reaproveitam data-edit-course/data-del-course, já ligados por bindConteudoCourseEvents(). */
 function moduloAdminRowHtml(modulo, isFirst, isLast){
   const aulaCount = COURSES.filter(c=>c.moduloId===modulo.id).length;
+  const key = 'modulo-'+modulo.id;
+  const aberto = conteudoAberto(key);
+  if(!aberto){
+    return `
+    <div class="curso-modulo-row curso-modulo-row-collapsed" data-modulo-row="${modulo.id}">
+      ${conteudoToggleBtnHtml(key)}
+      <div class="cm-collapsed-nome">${escapeHtml(modulo.nome)||'(sem nome)'}</div>
+      <div class="ct-actions">
+        <button class="reorder-btn" data-move-up-modulo="${modulo.id}" ${isFirst?'disabled':''} title="Mover para cima">${icon('up')}</button>
+        <button class="reorder-btn" data-move-down-modulo="${modulo.id}" ${isLast?'disabled':''} title="Mover para baixo">${icon('down')}</button>
+        <span class="cm-count">${aulaCount} aula${aulaCount===1?'':'s'}</span>
+        <button class="btn-mini danger" data-del-modulo="${modulo.id}">${icon('trash')} Remover</button>
+      </div>
+    </div>`;
+  }
   return `
     <div class="curso-modulo-row" data-modulo-row="${modulo.id}">
+      ${conteudoToggleBtnHtml(key)}
       <div class="cm-cover">
         ${modulo.capaUrl? `<img src="${escapeAttr(modulo.capaUrl)}" alt="">` : `<div class="cm-cover-empty">${icon('film','tiny')}</div>`}
         <label class="btn-mini cm-cover-upload">${icon('upload','tiny')} Capa
@@ -18445,9 +18487,10 @@ function cursoAdminAulasHtml(curso){
   const blocks = modulos.map(mod=>{
     const aulas = COURSES.filter(c=>c.moduloId===mod.id);
     if(!aulas.length) return '';
+    const key = 'curso-aulas-mod-'+mod.id;
     return `<div class="module-block">
-      <div class="module-block-h">${escapeHtml(mod.nome)}</div>
-      ${aulas.map((c,i)=>cursoAulaRowHtml(c,i===0,i===aulas.length-1)).join('')}
+      ${conteudoAccordionHeaderHtml(key, mod.nome, aulas.length+' aula'+(aulas.length===1?'':'s'))}
+      ${conteudoAberto(key)? aulas.map((c,i)=>cursoAulaRowHtml(c,i===0,i===aulas.length-1)).join('') : ''}
     </div>`;
   }).join('');
   return blocks || `<p class="modulo-empty">Nenhuma aula publicada ainda nos módulos criados.</p>`;
@@ -18796,9 +18839,10 @@ function renderConteudo(){
     ${MODULES.map(mod=>{
       const modCourses = COURSES.filter(c=>c.modId===mod.id);
       if(!modCourses.length) return '';
+      const key = 'aulas-mod-'+mod.id;
       return `<div class="module-block">
-        <div class="module-block-h">${mod.name}</div>
-        ${modCourses.map((c,i)=>courseRowHtml(c, i===0, i===modCourses.length-1)).join('')}
+        ${conteudoAccordionHeaderHtml(key, mod.name, modCourses.length+' aula'+(modCourses.length===1?'':'s'))}
+        ${conteudoAberto(key)? modCourses.map((c,i)=>courseRowHtml(c, i===0, i===modCourses.length-1)).join('') : ''}
       </div>`;
     }).join('')}
     <div class="add-form">
@@ -18851,8 +18895,21 @@ function renderConteudo(){
     <p class="section-sub" style="margin-top:-6px">O aluno escolhe uma identidade visual no Briefing da palestra, dentre todos os modelos cadastrados aqui. Envie a capa (obrigatória) e, se quiser, imagens dos layouts internos como referência visual; nome e ordem de exibição dá pra editar a qualquer momento. O campo "Estilo de exportação" é o que faz o PDF e o PowerPoint gerados realmente terem essa cara — por enquanto só existem os estilos já programados na lista; um modelo novo que você cadastrar sem programar o estilo sai com a aparência padrão da NCC.</p>
     <div class="pm-grupo-admin">
       <div class="pm-grupo-admin-grid">
-        ${PALESTRA_MODELOS.slice().sort((a,b)=>a.ordem-b.ordem).map(m=>`
-          <div class="pm-admin-card">
+        ${PALESTRA_MODELOS.slice().sort((a,b)=>a.ordem-b.ordem).map(m=>{
+          const key = 'pm-'+m.id; const aberto = conteudoAberto(key);
+          if(!aberto){
+            return `<div class="pm-admin-card">
+              <div class="pm-admin-thumb" data-pm-preview="${m.id}">${m.capaUrl? `<img src="${escapeAttr(m.capaUrl)}" alt="">` : `<div class="pm-admin-thumb-empty">${icon('film','tiny')}</div>`}</div>
+              <div class="pm-admin-collapsed-nome">${escapeHtml(m.nome)||'(sem nome)'}</div>
+              <div class="pm-admin-row">
+                ${conteudoToggleBtnHtml(key)}
+                <span class="cm-count">ordem ${m.ordem}</span>
+                <button type="button" class="btn-mini danger" data-pm-del="${m.id}" title="Remover modelo">${icon('trash','tiny')}</button>
+              </div>
+            </div>`;
+          }
+          return `<div class="pm-admin-card">
+            ${conteudoToggleBtnHtml(key)}
             <div class="pm-admin-thumb" data-pm-preview="${m.id}">${m.capaUrl? `<img src="${escapeAttr(m.capaUrl)}" alt="">` : `<div class="pm-admin-thumb-empty">${icon('film','tiny')}</div>`}</div>
             <input class="ps-input" type="text" data-pm-nome="${m.id}" value="${escapeAttr(m.nome)}" placeholder="Nome do modelo">
             <select class="ps-input" data-pm-estilo="${m.id}" title="Estilo de exportação (visual real do PDF/PowerPoint)">
@@ -18869,8 +18926,8 @@ function renderConteudo(){
               <button type="button" class="btn-mini" data-pm-layout-btn="${m.id}">${icon('plus','tiny')} Layout interno</button>
               <input type="file" accept="image/*" multiple data-pm-layout-file="${m.id}" style="display:none">
             </div>
-          </div>
-        `).join('')}
+          </div>`;
+        }).join('')}
         <div class="pm-admin-card pm-admin-card-new" data-pm-add-grupo="">
           <div class="pm-admin-thumb pm-admin-thumb-empty">${icon('plus')}</div>
           <input class="ps-input" type="text" data-pm-new-nome placeholder="Nome do novo modelo">
@@ -18940,10 +18997,11 @@ function renderConteudo(){
     <p class="section-sub" style="margin-top:-6px">Cadastre o livro em estudo, os capítulos, os materiais de apoio e os encontros ao vivo do Clube. Quem está matriculado só no Clube do Livro vê apenas este espaço; Formação, Pós-Graduação e Mentoria têm acesso gratuito a ele também.</p>
     <div class="table-wrap">
       <table class="check-table">
-        <thead><tr><th>Título</th><th>Subtítulo</th><th>Status</th><th>Ordem</th><th></th></tr></thead>
+        <thead><tr><th></th><th>Título</th><th>Subtítulo</th><th>Status</th><th>Ordem</th><th></th></tr></thead>
         <tbody>
-          ${CLUBE_LIVROS.map(l=>`
+          ${CLUBE_LIVROS.map(l=>{ const key = 'clube-livro-'+l.id; const aberto = conteudoAberto(key); return `
             <tr>
+              <td>${conteudoToggleBtnHtml(key)}</td>
               <td style="min-width:160px"><input class="ps-input" data-clube-livro-titulo="${l.id}" value="${escapeAttr(l.titulo)}"></td>
               <td style="min-width:160px"><input class="ps-input" data-clube-livro-subtitulo="${l.id}" value="${escapeAttr(l.subtitulo)}"></td>
               <td>
@@ -18956,7 +19014,7 @@ function renderConteudo(){
               <td><input class="ps-input" type="number" data-clube-livro-ordem="${l.id}" value="${l.ordem}" style="width:64px"></td>
               <td><button class="btn-mini danger" data-clube-livro-del="${l.id}">${icon('trash')} Remover</button></td>
             </tr>
-            <tr><td colspan="5" style="padding-top:0">
+            ${aberto? `<tr><td colspan="6" style="padding-top:0">
               <div class="add-form" style="margin:0 0 4px">
                 <div class="field">
                   <label>Capa do livro</label>
@@ -18967,10 +19025,10 @@ function renderConteudo(){
                   </div>
                 </div>
                 <div class="field"><label>Onde comprar (link)</label><input class="ps-input" type="text" data-clube-livro-comprar="${l.id}" value="${escapeAttr(l.onde_comprar_url||'')}" placeholder="https://..."></div>
-                <div class="field full"><label>Sobre o livro</label><textarea class="ps-input" data-clube-livro-sobre="${l.id}" placeholder="Texto exibido no modal &quot;Sobre o livro&quot;...">${escapeHtml(l.sobre_livro||'')}</textarea></div>
+                <div class="field full"><label>Texto curto sobre o livro</label><textarea class="ps-input" data-clube-livro-sobre="${l.id}" placeholder="Um resumo curto, exibido direto abaixo do título do livro para o aluno..." style="min-height:60px">${escapeHtml(l.sobre_livro||'')}</textarea></div>
               </div>
-            </td></tr>
-          `).join('') || `<tr><td colspan="5" style="color:var(--text-mute)">Nenhum livro cadastrado ainda.</td></tr>`}
+            </td></tr>` : ''}
+          `; }).join('') || `<tr><td colspan="6" style="color:var(--text-mute)">Nenhum livro cadastrado ainda.</td></tr>`}
         </tbody>
       </table>
     </div>
@@ -18997,21 +19055,22 @@ function renderConteudo(){
       <h3 class="section-title" style="margin-top:18px">${icon('book','tiny')} Capítulos — ${escapeHtml(livroSel.titulo)}</h3>
       <div class="table-wrap">
         <table class="check-table">
-          <thead><tr><th>Nº</th><th>Título</th><th>Ordem</th><th></th></tr></thead>
+          <thead><tr><th></th><th>Nº</th><th>Título</th><th>Ordem</th><th></th></tr></thead>
           <tbody>
-            ${caps.map(c=>`
+            ${caps.map(c=>{ const key = 'clube-cap-'+c.id; const aberto = conteudoAberto(key); return `
               <tr>
+                <td>${conteudoToggleBtnHtml(key)}</td>
                 <td style="width:56px"><input class="ps-input" type="number" data-clube-cap-numero="${c.id}" value="${c.numero}" style="width:56px"></td>
                 <td style="min-width:160px"><input class="ps-input" data-clube-cap-titulo="${c.id}" value="${escapeAttr(c.titulo)}"></td>
                 <td><input class="ps-input" type="number" data-clube-cap-ordem="${c.id}" value="${c.ordem}" style="width:64px"></td>
                 <td><button class="btn-mini danger" data-clube-cap-del="${c.id}">${icon('trash')} Remover</button></td>
               </tr>
-              <tr><td colspan="4" style="padding-top:0">
+              ${aberto? `<tr><td colspan="5" style="padding-top:0">
                 <div class="add-form" style="margin:0 0 4px">
                   <div class="field full"><label>Texto de estudo deste capítulo</label><textarea class="ps-input" data-clube-cap-texto="${c.id}" placeholder="Conteúdo do capítulo exibido para o aluno...">${escapeHtml(c.texto_estudo||'')}</textarea></div>
                 </div>
-              </td></tr>
-            `).join('') || `<tr><td colspan="4" style="color:var(--text-mute)">Nenhum capítulo cadastrado ainda.</td></tr>`}
+              </td></tr>` : ''}
+            `; }).join('') || `<tr><td colspan="5" style="color:var(--text-mute)">Nenhum capítulo cadastrado ainda.</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -19130,6 +19189,7 @@ function renderConteudo(){
   bindCursoAulaAdmin();
   bindConteudoPalestraModelosEvents();
   bindConteudoClubeEvents();
+  bindConteudoToggleEvents();
   document.getElementById('comunicado-save-btn').addEventListener('click', async ()=>{
     const texto = document.getElementById('comunicado-texto').value.trim();
     const ativo = document.getElementById('comunicado-ativo').checked;

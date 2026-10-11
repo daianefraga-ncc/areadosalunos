@@ -1655,6 +1655,9 @@
   .clube-caderno-sidebar{display:flex;flex-direction:column;}
   .clube-percurso-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;font-size:12px;}
   .clube-percurso-select{width:auto;padding:3px 6px;font-size:11px;}
+  .clube-admin-capa-row{display:flex;align-items:center;gap:10px;}
+  .clube-admin-capa-thumb{width:46px;height:64px;border-radius:6px;background:var(--bg-elev);display:flex;align-items:center;justify-content:center;color:var(--text-mute);overflow:hidden;flex-shrink:0;}
+  .clube-admin-capa-thumb img{width:100%;height:100%;object-fit:cover;}
   @media (max-width:880px){
     .sidebar{position:fixed;left:-260px;top:0;transition:left .2s;z-index:50;box-shadow:var(--shadow-side);}
     .sidebar.open{left:0;}
@@ -8968,6 +8971,28 @@ async function uploadCursoCapaFile(file, moduloId){
   const { error: upErr } = await sb.storage.from('curso-capas').upload(path, toUpload, {upsert:true, cacheControl:'31536000', contentType: toUpload.type || undefined});
   if(upErr) throw upErr;
   const { data } = sb.storage.from('curso-capas').getPublicUrl(path);
+  return data.publicUrl;
+}
+/* Capa de livro do Clube do Livro — mesmo esquema de redimensionamento da capa de módulo, em formato
+   retrato (a prévia na Biblioteca e no hero usam a mesma proporção). */
+const CLUBE_CAPA_MAX_DIM = 600;
+const CLUBE_CAPA_ALVO_BYTES = 180*1024;
+async function uploadClubeCapaFile(file, livroId){
+  let toUpload = file;
+  try{
+    toUpload = await Promise.race([
+      resizeImageForUpload(file, CLUBE_CAPA_ALVO_BYTES, CLUBE_CAPA_MAX_DIM),
+      new Promise((_,rej)=> setTimeout(()=>rej(new Error('Tempo esgotado ao processar a imagem.')), 12000))
+    ]);
+  }catch(e){
+    console.error('Falha ao redimensionar capa do livro, tentando enviar original:', e);
+    toUpload = file;
+  }
+  const ext = (toUpload.name||'').split('.').pop() || 'jpg';
+  const path = `${livroId}-${Date.now()}.${ext.toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg'}`;
+  const { error: upErr } = await sb.storage.from('clube-capas').upload(path, toUpload, {upsert:true, cacheControl:'31536000', contentType: toUpload.type || undefined});
+  if(upErr) throw upErr;
+  const { data } = sb.storage.from('clube-capas').getPublicUrl(path);
   return data.publicUrl;
 }
 /* ---- Programas extras do aluno (matrícula em Formação e/ou Pós-Graduação além do tier principal) ---- */
@@ -18933,7 +18958,14 @@ function renderConteudo(){
             </tr>
             <tr><td colspan="5" style="padding-top:0">
               <div class="add-form" style="margin:0 0 4px">
-                <div class="field"><label>Capa (URL da imagem)</label><input class="ps-input" type="text" data-clube-livro-capa="${l.id}" value="${escapeAttr(l.capa_url||'')}" placeholder="https://..."></div>
+                <div class="field">
+                  <label>Capa do livro</label>
+                  <div class="clube-admin-capa-row">
+                    <div class="clube-admin-capa-thumb">${l.capa_url? `<img src="${escapeAttr(l.capa_url)}" alt="">` : icon('book','tiny')}</div>
+                    <button type="button" class="btn-mini" data-clube-livro-capa-btn="${l.id}">${icon('upload','tiny')} ${l.capa_url?'Trocar imagem':'Anexar imagem'}</button>
+                    <input type="file" accept="image/*" data-clube-livro-capa-file="${l.id}" style="display:none">
+                  </div>
+                </div>
                 <div class="field"><label>Onde comprar (link)</label><input class="ps-input" type="text" data-clube-livro-comprar="${l.id}" value="${escapeAttr(l.onde_comprar_url||'')}" placeholder="https://..."></div>
                 <div class="field full"><label>Sobre o livro</label><textarea class="ps-input" data-clube-livro-sobre="${l.id}" placeholder="Texto exibido no modal &quot;Sobre o livro&quot;...">${escapeHtml(l.sobre_livro||'')}</textarea></div>
               </div>
@@ -19279,10 +19311,24 @@ function bindConteudoClubeEvents(){
       l.ordem = parseInt(inp.value,10) || 0; syncClubeLivroUpdate(l.id, {ordem:l.ordem});
     });
   });
-  root.querySelectorAll('[data-clube-livro-capa]').forEach(inp=>{
-    inp.addEventListener('change', ()=>{
-      const l = clubeGetLivro(inp.dataset.clubeLivroCapa); if(!l) return;
-      l.capa_url = inp.value.trim() || null; syncClubeLivroUpdate(l.id, {capa_url:l.capa_url});
+  root.querySelectorAll('[data-clube-livro-capa-btn]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const input = root.querySelector(`[data-clube-livro-capa-file="${btn.dataset.clubeLivroCapaBtn}"]`);
+      if(input) input.click();
+    });
+  });
+  root.querySelectorAll('[data-clube-livro-capa-file]').forEach(input=>{
+    input.addEventListener('change', async ()=>{
+      const file = input.files && input.files[0];
+      if(!file) return;
+      const l = clubeGetLivro(input.dataset.clubeLivroCapaFile); if(!l) return;
+      const btn = root.querySelector(`[data-clube-livro-capa-btn="${l.id}"]`);
+      if(btn){ btn.disabled = true; btn.textContent = 'Enviando...'; }
+      try{
+        const url = await uploadClubeCapaFile(file, l.id);
+        l.capa_url = url; syncClubeLivroUpdate(l.id, {capa_url:url});
+        renderConteudo();
+      }catch(e){ console.error('capa clube', e); alert('Não foi possível enviar essa imagem. Tente de novo.'); if(btn){ btn.disabled = false; } }
     });
   });
   root.querySelectorAll('[data-clube-livro-comprar]').forEach(inp=>{

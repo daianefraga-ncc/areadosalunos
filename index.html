@@ -1453,21 +1453,41 @@
   .ae-cal-legenda-dot.ae-cal-cat-ncc_plat{background:var(--individual);}
   .ae-cal-legenda-dot.ae-cal-cat-redes_sociais{background:var(--accent);}
   .ae-cal-legenda-dot.ae-cal-cat-outras{background:var(--text-mute);}
-  .ae-cronograma{display:flex;flex-direction:column;gap:18px;}
-  .ae-cron-modulo{border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
-  .ae-cron-modulo-head{background:var(--accent-soft);color:var(--accent-2,var(--accent));font-weight:800;font-size:13.5px;padding:9px 12px;}
-  .ae-cron-table{display:flex;flex-direction:column;width:100%;}
-  .ae-cron-row{display:grid;grid-template-columns:64px minmax(0,1fr) 150px 150px 86px;gap:8px;align-items:center;padding:7px 12px;border-top:1px solid var(--border);font-size:12.5px;min-width:0;}
-  .ae-cron-row > div{min-width:0;}
-  .ae-cron-row.ae-cron-header{border-top:none;background:var(--bg-elev);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--text-mute);}
-  .ae-cron-aulanum{font-weight:700;}
-  .ae-cron-tema{white-space:normal;word-break:break-word;}
-  .ae-cron-select{width:100%;border:1px solid transparent;border-radius:14px;padding:4px 8px;font-size:11.5px;font-weight:700;cursor:pointer;background:var(--individual-soft);color:var(--individual);}
-  .ae-cron-select.ae-cron-status-atualizada,.ae-cron-select.ae-cron-status-gravada{background:var(--success-soft);color:var(--success);}
-  .ae-cron-duracao{width:100%;border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-size:12px;background:var(--bg-elev);color:var(--text);box-sizing:border-box;}
+  .ae-semana-wrap{overflow-x:auto;}
+  .ae-semana-grid{width:100%;border-collapse:collapse;min-width:920px;}
+  .ae-semana-grid th{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--text-mute);background:var(--bg-elev);padding:8px 6px;text-align:center;border:1px solid var(--border);}
+  .ae-semana-hora{font-size:11.5px;font-weight:700;text-align:center;background:var(--bg-elev);border:1px solid var(--border);white-space:nowrap;padding:6px;}
+  .ae-semana-cel{border:1px solid var(--border);padding:5px;vertical-align:top;min-width:110px;}
+  .ae-semana-texto{width:100%;border:1px solid transparent;border-radius:6px;padding:4px 6px;font-size:12px;background:transparent;color:var(--text);box-sizing:border-box;margin-bottom:4px;}
+  .ae-semana-texto:focus{border-color:var(--border);background:var(--bg-elev);}
+  .ae-semana-status{width:100%;border:1px solid transparent;border-radius:14px;padding:3px 6px;font-size:10.5px;font-weight:700;cursor:pointer;background:var(--bg-elev);color:var(--text-mute);box-sizing:border-box;}
+  .ae-semana-status.ae-semana-status-feito{background:var(--success-soft);color:var(--success);}
+  .ae-semana-status.ae-semana-status-andamento{background:var(--individual-soft);color:var(--individual);}
+  .ae-planejamento-mes{font-size:13.5px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;margin:18px 0 10px;color:var(--text-dim);}
+  .ae-lotes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:8px;}
+  .ae-lote-card{border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;background:var(--bg-card);display:flex;flex-direction:column;gap:10px;}
+  .ae-lote-head{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .ae-lote-titulo{font-weight:800;font-size:13.5px;}
+  .ae-lote-sub{font-weight:600;color:var(--text-mute);font-size:11.5px;}
+  .ae-lote-aulas{display:flex;flex-direction:column;gap:4px;font-size:12.5px;}
+  .ae-lote-aula-row{display:flex;gap:6px;}
+  .ae-lote-aula-codigo{font-weight:800;color:var(--accent);flex-shrink:0;}
+  .ae-lote-cron-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;}
+  .ae-lote-cron-item{background:var(--bg-elev);border-radius:6px;padding:6px 8px;font-size:11px;display:flex;flex-direction:column;gap:2px;}
+  .ae-lote-cron-item span{color:var(--text-mute);text-transform:uppercase;font-size:9.5px;font-weight:800;letter-spacing:.3px;}
+  .ae-lote-gravacao{background:var(--shared-soft);color:var(--shared);border-radius:6px;padding:7px 10px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;}
+  .ae-lote-premissas{font-size:11.5px;color:var(--text-mute);margin:0;line-height:1.5;}
+  .ae-lote-status-row{display:flex;align-items:center;gap:8px;margin-top:auto;}
+  .ae-lote-status{border:1px solid transparent;border-radius:14px;padding:4px 10px;font-size:11.5px;font-weight:700;cursor:pointer;background:var(--individual-soft);color:var(--individual);}
+  .ae-lote-status.ae-lote-status-feito{background:var(--success-soft);color:var(--success);}
+  .ae-entrega-etapas{border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-top:18px;background:var(--bg-elev);}
+  .ae-entrega-head{font-weight:800;font-size:13px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+  .ae-entrega-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;}
+  .ae-entrega-col{background:var(--bg-card);border-radius:6px;padding:8px 10px;}
+  .ae-entrega-label{font-weight:800;font-size:11.5px;margin-bottom:3px;}
+  .ae-entrega-desc{font-size:11px;color:var(--text-mute);line-height:1.4;}
   @media (max-width:720px){
-    .ae-cron-row{grid-template-columns:1fr;row-gap:5px;}
-    .ae-cron-row.ae-cron-header{display:none;}
+    .ae-lotes-grid{grid-template-columns:1fr;}
   }
   .ae-checklist-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:13px;}
   .ae-checklist-item input{margin-top:2px;}
@@ -6576,12 +6596,26 @@ let STAFF_LIST = []; // [{id,name}] — contas com role='staff', populado em boo
 let AE_ATIVIDADES = [];
 let AE_RECORRENCIAS = [];
 let AE_MODELOS = [];
-let CRONOGRAMA_AULAS = []; // tabela por aula (tema/atualização/gravação/duração) — ver tabela cronograma_aulas
+let EQUIPE_AGENDA_SEMANA = []; // grade semanal única da equipe (dia_semana/horario/texto/status) — ver tabela equipe_agenda_semana
+let PLANEJAMENTO_LOTES = []; // lotes de produção de aulas (pesquisa→publicação) — ver tabela planejamento_lotes
 let AE_SUPORTE = []; // tickets de suporte a alunos — ver tabela suporte_alunos
 let AVAL_PERGUNTAS_CACHE = []; // perguntas (+ opções) da avaliação sendo editada no momento pela equipe — ver openAvaliacaoStaffModal
-let aeSubView = 'hoje'; // 'hoje' | 'semana' | 'calendario' | 'minhas' | 'quadro' | 'cronograma'
+let aeSubView = 'semana'; // 'semana' | 'calendario' | 'planejamento'
 let aeFiltro = { dominio:'todos', area:'todas', responsavel:'todos', status:'todos', prioridade:'todas' };
 let aeCalMonth = new Date();
+const AE_AGENDA_DIAS = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
+const AE_AGENDA_HORARIOS = ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00'];
+const AE_AGENDA_STATUS = { feito:'Feito', andamento:'Em andamento' };
+const AE_LOTE_STATUS = { em_andamento:'Em andamento', feito:'Feito' };
+const AE_LOTE_ETAPAS_INFO = [
+  {chave:'pesquisa', label:'Pesquisa', entrega:'artigos verificados e referências'},
+  {chave:'roteiro', label:'Roteiro', entrega:'fala por slide e exemplos práticos'},
+  {chave:'slides', label:'Slides', entrega:'conteúdo, figuras e referências'},
+  {chave:'revisao', label:'Revisão', entrega:'ciência, linguagem e sequência'},
+  {chave:'gravacao', label:'Gravação', entrega:'arquivos completos por aula'},
+  {chave:'edicao', label:'Edição', entrega:'cortes, áudio e conferência'},
+  {chave:'publicacao', label:'Publicação', entrega:'vídeo, materiais e teste de acesso'},
+];
 const AE_AREAS = {
   aulas_cursos:'Aulas e cursos', noticias_infancia:'Notícias da Infância', atualizacao_cientifica:'Atualização científica',
   redes_sociais:'Redes sociais', alunos_suporte:'Alunos e suporte', eventos_palestras:'Eventos e palestras',
@@ -6598,26 +6632,52 @@ const AE_ETAPA_PIPELINE = { pesquisa:'Pesquisa', roteiro:'Roteiro', slides:'Slid
 
 async function refreshAgendaEquipe(){
   try{
-    const [r1, r2, r3, r4, r5] = await Promise.all([
+    const [r1, r2, r3, r4, r5, r6] = await Promise.all([
       sb.from('equipe_atividades').select('*').order('prazo_entrega'),
       sb.from('equipe_recorrencias').select('*').order('created_at'),
       sb.from('equipe_modelos').select('*').order('created_at'),
-      sb.from('cronograma_aulas').select('*').order('modulo_ordem').order('aula_num'),
+      sb.from('equipe_agenda_semana').select('*'),
       sb.from('suporte_alunos').select('*').eq('arquivada', false).order('created_at',{ascending:false}),
+      sb.from('planejamento_lotes').select('*').order('mes_referencia').order('numero_lote'),
     ]);
-    if(r1.error) throw r1.error; if(r2.error) throw r2.error; if(r3.error) throw r3.error; if(r4.error) throw r4.error; if(r5.error) throw r5.error;
+    if(r1.error) throw r1.error; if(r2.error) throw r2.error; if(r3.error) throw r3.error; if(r4.error) throw r4.error; if(r5.error) throw r5.error; if(r6.error) throw r6.error;
     AE_ATIVIDADES = r1.data || [];
     AE_RECORRENCIAS = r2.data || [];
     AE_MODELOS = r3.data || [];
-    CRONOGRAMA_AULAS = r4.data || [];
+    EQUIPE_AGENDA_SEMANA = r4.data || [];
     AE_SUPORTE = r5.data || [];
+    PLANEJAMENTO_LOTES = r6.data || [];
   }catch(e){ console.error('Não foi possível carregar a Agenda da Equipe', e); }
 }
-async function aeAtualizarCronogramaAula(id, campos){
-  const { error } = await sb.from('cronograma_aulas').update(campos).eq('id', id);
+/* Grava (upsert) o conteúdo/status de uma célula da agenda semanal — chave única é dia_semana+horario,
+   então uma célula ainda vazia (sem linha no banco) e uma já existente usam o mesmo caminho. */
+async function aeAtualizarCelulaSemana(diaSemana, horario, campos){
+  const existente = EQUIPE_AGENDA_SEMANA.find(c=>c.dia_semana===diaSemana && c.horario===horario);
+  const payload = Object.assign({dia_semana:diaSemana, horario, updated_by: currentUser.id, updated_at:new Date().toISOString()}, campos);
+  const { data, error } = await sb.from('equipe_agenda_semana').upsert(payload, {onConflict:'dia_semana,horario'}).select().single();
   if(error){ console.error(error); alert('Não foi possível salvar. Tente de novo.'); return; }
-  const row = CRONOGRAMA_AULAS.find(c=>c.id===id);
-  if(row) Object.assign(row, campos);
+  if(existente) Object.assign(existente, data);
+  else EQUIPE_AGENDA_SEMANA.push(data);
+}
+/* ---------- CRUD: Planejamento de Aulas (lotes) ---------- */
+async function aeInserirLote(payload){
+  const { data, error } = await sb.from('planejamento_lotes').insert(payload).select().single();
+  if(error) throw error;
+  PLANEJAMENTO_LOTES.push(data);
+  return data;
+}
+async function aeAtualizarLote(id, payload){
+  const { data, error } = await sb.from('planejamento_lotes').update(payload).eq('id', id).select().single();
+  if(error) throw error;
+  const idx = PLANEJAMENTO_LOTES.findIndex(l=>l.id===id);
+  if(idx>=0) PLANEJAMENTO_LOTES[idx] = data;
+  return data;
+}
+async function aeExcluirLote(id){
+  const { error } = await sb.from('planejamento_lotes').delete().eq('id', id);
+  if(error){ console.error(error); alert('Não foi possível excluir. Tente de novo.'); return; }
+  const idx = PLANEJAMENTO_LOTES.findIndex(l=>l.id===id);
+  if(idx>=0) PLANEJAMENTO_LOTES.splice(idx,1);
 }
 function aeNomeStaff(id){ if(!id) return '—'; const s = STAFF_LIST.find(x=>x.id===id); return s ? s.name : '—'; }
 function aeAtrasada(a){ return a.status!=='concluida' && !!a.prazo_entrega && new Date(a.prazo_entrega) < new Date(); }
@@ -6678,14 +6738,11 @@ function renderAgendaEquipe(){
       <button class="btn-outline" id="ae-cronograma-aula-btn">${icon('film','tiny')} Gerar cronograma de aula</button>
     </div>
     <div class="ae-tabs">
-      <div class="ae-tab ${aeSubView==='hoje'?'active':''}" data-sub="hoje">Hoje</div>
       <div class="ae-tab ${aeSubView==='semana'?'active':''}" data-sub="semana">Semana</div>
       <div class="ae-tab ${aeSubView==='calendario'?'active':''}" data-sub="calendario">Calendário mensal</div>
-      <div class="ae-tab ${aeSubView==='minhas'?'active':''}" data-sub="minhas">Minhas tarefas</div>
-      <div class="ae-tab ${aeSubView==='quadro'?'active':''}" data-sub="quadro">Quadro de status</div>
-      <div class="ae-tab ${aeSubView==='cronograma'?'active':''}" data-sub="cronograma">Cronograma de aulas</div>
+      <div class="ae-tab ${aeSubView==='planejamento'?'active':''}" data-sub="planejamento">Planejamento de Aulas</div>
     </div>
-    ${aeSubView==='cronograma' ? '' : `
+    ${aeSubView==='calendario' ? `
     <div class="add-form" style="margin-bottom:16px">
       <div class="field"><label>Domínio</label>
         <select class="ps-input" id="ae-f-dominio">
@@ -6714,7 +6771,7 @@ function renderAgendaEquipe(){
           ${Object.entries(AE_PRIORIDADE).map(([k,v])=>`<option value="${k}" ${aeFiltro.prioridade===k?'selected':''}>${v}</option>`).join('')}
         </select>
       </div>
-    </div>`}
+    </div>` : ''}
     <div id="ae-subview-area"></div>
   `;
   document.getElementById('ae-nova-btn').addEventListener('click',()=>openAtividadeModal(null));
@@ -6731,7 +6788,7 @@ function renderAgendaEquipe(){
   renderAgendaEquipeSubview();
 }
 function renderAgendaEquipeSubview(){
-  const map = { hoje:aeRenderHoje, semana:aeRenderSemana, calendario:aeRenderCalendario, minhas:aeRenderMinhas, quadro:aeRenderQuadro, cronograma:aeRenderCronograma };
+  const map = { semana:aeRenderSemana, calendario:aeRenderCalendario, planejamento:aeRenderPlanejamento };
   map[aeSubView]();
 }
 function aeCardHtml(a){
@@ -6753,69 +6810,51 @@ function aeWireCards(containerEl){
     el.addEventListener('click',()=>openAtividadeDetalheModal(el.dataset.aeAbrir));
   });
 }
-function aeRenderHoje(){
-  const hoje = aeHojeISO();
-  const lista = aeAplicaFiltros(aeNaoArquivadas()).filter(a=> aeDiaISO(a.prazo_entrega)===hoje || aeAtrasada(a));
-  lista.sort((x,y)=> new Date(x.prazo_entrega||0) - new Date(y.prazo_entrega||0));
-  const porDominio = { ncc_plat:[], redes_sociais:[], gestao_aulas:[] };
-  lista.forEach(a=>{ (porDominio[a.dominio] || (porDominio[a.dominio]=[])).push(a); });
-
-  const blocoDominio = (key, label, extraHtml, comGear)=>{
-    const itens = porDominio[key] || [];
-    const atrasadasD = itens.filter(aeAtrasada);
-    const hojeD = itens.filter(a=>!aeAtrasada(a));
-    return `
-      <div class="ae-dominio-head">
-        <h4>${escapeHtml(label)}</h4>
-        ${comGear? `<button class="btn-mini icon-only ae-dominio-config" data-dominio="${key}" title="Configurar rotinas deste domínio">${icon('sliders','tiny')}</button>`:''}
-      </div>
-      ${extraHtml||''}
-      ${atrasadasD.length? `<div class="ae-day-group"><div class="ae-day-label" style="color:var(--danger)">Atrasadas (${atrasadasD.length})</div>${atrasadasD.map(aeCardHtml).join('')}</div>`:''}
-      <div class="ae-day-group">${hojeD.length? hojeD.map(aeCardHtml).join('') : '<p style="color:var(--text-mute);font-size:12.5px">Nada previsto para hoje.</p>'}</div>
-    `;
-  };
-
-  const ticketsAbertos = AE_SUPORTE.filter(t=>!t.resolvido);
-  const vendasHoje = (typeof VENDA_SESSOES!=='undefined'? VENDA_SESSOES : []).filter(v=>v.dataSessao===hoje);
-  const financeiroHoje = (typeof FIN_LANCAMENTOS!=='undefined'? FIN_LANCAMENTOS : []).filter(l=>!l.pagou && l.dataVencimento===hoje);
-  const extrasDominio1 = `
-    <div class="ps-section" style="margin-bottom:10px">
-      <div class="ae-livedata-line">${icon('users','tiny')} <strong>${ticketsAbertos.length}</strong> ticket(s) de suporte em aberto. <a href="#" id="ae-suporte-abrir" style="font-weight:600">Ver / registrar atendimentos →</a></div>
-      <div class="ae-livedata-line">${icon('briefcase','tiny')} ${vendasHoje.length? `${vendasHoje.length} reunião(ões) de vendas agendada(s) hoje: ${vendasHoje.map(v=>escapeHtml(v.lead||'—')).join(', ')}` : 'Nenhuma reunião de vendas agendada para hoje.'}</div>
-      <div class="ae-livedata-line" style="${financeiroHoje.length?'color:var(--danger)':''}">${icon('money','tiny')} ${financeiroHoje.length? `${financeiroHoje.length} lançamento(s) com vencimento hoje` : 'Nenhum vencimento financeiro hoje.'}</div>
-    </div>`;
-  const extrasDominio2 = `
-    <div class="ps-section" style="margin-bottom:10px">
-      <a href="${escapeAttr(CONFIG_LINK_PRONTUARIO||'#')}" target="_blank" rel="noopener" class="btn-outline" style="display:inline-flex;width:fit-content">${icon('film','tiny')} Criar stories em Ferramentas NCC</a>
-    </div>`;
-  const avisoDominio3 = `<p class="ae-dominio-sub">Mostrando apenas as etapas previstas para hoje e as atrasadas. Etapas sem prazo definido ("Prazo a definir") aparecem no Quadro de status e no Cronograma de aulas.</p>`;
-
-  const el = document.getElementById('ae-subview-area');
-  el.innerHTML = `
-    ${blocoDominio('ncc_plat', 'Domínio 1 — NCC Plat', extrasDominio1, true)}
-    ${blocoDominio('redes_sociais', 'Domínio 2 — Redes Sociais', extrasDominio2, true)}
-    ${blocoDominio('gestao_aulas', 'Domínio 3 — Gestão de Aulas', avisoDominio3, false)}
-  `;
-  aeWireCards(el);
-  document.querySelectorAll('.ae-dominio-config').forEach(btn=>{
-    btn.addEventListener('click', ()=>openRecorrenciasModal(btn.dataset.dominio));
-  });
-  const btnSuporte = document.getElementById('ae-suporte-abrir');
-  if(btnSuporte) btnSuporte.addEventListener('click', (e)=>{ e.preventDefault(); openSuporteModal(); });
-}
+/* Agenda semanal — grade única e compartilhada da equipe (rotina fixa por dia/horário, não por data
+   específica): cada célula tem um texto livre e um status (Feito/Em andamento), editáveis por qualquer
+   pessoa da equipe interna e salvos na hora. Ver tabela equipe_agenda_semana. */
 function aeRenderSemana(){
-  const base = new Date();
-  const dias = [];
-  for(let i=0;i<7;i++){ const d = new Date(base); d.setDate(base.getDate()+i); dias.push(d); }
-  const lista = aeAplicaFiltros(aeNaoArquivadas());
   const el = document.getElementById('ae-subview-area');
-  el.innerHTML = dias.map(d=>{
-    const iso = d.toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'});
-    const doDia = lista.filter(a=>aeDiaISO(a.prazo_entrega)===iso).sort((x,y)=>new Date(x.prazo_entrega)-new Date(y.prazo_entrega));
-    const label = d.toLocaleDateString('pt-BR',{weekday:'long', day:'2-digit', month:'2-digit'});
-    return `<div class="ae-day-group"><div class="ae-day-label">${label}</div>${doDia.length? doDia.map(aeCardHtml).join('') : '<p style="color:var(--text-mute);font-size:12.5px">Sem entregas.</p>'}</div>`;
-  }).join('');
-  aeWireCards(el);
+  const celula = (dia, horario) => EQUIPE_AGENDA_SEMANA.find(c=>c.dia_semana===dia && c.horario===horario) || {texto:'', status:null};
+  el.innerHTML = `
+    <div class="ae-semana-wrap">
+      <table class="ae-semana-grid">
+        <thead><tr><th>Horário</th>${AE_AGENDA_DIAS.map(d=>`<th>${d}</th>`).join('')}</tr></thead>
+        <tbody>
+          ${AE_AGENDA_HORARIOS.map(h=>`
+            <tr>
+              <td class="ae-semana-hora">${h}</td>
+              ${AE_AGENDA_DIAS.map((_,di)=>{
+                const c = celula(di, h);
+                return `
+                <td class="ae-semana-cel">
+                  <input type="text" class="ae-semana-texto" data-dia="${di}" data-horario="${h}" value="${escapeAttr(c.texto||'')}" placeholder="—">
+                  <select class="ae-semana-status ${c.status?'ae-semana-status-'+c.status:''}" data-dia="${di}" data-horario="${h}">
+                    <option value="">Selecionar</option>
+                    ${Object.entries(AE_AGENDA_STATUS).map(([k,v])=>`<option value="${k}" ${c.status===k?'selected':''}>${v}</option>`).join('')}
+                  </select>
+                </td>`;
+              }).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+  el.querySelectorAll('.ae-semana-texto').forEach(inp=>{
+    inp.addEventListener('change', async (e)=>{
+      const dia = Number(e.target.dataset.dia), horario = e.target.dataset.horario;
+      await aeAtualizarCelulaSemana(dia, horario, {texto: e.target.value.trim()});
+    });
+  });
+  el.querySelectorAll('.ae-semana-status').forEach(sel=>{
+    sel.addEventListener('change', async (e)=>{
+      const dia = Number(e.target.dataset.dia), horario = e.target.dataset.horario;
+      const valor = e.target.value || null;
+      e.target.className = `ae-semana-status ${valor?'ae-semana-status-'+valor:''}`;
+      await aeAtualizarCelulaSemana(dia, horario, {status: valor});
+    });
+  });
 }
 const AE_CAL_CATEGORIAS = {
   gravacao: 'Gravação de aula', publicacao: 'Publicação de aula', noticias: 'Notícias da Infância',
@@ -6870,74 +6909,187 @@ function aeRenderCalendario(){
   document.getElementById('ae-cal-next').addEventListener('click',()=>{ aeCalMonth = new Date(ano, mes+1, 1); aeRenderCalendario(); });
   aeWireCards(el);
 }
-function aeRenderMinhas(){
-  const lista = aeAplicaFiltros(aeNaoArquivadas()).filter(a=> a.responsavel_id===currentUser.id || a.revisor_id===currentUser.id);
-  lista.sort((x,y)=> (x.prazo_entrega? new Date(x.prazo_entrega).getTime() : Infinity) - (y.prazo_entrega? new Date(y.prazo_entrega).getTime() : Infinity));
-  const el = document.getElementById('ae-subview-area');
-  el.innerHTML = lista.length ? lista.map(aeCardHtml).join('') : '<p class="empty-state">Nenhuma tarefa atribuída a você.</p>';
-  aeWireCards(el);
+/* ---------- Planejamento de Aulas (lotes: pesquisa → publicação) ---------- */
+const AE_MESES_EXTENSO = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+function aeMesLabel(iso){
+  if(!iso) return '';
+  const [ano, mes] = iso.split('-');
+  return `${AE_MESES_EXTENSO[parseInt(mes,10)-1]} ${ano}`;
 }
-function aeRenderQuadro(){
-  const lista = aeAplicaFiltros(aeNaoArquivadas());
-  const el = document.getElementById('ae-subview-area');
-  el.innerHTML = `<div class="ae-kanban">${AE_STATUS_ORDEM.map(st=>{
-    const doStatus = lista.filter(a=>a.status===st);
-    return `<div class="ae-kanban-col">
-      <div class="ae-kanban-col-head"><span>${AE_STATUS[st]}</span><span>${doStatus.length}</span></div>
-      ${doStatus.map(aeCardHtml).join('')}
-    </div>`;
-  }).join('')}</div>`;
-  aeWireCards(el);
+function aeFormatDataCurta(iso){
+  if(!iso) return '—';
+  const [, mes, dia] = iso.split('-');
+  return `${dia}/${mes}`;
 }
-const AE_CRON_ATUALIZACAO = { em_andamento:'Em andamento', atualizada:'Atualizada' };
-const AE_CRON_GRAVACAO = { em_andamento:'Em andamento', gravada:'Gravada' };
-function aeRenderCronograma(){
-  const porModulo = {};
-  CRONOGRAMA_AULAS.forEach(r=>{
-    if(!porModulo[r.modulo_nome]) porModulo[r.modulo_nome] = { ordem:r.modulo_ordem, aulas:[] };
-    porModulo[r.modulo_nome].aulas.push(r);
-  });
-  const modulos = Object.entries(porModulo).sort((a,b)=>a[1].ordem-b[1].ordem);
-  const el = document.getElementById('ae-subview-area');
-  if(!modulos.length){
-    el.innerHTML = '<p class="empty-state">Nenhuma aula cadastrada no cronograma ainda.</p>';
-    return;
-  }
-  el.innerHTML = `<div class="ae-cronograma">${modulos.map(([nome, info])=>`
-    <div class="ae-cron-modulo">
-      <div class="ae-cron-modulo-head">${escapeHtml(nome)}</div>
-      <div class="ae-cron-table">
-        <div class="ae-cron-row ae-cron-header"><div>Aula</div><div>Tema</div><div>Atualização</div><div>Gravação</div><div>Duração</div></div>
-        ${info.aulas.map(a=>`
-          <div class="ae-cron-row" data-id="${a.id}">
-            <div class="ae-cron-aulanum">Aula ${a.aula_num}</div>
-            <div class="ae-cron-tema">${escapeHtml(a.tema)}</div>
-            <div><select class="ae-cron-select ae-cron-status-${a.atualizacao}" data-campo="atualizacao">
-              ${Object.entries(AE_CRON_ATUALIZACAO).map(([k,v])=>`<option value="${k}" ${a.atualizacao===k?'selected':''}>${v}</option>`).join('')}
-            </select></div>
-            <div><select class="ae-cron-select ae-cron-status-${a.gravacao}" data-campo="gravacao">
-              ${Object.entries(AE_CRON_GRAVACAO).map(([k,v])=>`<option value="${k}" ${a.gravacao===k?'selected':''}>${v}</option>`).join('')}
-            </select></div>
-            <div><input class="ae-cron-duracao" data-campo="duracao" placeholder="--:--" value="${escapeAttr(a.duracao||'')}"></div>
-          </div>
-        `).join('')}
+function aeFormatEdicaoRange(inicio, fim){
+  if(!inicio && !fim) return '—';
+  if(!inicio) return aeFormatDataCurta(fim);
+  if(!fim) return aeFormatDataCurta(inicio);
+  const [anoI, mesI, diaI] = inicio.split('-');
+  const [anoF, mesF, diaF] = fim.split('-');
+  if(anoI===anoF && mesI===mesF) return `${diaI}-${diaF}/${mesI}`;
+  return `${aeFormatDataCurta(inicio)} – ${aeFormatDataCurta(fim)}`;
+}
+function aeLoteCardHtml(l){
+  const aulas = Array.isArray(l.aulas) ? l.aulas : [];
+  return `
+    <div class="ae-lote-card" data-id="${l.id}">
+      <div class="ae-lote-head">
+        <div class="ae-lote-titulo">LOTE ${l.numero_lote} <span class="ae-lote-sub">• ${aulas.length} aula${aulas.length===1?'':'s'}${l.modulo_label? ' • '+escapeHtml(l.modulo_label):''}</span></div>
+        <button class="btn-mini icon-only" data-lote-editar="${l.id}">${icon('edit','tiny')}</button>
       </div>
+      <div class="ae-lote-aulas">
+        ${aulas.map(a=>`<div class="ae-lote-aula-row">${a.codigo?`<span class="ae-lote-aula-codigo">${escapeHtml(a.codigo)}</span>`:''} ${escapeHtml(a.titulo||'')}</div>`).join('')}
+      </div>
+      <div class="ae-lote-cron-grid">
+        <div class="ae-lote-cron-item"><span>Pesquisa</span><strong>${aeFormatDataCurta(l.data_pesquisa)}</strong></div>
+        <div class="ae-lote-cron-item"><span>Roteiro</span><strong>${aeFormatDataCurta(l.data_roteiro)}</strong></div>
+        <div class="ae-lote-cron-item"><span>Slides</span><strong>${aeFormatDataCurta(l.data_slides)}</strong></div>
+        <div class="ae-lote-cron-item"><span>Revisão</span><strong>${aeFormatDataCurta(l.data_revisao)}${l.revisao_obs?` (${escapeHtml(l.revisao_obs)})`:''}</strong></div>
+      </div>
+      <div class="ae-lote-gravacao">${icon('calendar','tiny')} Gravação: <strong>${aeFormatDataCurta(l.data_gravacao)}</strong>${l.gravacao_horario? ' — '+escapeHtml(l.gravacao_horario):''}</div>
+      <div class="ae-lote-cron-grid">
+        <div class="ae-lote-cron-item"><span>Edição</span><strong>${aeFormatEdicaoRange(l.data_edicao_inicio, l.data_edicao_fim)}</strong></div>
+        <div class="ae-lote-cron-item"><span>Publicação</span><strong>${aeFormatDataCurta(l.data_publicacao)}</strong></div>
+      </div>
+      ${l.premissas? `<p class="ae-lote-premissas">${escapeHtml(l.premissas).replace(/\n/g,'<br>')}</p>` : ''}
+      <div class="ae-lote-status-row">
+        <label class="ps-label" style="margin:0">Status</label>
+        <select class="ae-lote-status ae-lote-status-${l.status}" data-id="${l.id}">
+          ${Object.entries(AE_LOTE_STATUS).map(([k,v])=>`<option value="${k}" ${l.status===k?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+    </div>`;
+}
+function aeRenderPlanejamento(){
+  const el = document.getElementById('ae-subview-area');
+  const porMes = {};
+  PLANEJAMENTO_LOTES.forEach(l=>{
+    if(!porMes[l.mes_referencia]) porMes[l.mes_referencia] = [];
+    porMes[l.mes_referencia].push(l);
+  });
+  const meses = Object.keys(porMes).sort();
+  el.innerHTML = `
+    <div class="modal-actions" style="margin:0 0 16px">
+      <button class="btn-accent" id="ae-lote-novo">${icon('plus','tiny')} Novo lote de aulas</button>
     </div>
-  `).join('')}</div>`;
-  el.querySelectorAll('.ae-cron-select').forEach(sel=>{
+    ${meses.length? meses.map(mes=>`
+      <h3 class="ae-planejamento-mes">Planejamento Mensal das Aulas — ${aeMesLabel(mes)}</h3>
+      <div class="ae-lotes-grid">
+        ${porMes[mes].slice().sort((a,b)=>a.numero_lote-b.numero_lote).map(aeLoteCardHtml).join('')}
+      </div>
+    `).join('') : '<p class="empty-state">Nenhum lote de aulas planejado ainda.</p>'}
+    <div class="ae-entrega-etapas">
+      <div class="ae-entrega-head">${icon('list','tiny')} Entrega de cada etapa</div>
+      <div class="ae-entrega-grid">
+        ${AE_LOTE_ETAPAS_INFO.map(e=>`<div class="ae-entrega-col"><div class="ae-entrega-label">${e.label}</div><div class="ae-entrega-desc">${escapeHtml(e.entrega)}</div></div>`).join('')}
+      </div>
+      <p style="color:var(--text-mute);font-size:11.5px;margin:10px 0 0">Legenda do status: ${Object.values(AE_AGENDA_STATUS).join(' · ')}</p>
+    </div>
+  `;
+  document.getElementById('ae-lote-novo').addEventListener('click', ()=>openLoteModal(null));
+  el.querySelectorAll('[data-lote-editar]').forEach(btn=>{
+    btn.addEventListener('click', ()=>openLoteModal(btn.dataset.loteEditar));
+  });
+  el.querySelectorAll('.ae-lote-status').forEach(sel=>{
     sel.addEventListener('change', async (e)=>{
-      const id = e.target.closest('.ae-cron-row').dataset.id;
-      const campo = e.target.dataset.campo;
+      const id = e.target.dataset.id;
       const valor = e.target.value;
-      e.target.className = `ae-cron-select ae-cron-status-${valor}`;
-      await aeAtualizarCronogramaAula(id, { [campo]: valor });
+      e.target.className = `ae-lote-status ae-lote-status-${valor}`;
+      try{ await aeAtualizarLote(id, {status: valor}); }
+      catch(err){ console.error(err); alert('Não foi possível atualizar o status.'); }
     });
   });
-  el.querySelectorAll('.ae-cron-duracao').forEach(inp=>{
-    inp.addEventListener('change', async (e)=>{
-      const id = e.target.closest('.ae-cron-row').dataset.id;
-      await aeAtualizarCronogramaAula(id, { duracao: e.target.value.trim() });
+}
+function openLoteModal(id){
+  const existente = id ? PLANEJAMENTO_LOTES.find(l=>l.id===id) : null;
+  const d = existente ? Object.assign({}, existente) : {
+    mes_referencia:'', numero_lote: (PLANEJAMENTO_LOTES.reduce((m,l)=>Math.max(m,l.numero_lote||0),0)+1),
+    modulo_label:'', aulas:[], data_pesquisa:'', data_roteiro:'', data_slides:'', data_revisao:'', revisao_obs:'',
+    data_gravacao:'', gravacao_horario:'', data_edicao_inicio:'', data_edicao_fim:'', data_publicacao:'',
+    status:'em_andamento', premissas:'',
+  };
+  const mesInputVal = d.mes_referencia ? d.mes_referencia.slice(0,7) : '';
+  const aulasTxt = (d.aulas||[]).map(a=> a.codigo ? `${a.codigo} — ${a.titulo||''}` : (a.titulo||'')).join('\n');
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal" style="max-width:640px">
+      <div class="cat">Agenda da Equipe — Planejamento de Aulas</div>
+      <h3>${existente? 'Editar lote' : 'Novo lote de aulas'}</h3>
+      <div class="ps-section fin-form-grid">
+        <div><label class="ps-label">Mês de referência *</label><input class="ps-input" type="month" id="lote-mes" value="${mesInputVal}"></div>
+        <div><label class="ps-label">Número do lote *</label><input class="ps-input" type="number" min="1" id="lote-numero" value="${d.numero_lote}"></div>
+        <div style="grid-column:1/-1"><label class="ps-label">Módulo(s)</label><input class="ps-input" id="lote-modulo" value="${escapeAttr(d.modulo_label||'')}" placeholder="Ex.: Módulo 3"></div>
+        <div style="grid-column:1/-1"><label class="ps-label">Aulas (uma por linha: código — título) *</label><textarea class="ps-input" id="lote-aulas" placeholder="A2 — O que é temperamento?">${escapeHtml(aulasTxt)}</textarea></div>
+        <div><label class="ps-label">Pesquisa</label><input class="ps-input" type="date" id="lote-pesquisa" value="${d.data_pesquisa||''}"></div>
+        <div><label class="ps-label">Roteiro</label><input class="ps-input" type="date" id="lote-roteiro" value="${d.data_roteiro||''}"></div>
+        <div><label class="ps-label">Slides</label><input class="ps-input" type="date" id="lote-slides" value="${d.data_slides||''}"></div>
+        <div><label class="ps-label">Revisão</label><input class="ps-input" type="date" id="lote-revisao" value="${d.data_revisao||''}"></div>
+        <div style="grid-column:1/-1"><label class="ps-label">Observação da revisão</label><input class="ps-input" id="lote-revisao-obs" value="${escapeAttr(d.revisao_obs||'')}" placeholder="Ex.: manhã"></div>
+        <div><label class="ps-label">Gravação — data</label><input class="ps-input" type="date" id="lote-gravacao" value="${d.data_gravacao||''}"></div>
+        <div><label class="ps-label">Gravação — horário</label><input class="ps-input" id="lote-gravacao-horario" value="${escapeAttr(d.gravacao_horario||'')}" placeholder="Ex.: 13h–18h"></div>
+        <div><label class="ps-label">Edição — início</label><input class="ps-input" type="date" id="lote-edicao-inicio" value="${d.data_edicao_inicio||''}"></div>
+        <div><label class="ps-label">Edição — fim</label><input class="ps-input" type="date" id="lote-edicao-fim" value="${d.data_edicao_fim||''}"></div>
+        <div><label class="ps-label">Publicação</label><input class="ps-input" type="date" id="lote-publicacao" value="${d.data_publicacao||''}"></div>
+        <div><label class="ps-label">Status</label>
+          <select class="ps-input" id="lote-status">${Object.entries(AE_LOTE_STATUS).map(([k,v])=>`<option value="${k}" ${d.status===k?'selected':''}>${v}</option>`).join('')}</select>
+        </div>
+        <div style="grid-column:1/-1"><label class="ps-label">Premissas</label><textarea class="ps-input" id="lote-premissas" placeholder="Observações gerais sobre o lote">${escapeHtml(d.premissas||'')}</textarea></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-accent" id="lote-salvar">${existente? 'Salvar alterações' : 'Criar lote'}</button>
+        ${existente? `<button class="btn-outline" id="lote-excluir" style="color:var(--danger);border-color:var(--danger)">${icon('trash','tiny')} Excluir lote</button>`:''}
+        <button class="btn-outline" id="lote-cancelar">Cancelar</button>
+      </div>
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('lote-cancelar').addEventListener('click', closeModal);
+  document.getElementById('lote-salvar').addEventListener('click', async ()=>{
+    const mesVal = document.getElementById('lote-mes').value;
+    const numero = parseInt(document.getElementById('lote-numero').value, 10);
+    const aulasTxtVal = document.getElementById('lote-aulas').value;
+    if(!mesVal || !numero || !aulasTxtVal.trim()){ alert('Preencha o mês de referência, o número do lote e ao menos uma aula.'); return; }
+    const aulas = aulasTxtVal.split('\n').map(s=>s.trim()).filter(Boolean).map(linha=>{
+      const sep = linha.match(/\s[—-]\s/);
+      if(sep){
+        const idx = linha.indexOf(sep[0]);
+        return { codigo: linha.slice(0, idx).trim(), titulo: linha.slice(idx+sep[0].length).trim() };
+      }
+      return { codigo:'', titulo: linha };
     });
+    const payload = {
+      mes_referencia: mesVal + '-01',
+      numero_lote: numero,
+      modulo_label: document.getElementById('lote-modulo').value.trim(),
+      aulas,
+      data_pesquisa: document.getElementById('lote-pesquisa').value || null,
+      data_roteiro: document.getElementById('lote-roteiro').value || null,
+      data_slides: document.getElementById('lote-slides').value || null,
+      data_revisao: document.getElementById('lote-revisao').value || null,
+      revisao_obs: document.getElementById('lote-revisao-obs').value.trim() || null,
+      data_gravacao: document.getElementById('lote-gravacao').value || null,
+      gravacao_horario: document.getElementById('lote-gravacao-horario').value.trim() || null,
+      data_edicao_inicio: document.getElementById('lote-edicao-inicio').value || null,
+      data_edicao_fim: document.getElementById('lote-edicao-fim').value || null,
+      data_publicacao: document.getElementById('lote-publicacao').value || null,
+      status: document.getElementById('lote-status').value,
+      premissas: document.getElementById('lote-premissas').value.trim(),
+    };
+    const btn = document.getElementById('lote-salvar'); btn.disabled = true;
+    try{
+      if(existente) await aeAtualizarLote(existente.id, payload);
+      else await aeInserirLote(Object.assign({created_by: currentUser.id}, payload));
+      closeModal();
+      if(currentView==='agendaequipe') renderAgendaEquipeSubview();
+    }catch(e){ console.error(e); alert('Não foi possível salvar. Tente de novo.'); btn.disabled = false; }
+  });
+  const btnExcluir = document.getElementById('lote-excluir');
+  if(btnExcluir) btnExcluir.addEventListener('click', async ()=>{
+    if(!confirmDelete('Excluir este lote de aulas? Essa ação não pode ser desfeita.')) return;
+    btnExcluir.disabled = true;
+    await aeExcluirLote(existente.id);
+    closeModal();
+    if(currentView==='agendaequipe') renderAgendaEquipeSubview();
   });
 }
 

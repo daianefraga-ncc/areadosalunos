@@ -1542,6 +1542,119 @@
      dentro, mas pointer-events:none impede qualquer clique/foco/seleção chegar nela. */
   .locked-preview{pointer-events:none;user-select:none;opacity:.5;filter:grayscale(.15);margin-top:28px;}
 
+  /* ---- Clube do Livro ---- */
+  .clube-tag{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--bg-elev);color:var(--text-dim);white-space:nowrap;}
+  .clube-tag-gratuito{background:var(--success-soft);color:var(--success);}
+  .clube-tag-concluido{background:var(--bg-elev);color:var(--text-mute);}
+  .clube-breadcrumb{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-mute);margin-bottom:14px;}
+  .clube-breadcrumb button{display:inline-flex;align-items:center;gap:5px;background:none;border:none;padding:0;font:inherit;color:var(--text-dim);font-weight:700;cursor:pointer;}
+  .clube-breadcrumb button:disabled{cursor:default;color:var(--text-mute);}
+  .clube-hero{display:flex;gap:22px;align-items:flex-start;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;margin-bottom:18px;}
+  .clube-hero-capa{flex-shrink:0;width:120px;height:170px;border-radius:8px;background:var(--bg-elev);display:flex;align-items:center;justify-content:center;text-align:center;font-weight:700;font-size:12px;color:var(--text-mute);overflow:hidden;padding:8px;}
+  .clube-hero-capa img{width:100%;height:100%;object-fit:cover;}
+  .clube-hero-info{flex:1;min-width:0;}
+  .clube-hero-info h2{margin:8px 0 4px;font-size:21px;}
+  .clube-hero-info p{margin:0 0 14px;color:var(--text-mute);font-size:13.5px;}
+  .clube-hero-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .clube-biblioteca-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;}
+  .clube-biblioteca-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;cursor:pointer;transition:border-color .12s;}
+  .clube-biblioteca-card:hover{border-color:var(--accent);}
+  .clube-biblioteca-capa{height:140px;border-radius:6px;background:var(--bg-elev);display:flex;align-items:center;justify-content:center;text-align:center;font-weight:700;font-size:12px;color:var(--text-mute);margin-bottom:10px;overflow:hidden;padding:8px;}
+  .clube-biblioteca-capa img{width:100%;height:100%;object-fit:cover;}
+  .clube-biblioteca-titulo{font-weight:700;font-size:13.5px;margin-bottom:6px;}
+  .clube-capitulos-wrap{display:grid;grid-template-columns:250px 1fr;gap:18px;align-items:start;}
+  .clube-capitulos-lista{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;}
+  .clube-capitulos-lista-titulo{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--text-mute);margin-bottom:8px;}
+  .clube-cap-item{display:flex;align-items:center;gap:8px;padding:9px 6px;border-radius:8px;cursor:pointer;font-size:12.5px;}
+  .clube-cap-item:hover{background:var(--bg-elev);}
+  .clube-cap-item.active{background:var(--accent-soft);color:var(--accent);font-weight:700;}
+  .clube-cap-item .icon{width:14px;height:14px;margin-left:auto;flex-shrink:0;opacity:.5;}
+  .clube-cap-bullet{width:9px;height:9px;border-radius:50%;background:var(--bg-elev);border:2px solid var(--border);flex-shrink:0;}
+  .clube-cap-bullet-em_leitura{background:var(--individual-soft);border-color:var(--individual);}
+  .clube-cap-bullet-concluido{background:var(--success);border-color:var(--success);}
+  .clube-cap-label{flex:1;min-width:0;}
+  .clube-cap-conteudo{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px;}
+  .clube-cap-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;}
+  .clube-cap-head h3{margin:0;font-size:16.5px;}
+  .clube-cap-sub{margin:3px 0 0;font-size:12px;color:var(--text-mute);}
+  .clube-cap-texto{font-size:13.5px;line-height:1.75;color:var(--text);margin-bottom:16px;}
+  .clube-cap-encontro,.clube-cap-atividade{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--bg-elev);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;font-size:12.5px;}
+  .clube-cap-materiais{margin-bottom:12px;}
+  .clube-cap-materiais-titulo{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--text-mute);margin-bottom:6px;}
+  .clube-mat-linha{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .clube-mat-linha:last-child{border-bottom:none;}
+  .clube-mat-linha-titulo{flex:1;min-width:0;}
+  .clube-mat-linha-acoes{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+  .clube-continue-banner{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:var(--accent-soft);border-radius:var(--radius-sm);padding:16px 18px;margin-top:18px;}
+  .clube-mat-toolbar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+  .clube-mat-filtros{display:grid;grid-template-columns:1fr 200px 180px;gap:8px;margin-bottom:16px;}
+  .clube-mat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+  .clube-mat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;display:flex;flex-direction:column;gap:8px;}
+  .clube-mat-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;}
+  .clube-mat-tipo-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--individual-soft);color:var(--individual);margin-right:5px;white-space:nowrap;}
+  .clube-mat-cap-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--bg-elev);color:var(--text-mute);white-space:nowrap;}
+  .clube-mat-card-visual{height:64px;border-radius:6px;background:var(--bg-elev);display:flex;align-items:center;justify-content:center;color:var(--text-mute);}
+  .clube-mat-card-titulo{font-weight:700;font-size:13px;}
+  .clube-mat-card-desc{font-size:11.5px;color:var(--text-mute);line-height:1.5;}
+  .clube-mat-card-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;}
+  .clube-mesa-wrap{display:grid;grid-template-columns:1fr 280px;gap:18px;align-items:start;}
+  .clube-mesa-main{min-width:0;}
+  .clube-composer{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px;}
+  .clube-composer-footer{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .clube-composer-footer select{max-width:180px;}
+  .clube-composer-tipos{display:flex;gap:6px;flex-wrap:wrap;}
+  .type-pill.clube-tipo-pergunta.active{background:var(--individual-soft);color:var(--individual);border-color:transparent;}
+  .type-pill.clube-tipo-reflexao.active{background:var(--shared-soft);color:var(--shared);border-color:transparent;}
+  .type-pill.clube-tipo-aplicacao.active{background:var(--success-soft);color:var(--success);border-color:transparent;}
+  .clube-mesa-feed{display:flex;flex-direction:column;gap:12px;}
+  .clube-post{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;}
+  .clube-post-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+  .clube-post-head > div{flex:1;min-width:0;}
+  .clube-post-tags{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:3px;}
+  .clube-post-tipo-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+  .clube-post-tipo-pergunta{background:var(--individual-soft);color:var(--individual);}
+  .clube-post-tipo-reflexao{background:var(--shared-soft);color:var(--shared);}
+  .clube-post-tipo-aplicacao{background:var(--success-soft);color:var(--success);}
+  .clube-post-cap-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--bg-elev);color:var(--text-mute);white-space:nowrap;}
+  .clube-post-tempo{font-size:11px;color:var(--text-mute);}
+  .clube-post-del{background:none;border:none;padding:4px;cursor:pointer;color:var(--text-mute);flex-shrink:0;}
+  .clube-post-del:hover{color:var(--danger);}
+  .clube-post-texto{font-size:13px;line-height:1.65;margin-bottom:10px;}
+  .clube-post-acoes{display:flex;gap:8px;flex-wrap:wrap;}
+  .clube-post-acoes .btn-mini.active{color:var(--danger);}
+  .clube-respostas-lista{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:10px;}
+  .clube-resposta{display:flex;gap:8px;align-items:flex-start;}
+  .clube-resposta-corpo{flex:1;min-width:0;}
+  .clube-resposta-head{display:flex;align-items:center;gap:7px;font-size:12px;}
+  .clube-resposta-texto{font-size:12.5px;line-height:1.55;margin-top:2px;}
+  .clube-post-reply-box{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+  .clube-sidebar-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:14px;}
+  .clube-sidebar-card-titulo{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--text-mute);margin-bottom:10px;}
+  .clube-sidebar-link{display:block;width:100%;text-align:left;background:none;border:none;padding:7px 0;font:inherit;font-size:12.5px;font-weight:600;color:var(--accent-2);cursor:pointer;border-bottom:1px solid var(--border);}
+  .clube-sidebar-link:last-child{border-bottom:none;}
+  .clube-sidebar-destaque-texto{font-size:12.5px;line-height:1.55;color:var(--text-dim);margin:0 0 10px;}
+  .clube-sidebar-combinados-texto{font-size:11.5px;line-height:1.55;color:var(--text-mute);margin:0 0 8px;}
+  .clube-sidebar-combinados-texto:last-child{margin-bottom:0;}
+  .clube-caderno-wrap{display:grid;grid-template-columns:230px 1fr 250px;gap:16px;align-items:start;}
+  .clube-caderno-lista{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;}
+  .clube-caderno-lista-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
+  .clube-caderno-itens{display:flex;flex-direction:column;gap:4px;margin-top:10px;max-height:460px;overflow-y:auto;}
+  .clube-cad-item{padding:8px;border-radius:8px;cursor:pointer;}
+  .clube-cad-item:hover{background:var(--bg-elev);}
+  .clube-cad-item.active{background:var(--accent-soft);}
+  .clube-cad-item-titulo{font-size:12.5px;font-weight:700;}
+  .clube-cad-item-sub{font-size:10.5px;color:var(--text-mute);margin-top:2px;}
+  .clube-caderno-editor{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;display:flex;flex-direction:column;}
+  .clube-cad-editor-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+  .clube-cad-editor-head input{font-weight:700;font-size:14px;border:none;background:none;padding:6px 0;flex:1;}
+  .clube-cad-editor-meta{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+  .clube-cad-editor-meta select{flex:1;min-width:160px;}
+  .clube-cad-editor-meta input{width:200px;}
+  .clube-caderno-editor textarea.ps-input{min-height:72px;}
+  .clube-cad-editor-acoes{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+  .clube-caderno-sidebar{display:flex;flex-direction:column;}
+  .clube-percurso-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;font-size:12px;}
+  .clube-percurso-select{width:auto;padding:3px 6px;font-size:11px;}
   @media (max-width:880px){
     .sidebar{position:fixed;left:-260px;top:0;transition:left .2s;z-index:50;box-shadow:var(--shadow-side);}
     .sidebar.open{left:0;}
@@ -1551,6 +1664,10 @@
     .topbar-title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .role-toggle span, .role-toggle{font-size:11px;}
     .quick-access-grid{grid-template-columns:repeat(2,1fr);}
+    .clube-hero{flex-direction:column;}
+    .clube-hero-capa{width:100px;height:140px;}
+    .clube-capitulos-wrap,.clube-mesa-wrap,.clube-caderno-wrap{grid-template-columns:1fr;}
+    .clube-mat-filtros{grid-template-columns:1fr;}
   }
   @media (max-width:520px){
     .topbar{gap:6px;}
@@ -1637,7 +1754,7 @@
     <button class="nav-item" data-view="comunidade"></button>
     <button class="nav-item" data-view="ranking"></button>
     <button class="nav-item" data-view="agenda"></button>
-    <button class="nav-item" data-view="materiais"></button>
+    <button class="nav-item" data-view="clubelivro"></button>
     <button class="nav-item" data-view="estudos"></button>
 
     <div class="nav-group-label" id="nav-group-metodo">Painel Profissional e Mentoria</div>
@@ -1729,6 +1846,7 @@
       <div class="view" id="view-ranking"></div>
       <div class="view" id="view-agenda"></div>
       <div class="view" id="view-materiais"></div>
+      <div class="view" id="view-clubelivro"></div>
       <div class="view" id="view-dashboard"></div>
       <div class="view" id="view-dashboardmentoria"></div>
       <div class="view" id="view-painel"></div>
@@ -1860,6 +1978,7 @@ const ICONS = {
   neuro:'<path d="M9.5 3.3c-2 .3-3.4 1.9-3.4 3.9 0 .6.1 1.1.4 1.6-1.3.6-2.2 1.9-2.2 3.4 0 1.3.7 2.4 1.7 3.1-.3.5-.4 1.1-.4 1.7 0 2 1.6 3.6 3.6 3.6.4 0 .8-.1 1.1-.2"/><path d="M14.5 3.3c2 .3 3.4 1.9 3.4 3.9 0 .6-.1 1.1-.4 1.6 1.3.6 2.2 1.9 2.2 3.4 0 1.3-.7 2.4-1.7 3.1.3.5.4 1.1.4 1.7 0 2-1.6 3.6-3.6 3.6-.4 0-.8-.1-1.1-.2"/><path d="M12 3.3v17.4"/><path d="M9 7.5c1 .8 1 2.2 0 3M15 7.5c-1 .8-1 2.2 0 3M8.5 13c1.2.5 1.2 2 0 2.8M15.5 13c-1.2.5-1.2 2 0 2.8"/>',
   biblioteca:'<path d="M4 19.5V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v14.5"/><path d="M10 19.5V5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v14.5"/><path d="M4 19.5h11"/><path d="M16.3 19l-2-13.2a1 1 0 0 1 .8-1.1l3.6-.6a1 1 0 0 1 1.1.8l2 13.2a1 1 0 0 1-.8 1.1l-3.6.6a1 1 0 0 1-1.1-.8z"/>',
   book:'<path d="M4 6a2 2 0 0 1 2-2h5v16H6a2 2 0 0 1-2-2z"/><path d="M20 6a2 2 0 0 0-2-2h-5v16h5a2 2 0 0 0 2-2z"/><path d="M11 4v16"/>',
+  bookmark:'<path d="M6 3.5h12a1 1 0 0 1 1 1V21l-7-4-7 4V4.5a1 1 0 0 1 1-1z"/>',
   briefcase:'<rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/>',
   tablet:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M11 18h2"/>',
   gamepad:'<rect x="2" y="8" width="20" height="10" rx="4"/><path d="M7 11v4M5 13h4"/><circle cx="16" cy="11" r="1" fill="currentColor" stroke="none"/><circle cx="18.5" cy="13.5" r="1" fill="currentColor" stroke="none"/>',
@@ -1882,7 +2001,7 @@ function fillIcon(name,cls){return `<svg class="icon ${cls||''}" viewBox="0 0 24
 const NAV_LABELS = {
   inicio:['home','Início'], aulas:['film','Aulas'], comunidade:['users','Comunidade'],
   ranking:['award','Ranking'],
-  agenda:['calendar','Agenda ao Vivo'], materiais:['folder','Materiais'],
+  agenda:['calendar','Agenda ao Vivo'], materiais:['folder','Materiais'], clubelivro:['book','Clube do Livro'],
   dashboard:['chart','Dashboard do Curso'], dashboardmentoria:['chart','Dashboard da Mentoria'],
   painel:['compass','Painel Profissional'],
   biblioteca:['biblioteca','Biblioteca de Negócios'],
@@ -7642,6 +7761,31 @@ function mapLiveSessionRow(row){
 
 let MATERIALS = []; // populado em runtime a partir do Supabase (ver bootstrapData)
 
+/* ---- Clube do Livro (populado em runtime a partir do Supabase, ver bootstrapData) ---- */
+let CLUBE_LIVROS = [];        // livros da Biblioteca do Clube: {id, titulo, subtitulo, capa_url, sobre_livro, onde_comprar_url, status, ordem}
+let CLUBE_CAPITULOS = [];     // {id, livro_id, numero, titulo, texto_estudo, ordem}
+let CLUBE_MATERIAIS = [];     // {id, livro_id, capitulo_id, tipo, titulo, descricao, arquivo_url, link_url, ordem}
+let CLUBE_MATERIAL_FAVORITOS = new Set(); // material_id favoritados pela própria conta
+let CLUBE_ATIVIDADES = [];    // "Da leitura à prática": {id, capitulo_id, aluno_id, resposta}
+let CLUBE_PROGRESSO = [];     // percurso de leitura: {capitulo_id, aluno_id, status}
+let CLUBE_ENCONTROS = [];     // Encontros ao vivo do clube: {id, livro_id, capitulo_id, titulo, data_hora, link_url}
+let CLUBE_POSTS = [];         // Mesa de leitores: {id, livro_id, capitulo_id, autor_id, tipo, texto, destaque_semana, created_at}
+let CLUBE_POST_RESPOSTAS = [];// {id, post_id, autor_id, texto, created_at}
+let CLUBE_POST_REACOES = [];  // {post_id, aluno_id}
+let CLUBE_POST_SALVOS = new Set(); // post_id salvos pela própria conta
+let CLUBE_ANOTACOES = [];     // Meu caderno: {id, aluno_id, livro_id, capitulo_id, titulo, pagina, compreendi, conexao_atuacao, estudar_melhor}
+// Estado de navegação dentro do Clube do Livro (não persistido).
+let clubeLivroAtualId = null;
+let clubeSubView = 'capitulos'; // 'capitulos' | 'materiais' | 'mesa' | 'caderno'
+let clubeCapituloAtualId = null;
+let clubeAnotacaoAtualId = null; // null = "nova anotação" ainda não salva
+let clubeMateriaisFiltro = { busca:'', capitulo:'todos', tipo:'todos' };
+let clubeMesaFiltro = 'todos'; // 'todos' | 'pergunta' | 'reflexao' | 'aplicacao' | 'minhas' | 'salvas'
+const CLUBE_TIPO_MATERIAL = { mapa_mental:'Mapa mental', guia_leitura:'Guia de leitura', glossario:'Glossário', referencias:'Referências', outro:'Material' };
+const CLUBE_TIPO_POST = { pergunta:'Pergunta', reflexao:'Reflexão', aplicacao:'Aplicação na prática' };
+const CLUBE_TIPO_POST_REACAO = { pergunta:'Também tenho essa dúvida', reflexao:'Me fez pensar', aplicacao:'Também vou aplicar' };
+const CLUBE_PROGRESSO_LABEL = { nao_iniciado:'Não iniciado', em_leitura:'Em leitura', concluido:'Concluído' };
+
 /* Mural "O que está acontecendo no mundo sobre a Infância" — notícias/conteúdos curtos que a equipe
    publica para os alunos verem na tela de Início (card que abre um modal com a lista completa, ver
    openNovidadesMural). Populado em runtime a partir do Supabase (ver bootstrapData); gerenciado pela
@@ -8119,6 +8263,7 @@ function tierLabel(s){
   if(s.tier==='curso') return s.bonus ? 'Método + Bônus' : 'Método';
   if(s.tier==='formacao') return 'Formação';
   if(s.tier==='pgncc') return 'PGNCC';
+  if(s.tier==='clube_livro') return 'Clube do Livro';
   return 'Mentoria';
 }
 function getViewingTier(){
@@ -8380,6 +8525,40 @@ async function bootstrapData(){
   await Promise.all([carregarMural('mentorado'), carregarMural('curso')]);
   refreshPendencias(); // sem await de propósito: o sininho pode chegar meio segundo depois
   refreshNotificacoes(); // idem — feed de notificações (novidade/aula/evento/conclusão/lembrete)
+
+  // Clube do Livro: a RLS (tem_acesso_clube) já restringe quem recebe linha de livros/capítulos/
+  // materiais/mesa de leitores a quem tem acesso (equipe, Formação, PGNCC, Mentoria ou a própria conta
+  // do Clube) — quem não tem acesso só recebe listas vazias, sem erro algum. Anotações, atividades e
+  // progresso de leitura são sempre só os da própria conta (ou de todo mundo, pra equipe interna) —
+  // não precisa filtrar aqui, a RLS de cada tabela já cuida disso sozinha.
+  const [{data:clubeLivrosRows},{data:clubeCapRows},{data:clubeMatRows},{data:clubeMatFavRows},
+         {data:clubeAtivRows},{data:clubeProgRows},{data:clubeEncontrosRows},{data:clubePostsRows},{data:clubeRespRows},
+         {data:clubeReacRows},{data:clubeSalvosRows},{data:clubeNotasRows}] = await Promise.all([
+    sb.from('clube_livros').select('*').order('ordem').order('created_at'),
+    sb.from('clube_capitulos').select('*').order('numero'),
+    sb.from('clube_materiais').select('*').order('ordem').order('created_at'),
+    sb.from('clube_material_favoritos').select('*'),
+    sb.from('clube_atividades').select('*'),
+    sb.from('clube_progresso').select('*'),
+    sb.from('clube_encontros').select('*').order('data_hora'),
+    sb.from('clube_posts').select('*').order('created_at',{ascending:false}),
+    sb.from('clube_post_respostas').select('*').order('created_at',{ascending:true}),
+    sb.from('clube_post_reacoes').select('*'),
+    sb.from('clube_post_salvos').select('*'),
+    sb.from('clube_anotacoes').select('*').order('updated_at',{ascending:false}),
+  ]);
+  CLUBE_LIVROS = clubeLivrosRows || [];
+  CLUBE_CAPITULOS = clubeCapRows || [];
+  CLUBE_MATERIAIS = clubeMatRows || [];
+  CLUBE_MATERIAL_FAVORITOS = new Set((clubeMatFavRows||[]).map(r=>r.material_id));
+  CLUBE_ATIVIDADES = clubeAtivRows || [];
+  CLUBE_PROGRESSO = clubeProgRows || [];
+  CLUBE_ENCONTROS = clubeEncontrosRows || [];
+  CLUBE_POSTS = clubePostsRows || [];
+  CLUBE_POST_RESPOSTAS = clubeRespRows || [];
+  CLUBE_POST_REACOES = clubeReacRows || [];
+  CLUBE_POST_SALVOS = new Set((clubeSalvosRows||[]).map(r=>r.post_id));
+  CLUBE_ANOTACOES = clubeNotasRows || [];
 
   // Registros Internos: buscado à parte, e só quando é equipe interna — o aluno nunca faz essa
   // consulta, então esse conteúdo jamais chega ao navegador dele (nem via RLS, nem por não pedir).
@@ -9329,6 +9508,56 @@ function syncLiveSessionWatched(liveId, watched){
   else syncNow(sb.from('live_session_watched').delete().eq('student_id',uid).eq('live_session_id',liveId));
 }
 
+/* ---- Administração do Clube do Livro (cadastro de livro/capítulos/materiais/encontros, equipe interna
+   em Conteúdo) — colunas do banco já batem com os nomes usados no JS, então os campos vão direto. ---- */
+async function syncClubeLivroInsert(fields){
+  const { data, error } = await sb.from('clube_livros').insert({...fields, created_by: currentUser.id}).select().single();
+  if(error) throw error;
+  return data;
+}
+function syncClubeLivroUpdate(id, fields){
+  syncNow(sb.from('clube_livros').update({...fields, updated_at:new Date().toISOString()}).eq('id', id));
+}
+function syncClubeLivroDelete(id){
+  syncNow(sb.from('clube_livros').delete().eq('id', id));
+}
+async function syncClubeCapituloInsert(fields){
+  const { data, error } = await sb.from('clube_capitulos').insert(fields).select().single();
+  if(error) throw error;
+  return data;
+}
+function syncClubeCapituloUpdate(id, fields){
+  syncNow(sb.from('clube_capitulos').update({...fields, updated_at:new Date().toISOString()}).eq('id', id));
+}
+function syncClubeCapituloDelete(id){
+  syncNow(sb.from('clube_capitulos').delete().eq('id', id));
+}
+async function syncClubeMaterialInsert(fields){
+  const { data, error } = await sb.from('clube_materiais').insert(fields).select().single();
+  if(error) throw error;
+  return data;
+}
+function syncClubeMaterialUpdate(id, fields){
+  syncNow(sb.from('clube_materiais').update({...fields, updated_at:new Date().toISOString()}).eq('id', id));
+}
+function syncClubeMaterialDelete(id){
+  syncNow(sb.from('clube_materiais').delete().eq('id', id));
+}
+async function syncClubeEncontroInsert(fields){
+  const { data, error } = await sb.from('clube_encontros').insert(fields).select().single();
+  if(error) throw error;
+  return data;
+}
+function syncClubeEncontroUpdate(id, fields){
+  syncNow(sb.from('clube_encontros').update(fields).eq('id', id));
+}
+function syncClubeEncontroDelete(id){
+  syncNow(sb.from('clube_encontros').delete().eq('id', id));
+}
+function syncClubePostDestaqueToggle(postId, valor){
+  syncNow(sb.from('clube_posts').update({destaque_semana:valor}).eq('id', postId));
+}
+
 /* ================= LOGIN ================= */
 function renderLogin(){
   document.querySelectorAll('#login-tabs [data-tab]').forEach(btn=>{
@@ -9565,9 +9794,13 @@ function setupNav(){
       openBloqueioMentoradosModal('Ferramentas NCC', 'O sistema de prontuários é exclusivo para mentorados da Mentoria. Fale com a equipe e conheça as condições para migrar seu acesso.');
     }
   });
-  document.getElementById('nav-neurotodasidades').addEventListener('click',()=>{
+  document.getElementById('nav-neurotodasidades').addEventListener('click',(e)=>{
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-backdrop').classList.remove('open');
+    if(e.currentTarget.dataset.locked){
+      e.preventDefault();
+      openBloqueioMentoradosModal('Neurociência todas as idades', 'Este conteúdo é exclusivo para quem está matriculado na Formação NCC, na Pós-Graduação NCC ou na Mentoria NCC. Fale com a equipe para conhecer essas opções.');
+    }
   });
 }
 
@@ -9606,6 +9839,24 @@ function renderBloqueioMentorados(viewId, titulo, previewHtml){
     </div>
     ${previewHtml? `<div class="locked-preview" aria-hidden="true">${previewHtml}</div>` : ''}`;
   document.getElementById('bloqueio-mentorados-voltar').addEventListener('click', ()=>goTo('inicio'));
+}
+/* Mesma ideia do bloqueio acima, mas pro caso contrário: conta cadastrada só no Clube do Livro tentando
+   abrir qualquer outra área da plataforma (ver isClubeOnlyView em setRole() e a chamada em
+   renderCurrentView()). */
+function renderBloqueioClube(viewId){
+  const [,titulo] = NAV_LABELS[viewId] || [null,'Este espaço'];
+  const msgZap = encodeURIComponent('Olá! Gostaria de saber mais sobre a Formação, a Pós-Graduação ou a Mentoria NCC.');
+  document.getElementById('view-'+viewId).innerHTML = `
+    <div class="locked-view">
+      <div class="locked-icon">${icon('lock')}</div>
+      <h2>${escapeHtml(titulo)} bloqueado</h2>
+      <p>Sua conta tem acesso só ao Clube do Livro. ${escapeHtml(titulo)} é exclusivo para quem está matriculado na Formação NCC, na Pós-Graduação NCC ou na Mentoria NCC. Fale com a nossa equipe para conhecer essas opções.</p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px">
+        <button class="btn-accent" id="bloqueio-clube-voltar">Voltar ao Clube do Livro</button>
+        <a class="btn-outline" href="https://wa.me/5548992118883?text=${msgZap}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;color:#25d366;border-color:#25d366">${icon('whatsapp','tiny')} Falar no WhatsApp</a>
+      </div>
+    </div>`;
+  document.getElementById('bloqueio-clube-voltar').addEventListener('click', ()=>goTo('clubelivro'));
 }
 function isAnswered(p){
   return p.comments.some(c=>{ const a=getPerson(c.authorId); return a && a.role==='staff'; });
@@ -9770,9 +10021,9 @@ function setRole(role){
   const viewingTier = getViewingTier();
   const isCursoView = role==='aluno' && viewingTier==='curso';
   const isMentoradoView = role==='aluno' && viewingTier==='mentorado';
-  /* Área Coletiva (Aulas, Comunidade, Ranking, Agenda ao Vivo, Materiais, Biblioteca Científica) é
+  /* Área Coletiva (Aulas, Comunidade, Ranking, Agenda ao Vivo, Clube do Livro, Biblioteca Científica) é
      igual pra qualquer tier de aluno — Curso Gravado, Mentoria, Formação e PGNCC. */
-  ['inicio','aulas','comunidade','ranking','materiais','estudos'].forEach(v=>{
+  ['inicio','aulas','comunidade','ranking','clubelivro','estudos'].forEach(v=>{
     const el = document.querySelector(`.nav-item[data-view="${v}"]`);
     if(el) el.style.display = role==='aluno' ? 'flex' : 'none';
   });
@@ -9833,6 +10084,33 @@ function setRole(role){
     agendaBtn.innerHTML = (isCursoView && !isBonusView())
       ? `${icon(agIc)}<span>${agLabel}</span><span style="margin-left:auto;display:flex" title="Disponível apenas para mentorados da Mentoria">${icon('lock','tiny')}</span>`
       : `${icon(agIc)}<span>${agLabel}</span>`;
+  }
+  /* Clube do Livro: quem está cadastrado só no Clube (tier 'clube_livro') não tem acesso a mais nada na
+     plataforma — vê o índice inteiro normalmente, mas com cadeado em tudo, menos em "Início" e "Clube do
+     Livro" (mesmo padrão de cadeado usado acima pra Painel Profissional/Agenda/Ferramentas NCC). Quem é
+     de Formação, PGNCC ou Mentoria continua com acesso livre ao Clube, sem cadeado nenhum. */
+  const isClubeOnlyView = role==='aluno' && viewingTier==='clube_livro';
+  const CLUBE_LOCK_TITLE = 'Disponível apenas para quem está matriculado na Formação NCC, na Pós-Graduação NCC ou na Mentoria NCC';
+  if(isClubeOnlyView){
+    document.querySelectorAll('.nav-item[data-view]').forEach(btn=>{
+      const v = btn.dataset.view;
+      if(v==='clubelivro' || v==='inicio' || btn.style.display==='none') return;
+      const [ic,label] = NAV_LABELS[v];
+      btn.innerHTML = `${icon(ic)}<span>${label}</span><span style="margin-left:auto;display:flex" title="${CLUBE_LOCK_TITLE}">${icon('lock','tiny')}</span>`;
+    });
+  }
+  if(prontEl){
+    if(isClubeOnlyView){
+      const prontSvgClube = prontEl.querySelector('svg').outerHTML;
+      prontEl.innerHTML = prontSvgClube + '<span>Ferramentas NCC</span>' + `<span style="margin-left:auto;display:flex" title="${CLUBE_LOCK_TITLE}">${icon('lock','tiny')}</span>`;
+      prontEl.dataset.locked = '1';
+    }
+  }
+  if(neuroEl){
+    const neuroSvg = neuroEl.querySelector('svg').outerHTML;
+    neuroEl.innerHTML = neuroSvg + '<span>Neurociência todas as idades</span>' + (isClubeOnlyView
+      ? `<span style="margin-left:auto;display:flex" title="${CLUBE_LOCK_TITLE}">${icon('lock','tiny')}</span>` : '');
+    neuroEl.dataset.locked = isClubeOnlyView ? '1' : '';
   }
   /* O seletor de alunos continua no menu de perfil mesmo no modo "Aluno", pra equipe pular de um
      mentorado pro outro sem ter que voltar pro modo Equipe Interna a cada troca. */
@@ -9918,7 +10196,7 @@ function goTo(view){
 
 function renderCurrentView(){
   const map = {inicio:renderInicio, aulas:renderAulas, comunidade:renderComunidade, ranking:renderRanking, agenda:renderAgenda,
-               materiais:renderMateriais, dashboard:renderDashboard, dashboardmentoria:renderDashboardMentoria,
+               materiais:renderMateriais, clubelivro:renderClubeLivro, dashboard:renderDashboard, dashboardmentoria:renderDashboardMentoria,
                painel:renderPainel, biblioteca:renderBiblioteca,
                estudos:renderEstudos, palestras:renderPalestras, projetoacademico:renderProjetoAcademico,
                sessoes:renderSessoes, metas:renderMetas, interno:renderInterno, conteudo:renderConteudo, visaogeral:renderVisaoGeral,
@@ -9927,6 +10205,15 @@ function renderCurrentView(){
   const NEEDS_STUDENT = ['inicio','dashboard','dashboardmentoria','painel','sessoes','metas','interno','estudos','palestras','projetoacademico'];
   if(NEEDS_STUDENT.includes(currentView) && !getStudent(currentStudentId)){
     document.getElementById('view-'+currentView).innerHTML = '<div class="empty-state">Nenhum mentorado cadastrado ainda. Assim que um aluno criar a conta, os dados aparecerão aqui.</div>';
+    return;
+  }
+  /* Quem está cadastrado só no Clube do Livro (tier 'clube_livro') não tem acesso a mais nada —
+     qualquer outra view (inclusive "Início", que mostraria conteúdo de curso/mentoria que essa conta
+     não tem) mostra o Clube do Livro no lugar. Ver bloqueio dos itens do menu em setRole(). */
+  if(currentRole==='aluno' && getViewingTier()==='clube_livro' && currentView!=='clubelivro'){
+    if(currentView==='inicio'){ renderClubeLivro('inicio'); renderAniversarioCanto(); return; }
+    renderBloqueioClube(currentView);
+    renderAniversarioCanto();
     return;
   }
   map[currentView]();
@@ -14137,6 +14424,877 @@ function renderAgenda(){
   });
 }
 
+/* ================= VIEW: CLUBE DO LIVRO =================
+   Four abas: Capítulos e aulas / Materiais de apoio / Mesa de leitores / Meu caderno — ver CLUBE_* no
+   topo do arquivo. A parte monetizada (aula gravada avulsa + acervo anual) fica pra depois, por pedido
+   da Daiane — por isso não existe ainda nenhum botão de compra nesta view. */
+let clubeMostrandoBiblioteca = false;
+let clubeNovoPostTipo = 'pergunta'; // tipo selecionado no composer da Mesa de leitores
+let clubeRespostaAbertaPostId = null; // id do post cujo campo de resposta está aberto agora
+let clubeCadernoBusca = ''; // busca na lista de anotações do Meu caderno
+
+function clubeContextAlunoId(){
+  if(currentRole==='staff'){ const s = getStudent(currentStudentId); return s ? s.id : null; }
+  return currentUser ? currentUser.id : null;
+}
+function clubeLivroPadrao(){
+  if(!CLUBE_LIVROS.length) return null;
+  return CLUBE_LIVROS.find(l=>l.status==='em_estudo') || CLUBE_LIVROS[0];
+}
+function clubeGetLivro(id){ return CLUBE_LIVROS.find(l=>l.id===id) || null; }
+function clubeCapitulosDoLivro(livroId){ return CLUBE_CAPITULOS.filter(c=>c.livro_id===livroId).sort((a,b)=>a.numero-b.numero); }
+function clubeMateriaisDoLivro(livroId){ return CLUBE_MATERIAIS.filter(m=>m.livro_id===livroId); }
+function clubeMateriaisDoCapitulo(capId){ return CLUBE_MATERIAIS.filter(m=>m.capitulo_id===capId); }
+function clubeProgressoStatus(capId, alunoId){
+  const p = CLUBE_PROGRESSO.find(x=>x.capitulo_id===capId && x.aluno_id===alunoId);
+  return p ? p.status : 'nao_iniciado';
+}
+function clubeAtividadeResposta(capId, alunoId){
+  const a = CLUBE_ATIVIDADES.find(x=>x.capitulo_id===capId && x.aluno_id===alunoId);
+  return a ? a.resposta : '';
+}
+async function clubeSetProgresso(capId, status){
+  const alunoId = clubeContextAlunoId();
+  if(!alunoId) return;
+  const { data, error } = await sb.from('clube_progresso')
+    .upsert({capitulo_id:capId, aluno_id:alunoId, status, updated_at:new Date().toISOString()}, {onConflict:'capitulo_id,aluno_id'})
+    .select().single();
+  if(error){ console.error(error); return; }
+  const idx = CLUBE_PROGRESSO.findIndex(p=>p.capitulo_id===capId && p.aluno_id===alunoId);
+  if(idx>=0) CLUBE_PROGRESSO[idx] = data; else CLUBE_PROGRESSO.push(data);
+}
+async function clubeSalvarAtividade(capId, resposta){
+  const alunoId = clubeContextAlunoId();
+  if(!alunoId) throw new Error('sem aluno');
+  const { data, error } = await sb.from('clube_atividades')
+    .upsert({capitulo_id:capId, aluno_id:alunoId, resposta, updated_at:new Date().toISOString()}, {onConflict:'capitulo_id,aluno_id'})
+    .select().single();
+  if(error) throw error;
+  const idx = CLUBE_ATIVIDADES.findIndex(a=>a.capitulo_id===capId && a.aluno_id===alunoId);
+  if(idx>=0) CLUBE_ATIVIDADES[idx] = data; else CLUBE_ATIVIDADES.push(data);
+  // Ler uma atividade conta como "em leitura" se o capítulo ainda não foi marcado como concluído.
+  if(clubeProgressoStatus(capId, alunoId)==='nao_iniciado') await clubeSetProgresso(capId, 'em_leitura');
+}
+async function clubeToggleFavoritoMaterial(materialId){
+  const alunoId = clubeContextAlunoId();
+  if(!alunoId) return;
+  const jaFavoritado = CLUBE_MATERIAL_FAVORITOS.has(materialId);
+  if(jaFavoritado){
+    const { error } = await sb.from('clube_material_favoritos').delete().eq('material_id', materialId).eq('aluno_id', alunoId);
+    if(error){ console.error(error); return; }
+    CLUBE_MATERIAL_FAVORITOS.delete(materialId);
+  } else {
+    const { error } = await sb.from('clube_material_favoritos').insert({material_id:materialId, aluno_id:alunoId});
+    if(error){ console.error(error); return; }
+    CLUBE_MATERIAL_FAVORITOS.add(materialId);
+  }
+}
+
+/* Limpa o outro container de view que também pode ter recebido o Clube do Livro (quem está cadastrado
+   só no Clube vê o Clube no lugar de "Início" também — ver renderCurrentView). Evita ids duplicados no
+   documento (os dois containers usam os mesmos ids internos, ex. "clube-subview-area"). */
+function clubeLimparOutroContainer(viewId){
+  const outroId = viewId==='clubelivro' ? 'inicio' : 'clubelivro';
+  const outro = document.getElementById('view-'+outroId);
+  if(outro && outro.querySelector('#clube-tabs')) outro.innerHTML = '';
+}
+
+function renderClubeLivro(viewId){
+  viewId = viewId || 'clubelivro';
+  clubeLimparOutroContainer(viewId);
+  const container = document.getElementById('view-'+viewId);
+  if(!CLUBE_LIVROS.length){
+    container.innerHTML = currentRole==='staff'
+      ? `<div class="empty-state">Nenhum livro cadastrado no Clube ainda. Cadastre o primeiro livro em Conteúdo → Clube do Livro.</div>`
+      : `<div class="empty-state">O Clube do Livro ainda não tem nenhum livro publicado. Volte em breve!</div>`;
+    return;
+  }
+  if(!clubeLivroAtualId || !clubeGetLivro(clubeLivroAtualId)) clubeLivroAtualId = (clubeLivroPadrao()||{}).id || null;
+
+  if(clubeMostrandoBiblioteca && CLUBE_LIVROS.length>1){
+    container.innerHTML = `
+      <nav class="clube-breadcrumb"><span>${icon('home','tiny')} Biblioteca do clube</span></nav>
+      <h2 class="section-title">Biblioteca do Clube</h2>
+      <div class="clube-biblioteca-grid">
+        ${CLUBE_LIVROS.map(l=>`
+          <div class="clube-biblioteca-card" data-livro="${l.id}">
+            <div class="clube-biblioteca-capa">${l.capa_url? `<img src="${escapeAttr(l.capa_url)}" alt="">` : escapeHtml(l.titulo)}</div>
+            <div class="clube-biblioteca-titulo">${escapeHtml(l.titulo)}</div>
+            ${l.status==='em_estudo'? `<span class="clube-tag">Livro em estudo</span>` : l.status==='concluido'? `<span class="clube-tag clube-tag-concluido">Já estudado</span>` : ''}
+          </div>`).join('')}
+      </div>`;
+    container.querySelectorAll('[data-livro]').forEach(card=>{
+      card.addEventListener('click', ()=>{
+        clubeLivroAtualId = card.dataset.livro; clubeMostrandoBiblioteca = false;
+        clubeSubView = 'capitulos'; clubeCapituloAtualId = null;
+        renderClubeLivro(viewId);
+      });
+    });
+    return;
+  }
+
+  const livro = clubeGetLivro(clubeLivroAtualId);
+  if(!livro){ container.innerHTML = '<div class="empty-state">Nenhum livro disponível.</div>'; return; }
+  container.innerHTML = `
+    <nav class="clube-breadcrumb">
+      <button type="button" id="clube-bc-biblioteca" ${CLUBE_LIVROS.length<=1?'disabled':''}>${icon('home','tiny')} Biblioteca do clube</button>
+      <span>›</span><span>${livro.status==='em_estudo'? 'Livro em estudo' : escapeHtml(livro.titulo)}</span>
+    </nav>
+    <div class="clube-hero">
+      <div class="clube-hero-capa">${livro.capa_url? `<img src="${escapeAttr(livro.capa_url)}" alt="">` : escapeHtml(livro.titulo)}</div>
+      <div class="clube-hero-info">
+        ${livro.status==='em_estudo'? `<span class="clube-tag">Livro em estudo</span>` : ''}
+        <h2>${escapeHtml(livro.titulo)}</h2>
+        ${livro.subtitulo? `<p>${escapeHtml(livro.subtitulo)}</p>` : ''}
+        <div class="clube-hero-actions">
+          ${livro.sobre_livro? `<button type="button" class="btn-accent" id="clube-sobre-btn">${icon('book','tiny')} Sobre o livro</button>` : ''}
+          ${livro.onde_comprar_url? `<a class="btn-outline" href="${escapeAttr(livro.onde_comprar_url)}" target="_blank" rel="noopener">${icon('externallink','tiny')} Onde comprar</a>` : ''}
+        </div>
+      </div>
+    </div>
+    <div class="ae-tabs" id="clube-tabs">
+      <div class="ae-tab ${clubeSubView==='capitulos'?'active':''}" data-sub="capitulos">Capítulos e aulas</div>
+      <div class="ae-tab ${clubeSubView==='materiais'?'active':''}" data-sub="materiais">Materiais de apoio</div>
+      <div class="ae-tab ${clubeSubView==='mesa'?'active':''}" data-sub="mesa">Mesa de leitores</div>
+      <div class="ae-tab ${clubeSubView==='caderno'?'active':''}" data-sub="caderno">Meu caderno</div>
+    </div>
+    <div id="clube-subview-area"></div>
+  `;
+  const bcBtn = document.getElementById('clube-bc-biblioteca');
+  if(bcBtn) bcBtn.addEventListener('click', ()=>{
+    if(CLUBE_LIVROS.length>1){ clubeMostrandoBiblioteca = true; renderClubeLivro(viewId); }
+  });
+  const sobreBtn = document.getElementById('clube-sobre-btn');
+  if(sobreBtn) sobreBtn.addEventListener('click', ()=>openClubeSobreLivroModal(livro));
+  container.querySelectorAll('#clube-tabs .ae-tab').forEach(t=>{
+    t.addEventListener('click', ()=>{
+      clubeSubView = t.dataset.sub;
+      container.querySelectorAll('#clube-tabs .ae-tab').forEach(x=>x.classList.toggle('active', x===t));
+      renderClubeSubview(viewId);
+    });
+  });
+  renderClubeSubview(viewId);
+}
+
+function renderClubeSubview(viewId){
+  const map = { capitulos:clubeRenderCapitulos, materiais:clubeRenderMateriais, mesa:clubeRenderMesa, caderno:clubeRenderCaderno };
+  map[clubeSubView](viewId);
+}
+
+function openClubeSobreLivroModal(livro){
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <div class="cat">Clube do Livro</div>
+      <h3>${escapeHtml(livro.titulo)}</h3>
+      ${livro.subtitulo? `<p style="color:var(--text-mute);margin-top:-8px">${escapeHtml(livro.subtitulo)}</p>`:''}
+      <div class="ps-section" style="font-size:13.5px;line-height:1.7">${formatEstudoTexto(livro.sobre_livro||'')}</div>
+      <div class="modal-actions">
+        ${livro.onde_comprar_url? `<a class="btn-accent" href="${escapeAttr(livro.onde_comprar_url)}" target="_blank" rel="noopener">${icon('externallink','tiny')} Onde comprar</a>`:''}
+        <button class="btn-outline" id="clube-sobre-fechar">Fechar</button>
+      </div>
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('clube-sobre-fechar').addEventListener('click', closeModal);
+}
+
+function openClubeProximoEncontroModal(livro, cap){
+  const agora = Date.now();
+  const encontros = CLUBE_ENCONTROS
+    .filter(e=>e.livro_id===livro.id && (!e.capitulo_id || e.capitulo_id===cap.id) && new Date(e.data_hora).getTime()>=agora)
+    .sort((a,b)=>new Date(a.data_hora)-new Date(b.data_hora));
+  const proximo = encontros[0];
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <div class="cat">Clube do Livro — ${escapeHtml(livro.titulo)}</div>
+      <h3>Encontro ao vivo</h3>
+      ${proximo ? `
+        <div class="ps-section" style="font-size:13.5px;line-height:1.7">
+          <p><strong>${escapeHtml(proximo.titulo)}</strong></p>
+          <p>${aeFormatPrazo(proximo.data_hora)}</p>
+        </div>
+        <div class="modal-actions">
+          ${proximo.link_url? `<a class="btn-accent" href="${escapeAttr(proximo.link_url)}" target="_blank" rel="noopener">${icon('externallink','tiny')} Entrar no encontro</a>`:''}
+          <button class="btn-outline" id="clube-encontro-fechar">Fechar</button>
+        </div>
+      ` : `
+        <p class="empty-state">Nenhum encontro agendado ainda para este livro. Assim que a equipe marcar um, ele aparece aqui.</p>
+        <div class="modal-actions"><button class="btn-outline" id="clube-encontro-fechar">Fechar</button></div>
+      `}
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('clube-encontro-fechar').addEventListener('click', closeModal);
+}
+
+function openClubeAtividadeModal(capId, respostaAtual){
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <div class="cat">Clube do Livro</div>
+      <h3>Da leitura à prática</h3>
+      <p style="color:var(--text-mute);font-size:12.5px;margin-top:-8px">O que este capítulo acrescenta à sua atuação profissional?</p>
+      <div class="ps-section">
+        <textarea class="ps-input" id="clube-ativ-texto" placeholder="Registre aqui o que você vai levar deste capítulo para a prática..." style="min-height:160px">${escapeHtml(respostaAtual||'')}</textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-accent" id="clube-ativ-salvar">Salvar</button>
+        <button class="btn-outline" id="clube-ativ-cancelar">Cancelar</button>
+      </div>
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('clube-ativ-cancelar').addEventListener('click', closeModal);
+  document.getElementById('clube-ativ-salvar').addEventListener('click', async ()=>{
+    const texto = document.getElementById('clube-ativ-texto').value.trim();
+    const btn = document.getElementById('clube-ativ-salvar'); btn.disabled = true;
+    try{
+      await clubeSalvarAtividade(capId, texto);
+      closeModal();
+      if(currentView==='clubelivro' || currentView==='inicio') renderClubeSubview(currentView==='inicio'?'inicio':'clubelivro');
+    }catch(e){ console.error(e); alert('Não foi possível salvar. Tente de novo.'); btn.disabled = false; }
+  });
+}
+
+function clubeMaterialAcaoLink(m){
+  if(m.tipo==='glossario') return 'Consultar';
+  if(m.tipo==='referencias') return 'Acessar referências';
+  if(m.tipo==='guia_leitura') return 'Abrir';
+  return 'Visualizar';
+}
+/* Linha compacta de um material, usada dentro do capítulo (ver clubeRenderCapitulos). */
+function clubeMaterialLinhaHtml(m){
+  const favoritado = CLUBE_MATERIAL_FAVORITOS.has(m.id);
+  return `
+    <div class="clube-mat-linha" data-material="${m.id}">
+      ${icon('folder','tiny')}
+      <span class="clube-mat-linha-titulo">${escapeHtml(m.titulo)}</span>
+      <div class="clube-mat-linha-acoes">
+        ${m.link_url? `<a class="btn-mini" href="${escapeAttr(m.link_url)}" target="_blank" rel="noopener">${icon('externallink','tiny')} ${clubeMaterialAcaoLink(m)}</a>`:''}
+        ${m.arquivo_url? `<a class="btn-mini" href="${escapeAttr(m.arquivo_url)}" target="_blank" rel="noopener" download>${icon('download','tiny')} Baixar</a>`:''}
+        <button type="button" class="btn-mini icon-only clube-fav-btn" data-fav="${m.id}" title="Favoritar">${favoritado? fillIcon('bookmark','tiny') : icon('bookmark','tiny')}</button>
+      </div>
+    </div>`;
+}
+function clubeWireMateriaisBotoes(container){
+  container.querySelectorAll('[data-fav]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      await clubeToggleFavoritoMaterial(btn.dataset.fav);
+      const favoritado = CLUBE_MATERIAL_FAVORITOS.has(btn.dataset.fav);
+      btn.innerHTML = favoritado? fillIcon('bookmark','tiny') : icon('bookmark','tiny');
+    });
+  });
+}
+
+function clubeRenderCapitulos(viewId){
+  const area = document.querySelector('#view-'+viewId+' #clube-subview-area');
+  if(!area) return;
+  const livro = clubeGetLivro(clubeLivroAtualId);
+  const capitulos = clubeCapitulosDoLivro(livro.id);
+  if(!capitulos.length){
+    area.innerHTML = currentRole==='staff'
+      ? `<div class="empty-state">Nenhum capítulo cadastrado ainda. Adicione o primeiro capítulo em Conteúdo → Clube do Livro.</div>`
+      : `<div class="empty-state">Os capítulos deste livro ainda não foram publicados.</div>`;
+    return;
+  }
+  if(!clubeCapituloAtualId || !capitulos.find(c=>c.id===clubeCapituloAtualId)) clubeCapituloAtualId = capitulos[0].id;
+  const cap = capitulos.find(c=>c.id===clubeCapituloAtualId);
+  const alunoId = clubeContextAlunoId();
+  const materiais = clubeMateriaisDoCapitulo(cap.id);
+  area.innerHTML = `
+    <div class="clube-capitulos-wrap">
+      <div class="clube-capitulos-lista">
+        <div class="clube-capitulos-lista-titulo">Percurso de leitura</div>
+        ${capitulos.map(c=>{
+          const st = alunoId ? clubeProgressoStatus(c.id, alunoId) : 'nao_iniciado';
+          return `
+          <div class="clube-cap-item ${c.id===cap.id?'active':''}" data-cap="${c.id}">
+            <span class="clube-cap-bullet clube-cap-bullet-${st}"></span>
+            <span class="clube-cap-label">Capítulo ${c.numero}${c.titulo? ' · '+escapeHtml(c.titulo):''}</span>
+            ${icon('next','tiny')}
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="clube-cap-conteudo">
+        <div class="clube-cap-head">
+          <div>
+            <h3>Capítulo ${cap.numero}${cap.titulo? ' · '+escapeHtml(cap.titulo):''}</h3>
+            <p class="clube-cap-sub">Seu espaço de estudo</p>
+          </div>
+          <span class="clube-tag clube-tag-gratuito">Acesso gratuito</span>
+        </div>
+        ${cap.texto_estudo? `<div class="clube-cap-texto">${formatEstudoTexto(cap.texto_estudo)}</div>` : `<p class="empty-state">Conteúdo deste capítulo ainda não foi publicado.</p>`}
+        <div class="clube-cap-encontro">
+          <div>${icon('calendar','tiny')} <strong>Encontro ao vivo</strong><br><span style="color:var(--text-mute);font-size:12px">Acompanhe o calendário do clube</span></div>
+          <button type="button" class="btn-accent" id="clube-cap-encontro-btn">Ver próximo encontro ${icon('next','tiny')}</button>
+        </div>
+        ${materiais.length? `
+        <div class="clube-cap-materiais">
+          <div class="clube-cap-materiais-titulo">Materiais do capítulo</div>
+          ${materiais.map(clubeMaterialLinhaHtml).join('')}
+        </div>` : ''}
+        ${alunoId ? `
+        <div class="clube-cap-atividade">
+          <div>${icon('edit','tiny')} <strong>Da leitura à prática</strong><br><span style="color:var(--text-mute);font-size:12px">Registre o que este capítulo acrescenta à sua atuação</span></div>
+          <button type="button" class="btn-outline" id="clube-cap-atividade-btn">Fazer atividade ${icon('next','tiny')}</button>
+        </div>` : ''}
+      </div>
+    </div>
+    <div class="clube-continue-banner">
+      <div>${icon('book','tiny')} <strong>Continue seu estudo no NCC</strong><br><span style="color:var(--text-mute);font-size:12px">Aprofunde sua formação com cursos, mentorias e conteúdos complementares.</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a class="btn-outline" href="https://wa.me/5548992118883?text=${encodeURIComponent('Olá! Gostaria de saber mais sobre a Formação NCC.')}" target="_blank" rel="noopener">${icon('idcard','tiny')} Conhecer a Formação</a>
+        <a class="btn-outline" href="https://wa.me/5548992118883?text=${encodeURIComponent('Olá! Gostaria de saber mais sobre a mentoria NCC.')}" target="_blank" rel="noopener">${icon('users','tiny')} Conhecer a mentoria</a>
+      </div>
+    </div>
+  `;
+  area.querySelectorAll('[data-cap]').forEach(el=>{
+    el.addEventListener('click', ()=>{ clubeCapituloAtualId = el.dataset.cap; clubeRenderCapitulos(viewId); });
+  });
+  const encontroBtn = document.getElementById('clube-cap-encontro-btn');
+  if(encontroBtn) encontroBtn.addEventListener('click', ()=>openClubeProximoEncontroModal(livro, cap));
+  const ativBtn = document.getElementById('clube-cap-atividade-btn');
+  if(ativBtn) ativBtn.addEventListener('click', ()=>openClubeAtividadeModal(cap.id, alunoId? clubeAtividadeResposta(cap.id, alunoId) : ''));
+  clubeWireMateriaisBotoes(area);
+}
+
+function clubeMaterialCardHtml(m, capLabel){
+  const favoritado = CLUBE_MATERIAL_FAVORITOS.has(m.id);
+  return `
+    <div class="clube-mat-card" data-material="${m.id}">
+      <div class="clube-mat-card-head">
+        <div>
+          <span class="clube-mat-tipo-tag">${CLUBE_TIPO_MATERIAL[m.tipo]||'Material'}</span>
+          ${capLabel? `<span class="clube-mat-cap-tag">${escapeHtml(capLabel)}</span>`:''}
+        </div>
+        <button type="button" class="btn-mini icon-only clube-fav-btn" data-fav="${m.id}" title="Favoritar">${favoritado? fillIcon('bookmark','tiny') : icon('bookmark','tiny')}</button>
+      </div>
+      <div class="clube-mat-card-visual">${icon('folder')}</div>
+      <div class="clube-mat-card-titulo">${escapeHtml(m.titulo)}</div>
+      ${m.descricao? `<div class="clube-mat-card-desc">${escapeHtml(m.descricao)}</div>`:''}
+      <div class="clube-mat-card-acoes">
+        ${m.link_url? `<a class="btn-outline" href="${escapeAttr(m.link_url)}" target="_blank" rel="noopener">${icon('externallink','tiny')} ${clubeMaterialAcaoLink(m)}</a>`:''}
+        ${m.arquivo_url? `<a class="btn-accent" href="${escapeAttr(m.arquivo_url)}" target="_blank" rel="noopener" download>${icon('download','tiny')} Baixar PDF</a>`:''}
+      </div>
+    </div>`;
+}
+function clubeAtualizarGradeMateriais(viewId){
+  const grid = document.querySelector('#view-'+viewId+' #clube-mat-grid');
+  if(!grid) return;
+  const livro = clubeGetLivro(clubeLivroAtualId);
+  const capitulos = clubeCapitulosDoLivro(livro.id);
+  const capLabelOf = (capId)=>{ const c = capitulos.find(x=>x.id===capId); return c? `Capítulo ${c.numero}` : ''; };
+  let lista = clubeMateriaisDoLivro(livro.id);
+  if(clubeMateriaisFiltro.capitulo==='geral') lista = lista.filter(m=>!m.capitulo_id);
+  else if(clubeMateriaisFiltro.capitulo!=='todos') lista = lista.filter(m=>m.capitulo_id===clubeMateriaisFiltro.capitulo);
+  if(clubeMateriaisFiltro.tipo!=='todos') lista = lista.filter(m=>m.tipo===clubeMateriaisFiltro.tipo);
+  if(clubeMateriaisFiltro.busca.trim()){
+    const q = clubeMateriaisFiltro.busca.trim().toLowerCase();
+    lista = lista.filter(m=>(m.titulo||'').toLowerCase().includes(q) || (m.descricao||'').toLowerCase().includes(q));
+  }
+  grid.innerHTML = lista.length ? lista.map(m=>clubeMaterialCardHtml(m, capLabelOf(m.capitulo_id))).join('') : '<p class="empty-state">Nenhum material encontrado.</p>';
+  clubeWireMateriaisBotoes(grid);
+}
+function clubeRenderMateriais(viewId){
+  const area = document.querySelector('#view-'+viewId+' #clube-subview-area');
+  if(!area) return;
+  const livro = clubeGetLivro(clubeLivroAtualId);
+  const capitulos = clubeCapitulosDoLivro(livro.id);
+  area.innerHTML = `
+    <div class="clube-mat-toolbar">
+      <div>
+        <h3 style="margin:0">Materiais de apoio</h3>
+        <p style="color:var(--text-mute);font-size:12.5px;margin:2px 0 0">Recursos para acompanhar a leitura e organizar seu estudo.</p>
+      </div>
+      <span class="clube-tag clube-tag-gratuito">Acesso gratuito</span>
+    </div>
+    <div class="clube-mat-filtros">
+      <input class="ps-input" id="clube-mat-busca" placeholder="Buscar material..." value="${escapeAttr(clubeMateriaisFiltro.busca)}">
+      <select class="ps-input" id="clube-mat-filtro-cap">
+        <option value="todos">Todos os capítulos</option>
+        <option value="geral">Materiais gerais</option>
+        ${capitulos.map(c=>`<option value="${c.id}" ${clubeMateriaisFiltro.capitulo===c.id?'selected':''}>Capítulo ${c.numero}</option>`).join('')}
+      </select>
+      <select class="ps-input" id="clube-mat-filtro-tipo">
+        <option value="todos">Todos os tipos</option>
+        ${Object.entries(CLUBE_TIPO_MATERIAL).map(([k,v])=>`<option value="${k}" ${clubeMateriaisFiltro.tipo===k?'selected':''}>${v}</option>`).join('')}
+      </select>
+    </div>
+    <div class="clube-mat-grid" id="clube-mat-grid"></div>
+    <p style="color:var(--text-mute);font-size:11.5px;margin-top:14px">${icon('bookmark','tiny')} Salve seus materiais favoritos para encontrar depois.</p>
+  `;
+  document.getElementById('clube-mat-filtro-cap').value = clubeMateriaisFiltro.capitulo;
+  document.getElementById('clube-mat-busca').addEventListener('input', (e)=>{ clubeMateriaisFiltro.busca = e.target.value; clubeAtualizarGradeMateriais(viewId); });
+  document.getElementById('clube-mat-filtro-cap').addEventListener('change', (e)=>{ clubeMateriaisFiltro.capitulo = e.target.value; clubeAtualizarGradeMateriais(viewId); });
+  document.getElementById('clube-mat-filtro-tipo').addEventListener('change', (e)=>{ clubeMateriaisFiltro.tipo = e.target.value; clubeAtualizarGradeMateriais(viewId); });
+  clubeAtualizarGradeMateriais(viewId);
+}
+
+/* -------- Mesa de leitores (mural de perguntas/reflexões/aplicações do livro) -------- */
+function clubeAutor(id){
+  return getPerson(id) || {name:'Participante', initials:'?', color:'#8a8a8a', avatarUrl:null};
+}
+function clubePostCapLabel(p, capitulos){
+  if(!p.capitulo_id) return '';
+  const c = capitulos.find(x=>x.id===p.capitulo_id);
+  return c ? `Capítulo ${c.numero}` : '';
+}
+function clubePostReacoes(postId){ return CLUBE_POST_REACOES.filter(r=>r.post_id===postId); }
+function clubePostRespostas(postId){ return CLUBE_POST_RESPOSTAS.filter(r=>r.post_id===postId); }
+async function clubeTogglePostReacao(postId){
+  const meuId = actingAuthorId();
+  if(!meuId) return;
+  const ja = CLUBE_POST_REACOES.some(r=>r.post_id===postId && r.aluno_id===meuId);
+  if(ja){
+    const { error } = await sb.from('clube_post_reacoes').delete().eq('post_id', postId).eq('aluno_id', meuId);
+    if(error){ console.error(error); return; }
+    CLUBE_POST_REACOES = CLUBE_POST_REACOES.filter(r=>!(r.post_id===postId && r.aluno_id===meuId));
+  } else {
+    const { error } = await sb.from('clube_post_reacoes').insert({post_id:postId, aluno_id:meuId});
+    if(error){ console.error(error); return; }
+    CLUBE_POST_REACOES.push({post_id:postId, aluno_id:meuId});
+  }
+}
+async function clubeTogglePostSalvo(postId){
+  const meuId = actingAuthorId();
+  if(!meuId) return;
+  const jaSalvo = CLUBE_POST_SALVOS.has(postId);
+  if(jaSalvo){
+    const { error } = await sb.from('clube_post_salvos').delete().eq('post_id', postId).eq('aluno_id', meuId);
+    if(error){ console.error(error); return; }
+    CLUBE_POST_SALVOS.delete(postId);
+  } else {
+    const { error } = await sb.from('clube_post_salvos').insert({post_id:postId, aluno_id:meuId});
+    if(error){ console.error(error); return; }
+    CLUBE_POST_SALVOS.add(postId);
+  }
+}
+async function clubeCriarPost(texto, tipo, capId){
+  const meuId = actingAuthorId();
+  if(!meuId) throw new Error('sem autor');
+  const { data, error } = await sb.from('clube_posts')
+    .insert({livro_id:clubeLivroAtualId, capitulo_id:capId||null, autor_id:meuId, tipo, texto})
+    .select().single();
+  if(error) throw error;
+  CLUBE_POSTS.unshift(data);
+}
+async function clubeCriarResposta(postId, texto){
+  const meuId = actingAuthorId();
+  if(!meuId) throw new Error('sem autor');
+  const { data, error } = await sb.from('clube_post_respostas')
+    .insert({post_id:postId, autor_id:meuId, texto})
+    .select().single();
+  if(error) throw error;
+  CLUBE_POST_RESPOSTAS.push(data);
+}
+async function clubeExcluirPost(postId){
+  const { error } = await sb.from('clube_posts').delete().eq('id', postId);
+  if(error){ console.error(error); return; }
+  CLUBE_POSTS = CLUBE_POSTS.filter(p=>p.id!==postId);
+  CLUBE_POST_RESPOSTAS = CLUBE_POST_RESPOSTAS.filter(r=>r.post_id!==postId);
+  CLUBE_POST_REACOES = CLUBE_POST_REACOES.filter(r=>r.post_id!==postId);
+  CLUBE_POST_SALVOS.delete(postId);
+}
+async function clubeExcluirResposta(respId){
+  const { error } = await sb.from('clube_post_respostas').delete().eq('id', respId);
+  if(error){ console.error(error); return; }
+  CLUBE_POST_RESPOSTAS = CLUBE_POST_RESPOSTAS.filter(r=>r.id!==respId);
+}
+function clubeRespostaHtml(r, meuId){
+  const autor = clubeAutor(r.autor_id);
+  const podeExcluir = r.autor_id===meuId || currentRole==='staff';
+  return `
+    <div class="clube-resposta" data-resposta="${r.id}">
+      ${initialsAvatar(autor.initials, autor.color, 26, autor.avatarUrl)}
+      <div class="clube-resposta-corpo">
+        <div class="clube-resposta-head">
+          <strong>${escapeHtml(autor.name)}</strong>
+          <span class="clube-post-tempo">${timeAgo(r.created_at)}</span>
+          ${podeExcluir? `<button type="button" class="clube-post-del" data-del-resposta="${r.id}" title="Excluir">${icon('trash','tiny')}</button>` : ''}
+        </div>
+        <div class="clube-resposta-texto">${escapeHtml(r.texto)}</div>
+      </div>
+    </div>`;
+}
+function clubePostCardHtml(p, meuId, capitulos){
+  const autor = clubeAutor(p.autor_id);
+  const capLabel = clubePostCapLabel(p, capitulos);
+  const reagiu = CLUBE_POST_REACOES.some(r=>r.post_id===p.id && r.aluno_id===meuId);
+  const totalReacoes = clubePostReacoes(p.id).length;
+  const salvo = CLUBE_POST_SALVOS.has(p.id);
+  const podeExcluir = p.autor_id===meuId || currentRole==='staff';
+  const respostas = clubePostRespostas(p.id);
+  const respostaAberta = clubeRespostaAbertaPostId===p.id;
+  return `
+    <div class="clube-post" data-post="${p.id}">
+      <div class="clube-post-head">
+        ${initialsAvatar(autor.initials, autor.color, 34, autor.avatarUrl)}
+        <div>
+          <strong>${escapeHtml(autor.name)}</strong>
+          <div class="clube-post-tags">
+            <span class="clube-post-tipo-tag clube-post-tipo-${p.tipo}">${CLUBE_TIPO_POST[p.tipo]||'Publicação'}</span>
+            ${capLabel? `<span class="clube-post-cap-tag">${escapeHtml(capLabel)}</span>`:''}
+            <span class="clube-post-tempo">${timeAgo(p.created_at)}</span>
+          </div>
+        </div>
+        ${podeExcluir? `<button type="button" class="clube-post-del" data-del-post="${p.id}" title="Excluir publicação">${icon('trash','tiny')}</button>` : ''}
+      </div>
+      <div class="clube-post-texto">${formatEstudoTexto(p.texto)}</div>
+      <div class="clube-post-acoes">
+        <button type="button" class="btn-mini ${reagiu?'active':''}" data-reagir="${p.id}">${reagiu? fillIcon('heart','tiny') : icon('heart','tiny')} ${CLUBE_TIPO_POST_REACAO[p.tipo]||'Reagir'}${totalReacoes? ` · ${totalReacoes}`:''}</button>
+        <button type="button" class="btn-mini" data-responder="${p.id}">${icon('comment','tiny')} Responder${respostas.length? ` · ${respostas.length}`:''}</button>
+        <button type="button" class="btn-mini icon-only" data-salvar="${p.id}" title="${salvo?'Remover dos salvos':'Salvar'}">${salvo? fillIcon('bookmark','tiny') : icon('bookmark','tiny')}</button>
+      </div>
+      ${respostas.length? `<div class="clube-respostas-lista">${respostas.map(r=>clubeRespostaHtml(r, meuId)).join('')}</div>` : ''}
+      ${respostaAberta? `
+      <div class="clube-post-reply-box">
+        <textarea class="ps-input" id="clube-resposta-texto-${p.id}" placeholder="Escreva sua resposta..."></textarea>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+          <button type="button" class="btn-outline btn-mini" data-cancelar-resposta="${p.id}">Cancelar</button>
+          <button type="button" class="btn-accent btn-mini" data-enviar-resposta="${p.id}">Enviar</button>
+        </div>
+      </div>` : ''}
+    </div>`;
+}
+function clubeRenderMesa(viewId){
+  const area = document.querySelector('#view-'+viewId+' #clube-subview-area');
+  if(!area) return;
+  const livro = clubeGetLivro(clubeLivroAtualId);
+  const capitulos = clubeCapitulosDoLivro(livro.id);
+  const meuId = actingAuthorId();
+  const todosDoLivro = CLUBE_POSTS.filter(p=>p.livro_id===livro.id);
+  const destaque = todosDoLivro.find(p=>p.destaque_semana);
+  let lista = todosDoLivro;
+  if(clubeMesaFiltro==='pergunta' || clubeMesaFiltro==='reflexao' || clubeMesaFiltro==='aplicacao'){
+    lista = todosDoLivro.filter(p=>p.tipo===clubeMesaFiltro);
+  } else if(clubeMesaFiltro==='minhas'){
+    lista = todosDoLivro.filter(p=>p.autor_id===meuId);
+  } else if(clubeMesaFiltro==='respostas'){
+    lista = todosDoLivro.filter(p=>p.autor_id===meuId && clubePostRespostas(p.id).some(r=>r.autor_id!==meuId));
+  } else if(clubeMesaFiltro==='salvos'){
+    lista = todosDoLivro.filter(p=>CLUBE_POST_SALVOS.has(p.id));
+  }
+  const filtrosTopo = [
+    {id:'todos', label:'Todos'},
+    {id:'pergunta', label:'Perguntas'},
+    {id:'reflexao', label:'Reflexões'},
+    {id:'aplicacao', label:'Aplicações na prática'},
+  ];
+  area.innerHTML = `
+    <div class="clube-mesa-wrap">
+      <div class="clube-mesa-main">
+        ${meuId? `
+        <div class="clube-composer">
+          <textarea class="ps-input" id="clube-post-texto" placeholder="Compartilhe uma pergunta, reflexão ou aplicação prática sobre a leitura..."></textarea>
+          <div class="clube-composer-footer">
+            <select class="ps-input" id="clube-post-cap">
+              <option value="">Capítulo (opcional)</option>
+              ${capitulos.map(c=>`<option value="${c.id}">Capítulo ${c.numero}${c.titulo? ' · '+escapeHtml(c.titulo):''}</option>`).join('')}
+            </select>
+            <div class="clube-composer-tipos" id="clube-post-tipo-select">
+              ${Object.entries(CLUBE_TIPO_POST).map(([k,v])=>`<button type="button" class="type-pill clube-tipo-${k} ${clubeNovoPostTipo===k?'active':''}" data-tipo="${k}">${v}</button>`).join('')}
+            </div>
+            <button class="btn-accent" id="clube-post-publicar">Publicar</button>
+          </div>
+        </div>` : ''}
+        <div class="ae-tabs" id="clube-mesa-tabs">
+          ${filtrosTopo.map(f=>`<div class="ae-tab ${clubeMesaFiltro===f.id?'active':''}" data-filtro="${f.id}">${f.label}</div>`).join('')}
+        </div>
+        <div class="clube-mesa-feed" id="clube-mesa-feed">
+          ${lista.length? lista.map(p=>clubePostCardHtml(p, meuId, capitulos)).join('') : '<p class="empty-state">Nenhuma publicação por aqui ainda.</p>'}
+        </div>
+      </div>
+      <div class="clube-mesa-sidebar">
+        ${destaque? `
+        <div class="clube-sidebar-card">
+          <div class="clube-sidebar-card-titulo">Conversa da semana</div>
+          <p class="clube-sidebar-destaque-texto">${escapeHtml((destaque.texto||'').slice(0,160))}${destaque.texto && destaque.texto.length>160? '…':''}</p>
+          <button type="button" class="btn-outline btn-mini" id="clube-sidebar-participar">Participar</button>
+        </div>` : ''}
+        <div class="clube-sidebar-card">
+          <div class="clube-sidebar-card-titulo">Minhas conversas</div>
+          <button type="button" class="clube-sidebar-link" data-filtro="minhas">Minhas publicações</button>
+          <button type="button" class="clube-sidebar-link" data-filtro="respostas">Respostas para mim</button>
+          <button type="button" class="clube-sidebar-link" data-filtro="salvos">Discussões salvas</button>
+        </div>
+        <div class="clube-sidebar-card">
+          <div class="clube-sidebar-card-titulo">Combinados da mesa</div>
+          <p class="clube-sidebar-combinados-texto">Dialogue com respeito. Use exemplos fictícios e preserve a identidade de crianças e famílias.</p>
+          <p class="clube-sidebar-combinados-texto">Discussões entre participantes. Dúvidas podem ser selecionadas para os encontros.</p>
+        </div>
+      </div>
+    </div>
+  `;
+  area.querySelectorAll('#clube-mesa-tabs [data-filtro], .clube-sidebar-link[data-filtro]').forEach(el=>{
+    el.addEventListener('click', ()=>{ clubeMesaFiltro = el.dataset.filtro; clubeRenderMesa(viewId); });
+  });
+  const tipoSelect = document.getElementById('clube-post-tipo-select');
+  if(tipoSelect){
+    tipoSelect.querySelectorAll('[data-tipo]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        clubeNovoPostTipo = btn.dataset.tipo;
+        tipoSelect.querySelectorAll('[data-tipo]').forEach(b=>b.classList.toggle('active', b===btn));
+      });
+    });
+  }
+  const participarBtn = document.getElementById('clube-sidebar-participar');
+  if(participarBtn) participarBtn.addEventListener('click', ()=>{
+    const ta = document.getElementById('clube-post-texto');
+    if(ta) ta.focus();
+  });
+  const publicarBtn = document.getElementById('clube-post-publicar');
+  if(publicarBtn) publicarBtn.addEventListener('click', async ()=>{
+    const ta = document.getElementById('clube-post-texto');
+    const texto = ta.value.trim();
+    if(!texto) return;
+    const capId = document.getElementById('clube-post-cap').value || null;
+    publicarBtn.disabled = true;
+    try{
+      await clubeCriarPost(texto, clubeNovoPostTipo, capId);
+      clubeRenderMesa(viewId);
+    }catch(e){ console.error(e); alert('Não foi possível publicar. Tente de novo.'); publicarBtn.disabled = false; }
+  });
+  area.querySelectorAll('[data-reagir]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      await clubeTogglePostReacao(btn.dataset.reagir);
+      clubeRenderMesa(viewId);
+    });
+  });
+  area.querySelectorAll('[data-salvar]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      await clubeTogglePostSalvo(btn.dataset.salvar);
+      clubeRenderMesa(viewId);
+    });
+  });
+  area.querySelectorAll('[data-responder]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      clubeRespostaAbertaPostId = clubeRespostaAbertaPostId===btn.dataset.responder ? null : btn.dataset.responder;
+      clubeRenderMesa(viewId);
+    });
+  });
+  area.querySelectorAll('[data-cancelar-resposta]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ clubeRespostaAbertaPostId = null; clubeRenderMesa(viewId); });
+  });
+  area.querySelectorAll('[data-enviar-resposta]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const postId = btn.dataset.enviarResposta;
+      const ta = document.getElementById('clube-resposta-texto-'+postId);
+      const texto = ta.value.trim();
+      if(!texto) return;
+      btn.disabled = true;
+      try{
+        await clubeCriarResposta(postId, texto);
+        clubeRespostaAbertaPostId = null;
+        clubeRenderMesa(viewId);
+      }catch(e){ console.error(e); alert('Não foi possível enviar sua resposta. Tente de novo.'); btn.disabled = false; }
+    });
+  });
+  area.querySelectorAll('[data-del-post]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      if(!confirmDelete('Excluir esta publicação? Essa ação não pode ser desfeita.')) return;
+      await clubeExcluirPost(btn.dataset.delPost);
+      clubeRenderMesa(viewId);
+    });
+  });
+  area.querySelectorAll('[data-del-resposta]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      if(!confirmDelete('Excluir esta resposta? Essa ação não pode ser desfeita.')) return;
+      await clubeExcluirResposta(btn.dataset.delResposta);
+      clubeRenderMesa(viewId);
+    });
+  });
+}
+
+/* -------- Meu caderno (anotações pessoais do aluno, totalmente privadas — sem exceção de equipe) -------- */
+function clubeMinhasAnotacoes(livroId, alunoId){
+  return CLUBE_ANOTACOES.filter(a=>a.livro_id===livroId && a.aluno_id===alunoId);
+}
+function clubeAnotacaoAtual(alunoId){
+  if(!clubeAnotacaoAtualId) return null;
+  return CLUBE_ANOTACOES.find(a=>a.id===clubeAnotacaoAtualId && a.aluno_id===alunoId) || null;
+}
+async function clubeSalvarAnotacao(campos){
+  const alunoId = clubeContextAlunoId();
+  if(!alunoId) throw new Error('sem aluno');
+  if(clubeAnotacaoAtualId){
+    const { data, error } = await sb.from('clube_anotacoes')
+      .update({...campos, updated_at:new Date().toISOString()})
+      .eq('id', clubeAnotacaoAtualId).eq('aluno_id', alunoId)
+      .select().single();
+    if(error) throw error;
+    const idx = CLUBE_ANOTACOES.findIndex(a=>a.id===data.id);
+    if(idx>=0) CLUBE_ANOTACOES[idx] = data; else CLUBE_ANOTACOES.unshift(data);
+    return data;
+  }
+  const { data, error } = await sb.from('clube_anotacoes')
+    .insert({...campos, livro_id:clubeLivroAtualId, aluno_id:alunoId})
+    .select().single();
+  if(error) throw error;
+  CLUBE_ANOTACOES.unshift(data);
+  clubeAnotacaoAtualId = data.id;
+  return data;
+}
+async function clubeExcluirAnotacao(id){
+  const alunoId = clubeContextAlunoId();
+  const { error } = await sb.from('clube_anotacoes').delete().eq('id', id).eq('aluno_id', alunoId);
+  if(error){ console.error(error); return; }
+  CLUBE_ANOTACOES = CLUBE_ANOTACOES.filter(a=>a.id!==id);
+  if(clubeAnotacaoAtualId===id) clubeAnotacaoAtualId = null;
+}
+/* Baixa um .txt com todas as anotações do aluno pra este livro — nunca inventa conteúdo, só formata
+   exatamente o que existe em CLUBE_ANOTACOES. */
+function clubeExportarAnotacoes(alunoId, livro, capitulos){
+  const minhas = clubeMinhasAnotacoes(livro.id, alunoId).slice().sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+  const capLabel = (capId)=>{ const c = capitulos.find(x=>x.id===capId); return c? `Capítulo ${c.numero}${c.titulo? ' - '+c.titulo:''}` : 'Sem capítulo'; };
+  let texto = `Minhas anotações — ${livro.titulo}\n\n`;
+  if(!minhas.length) texto += '(nenhuma anotação registrada ainda)\n';
+  minhas.forEach(a=>{
+    texto += `${'='.repeat(40)}\n`;
+    texto += `${a.titulo || '(sem título)'}\n`;
+    texto += `${capLabel(a.capitulo_id)}${a.pagina? ' · página '+a.pagina:''}\n\n`;
+    if(a.compreendi) texto += `O que compreendi:\n${a.compreendi}\n\n`;
+    if(a.conexao_atuacao) texto += `Como isso se conecta à minha atuação:\n${a.conexao_atuacao}\n\n`;
+    if(a.estudar_melhor) texto += `O que quero estudar melhor:\n${a.estudar_melhor}\n\n`;
+  });
+  const blob = new Blob([texto], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url; link.download = 'minhas-anotacoes-clube-do-livro.txt';
+  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+function clubeRenderCaderno(viewId){
+  const area = document.querySelector('#view-'+viewId+' #clube-subview-area');
+  if(!area) return;
+  const livro = clubeGetLivro(clubeLivroAtualId);
+  const capitulos = clubeCapitulosDoLivro(livro.id);
+  const alunoId = clubeContextAlunoId();
+  if(!alunoId){
+    area.innerHTML = '<div class="empty-state">Este espaço é pessoal e privado — disponível ao visualizar como um aluno específico.</div>';
+    return;
+  }
+  const capLabelOf = (capId)=>{ const c = capitulos.find(x=>x.id===capId); return c? `Capítulo ${c.numero}` : ''; };
+  let minhas = clubeMinhasAnotacoes(livro.id, alunoId);
+  if(clubeCadernoBusca.trim()){
+    const q = clubeCadernoBusca.trim().toLowerCase();
+    minhas = minhas.filter(a=>(a.titulo||'').toLowerCase().includes(q));
+  }
+  const atual = clubeAnotacaoAtual(alunoId);
+  const favMateriais = CLUBE_MATERIAIS.filter(m=>m.livro_id===livro.id && CLUBE_MATERIAL_FAVORITOS.has(m.id)).length;
+  const favPosts = CLUBE_POSTS.filter(p=>p.livro_id===livro.id && CLUBE_POST_SALVOS.has(p.id)).length;
+  area.innerHTML = `
+    <div class="clube-caderno-wrap">
+      <div class="clube-caderno-lista">
+        <div class="clube-caderno-lista-head">
+          <strong>Minhas anotações</strong>
+          <button type="button" class="btn-mini" id="clube-cad-nova">+ Nova anotação</button>
+        </div>
+        <input class="ps-input" id="clube-cad-busca" placeholder="Buscar anotação..." value="${escapeAttr(clubeCadernoBusca)}">
+        <div class="clube-caderno-itens">
+          ${minhas.length? minhas.map(a=>`
+            <div class="clube-cad-item ${a.id===clubeAnotacaoAtualId?'active':''}" data-anotacao="${a.id}">
+              <div class="clube-cad-item-titulo">${escapeHtml(a.titulo||'(sem título)')}</div>
+              <div class="clube-cad-item-sub">${escapeHtml(capLabelOf(a.capitulo_id)||'Sem capítulo')} · ${timeAgo(a.updated_at)}</div>
+            </div>`).join('') : '<p class="empty-state">Nenhuma anotação ainda.</p>'}
+        </div>
+      </div>
+      <div class="clube-caderno-editor">
+        <div class="clube-cad-editor-head">
+          <input class="ps-input" id="clube-cad-titulo" placeholder="Título da anotação" value="${escapeAttr(atual? atual.titulo : '')}">
+          <span class="clube-tag">${icon('lock','tiny')} Privado · só você acessa</span>
+        </div>
+        <div class="clube-cad-editor-meta">
+          <select class="ps-input" id="clube-cad-capitulo">
+            <option value="">Capítulo (opcional)</option>
+            ${capitulos.map(c=>`<option value="${c.id}" ${atual && atual.capitulo_id===c.id?'selected':''}>Capítulo ${c.numero}${c.titulo? ' · '+escapeHtml(c.titulo):''}</option>`).join('')}
+          </select>
+          <input class="ps-input" id="clube-cad-pagina" placeholder="Página do livro (opcional)" value="${escapeAttr(atual? (atual.pagina||'') : '')}">
+        </div>
+        <label class="ps-label">O que compreendi</label>
+        <textarea class="ps-input" id="clube-cad-compreendi" placeholder="O que você entendeu deste trecho?">${escapeHtml(atual? atual.compreendi : '')}</textarea>
+        <label class="ps-label">Como isso se conecta à minha atuação</label>
+        <textarea class="ps-input" id="clube-cad-conexao" placeholder="De que forma isso aparece na sua prática profissional?">${escapeHtml(atual? atual.conexao_atuacao : '')}</textarea>
+        <label class="ps-label">O que quero estudar melhor</label>
+        <textarea class="ps-input" id="clube-cad-estudar" placeholder="O que ficou em aberto, pra aprofundar depois?">${escapeHtml(atual? atual.estudar_melhor : '')}</textarea>
+        <div class="clube-cad-editor-acoes">
+          ${atual? `<button type="button" class="btn-outline" id="clube-cad-excluir">Excluir</button>` : ''}
+          <button type="button" class="btn-outline" id="clube-cad-exportar">${icon('download','tiny')} Exportar minhas notas</button>
+          <button type="button" class="btn-accent" id="clube-cad-salvar">Salvar anotação</button>
+        </div>
+      </div>
+      <div class="clube-caderno-sidebar">
+        <div class="clube-sidebar-card">
+          <div class="clube-sidebar-card-titulo">Meu percurso</div>
+          ${capitulos.length? capitulos.map(c=>{
+            const st = clubeProgressoStatus(c.id, alunoId);
+            return `
+            <div class="clube-percurso-item">
+              <span>Capítulo ${c.numero}${c.titulo? ' · '+escapeHtml(c.titulo):''}</span>
+              <select class="ps-input clube-percurso-select" data-cap-progresso="${c.id}" title="Atualizar leitura">
+                ${Object.entries(CLUBE_PROGRESSO_LABEL).map(([k,v])=>`<option value="${k}" ${st===k?'selected':''}>${v}</option>`).join('')}
+              </select>
+            </div>`;
+          }).join('') : '<p class="empty-state">Nenhum capítulo publicado ainda.</p>'}
+        </div>
+        <div class="clube-sidebar-card">
+          <div class="clube-sidebar-card-titulo">Meus favoritos</div>
+          <button type="button" class="clube-sidebar-link" id="clube-fav-materiais">Materiais salvos${favMateriais? ` (${favMateriais})`:''}</button>
+          <button type="button" class="clube-sidebar-link" id="clube-fav-discussoes">Discussões salvas${favPosts? ` (${favPosts})`:''}</button>
+        </div>
+        <div class="clube-sidebar-card">
+          <div class="clube-sidebar-card-titulo">Próximo aprofundamento</div>
+          <a class="btn-outline btn-mini" style="display:flex;justify-content:center" href="https://wa.me/5548992118883?text=${encodeURIComponent('Olá! Gostaria de saber mais sobre a Formação NCC.')}" target="_blank" rel="noopener">${icon('idcard','tiny')} Formação NCC</a>
+          <a class="btn-outline btn-mini" style="display:flex;justify-content:center;margin-top:6px" href="https://wa.me/5548992118883?text=${encodeURIComponent('Olá! Gostaria de saber mais sobre a mentoria NCC.')}" target="_blank" rel="noopener">${icon('users','tiny')} Mentoria NCC</a>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('clube-cad-nova').addEventListener('click', ()=>{
+    clubeAnotacaoAtualId = null;
+    clubeRenderCaderno(viewId);
+  });
+  document.getElementById('clube-cad-busca').addEventListener('input', (e)=>{
+    clubeCadernoBusca = e.target.value;
+    clubeRenderCaderno(viewId);
+  });
+  area.querySelectorAll('[data-anotacao]').forEach(el=>{
+    el.addEventListener('click', ()=>{ clubeAnotacaoAtualId = el.dataset.anotacao; clubeRenderCaderno(viewId); });
+  });
+  document.getElementById('clube-cad-salvar').addEventListener('click', async ()=>{
+    const btn = document.getElementById('clube-cad-salvar'); btn.disabled = true;
+    try{
+      await clubeSalvarAnotacao({
+        titulo: document.getElementById('clube-cad-titulo').value.trim(),
+        capitulo_id: document.getElementById('clube-cad-capitulo').value || null,
+        pagina: document.getElementById('clube-cad-pagina').value.trim() || null,
+        compreendi: document.getElementById('clube-cad-compreendi').value.trim(),
+        conexao_atuacao: document.getElementById('clube-cad-conexao').value.trim(),
+        estudar_melhor: document.getElementById('clube-cad-estudar').value.trim(),
+      });
+      clubeRenderCaderno(viewId);
+    }catch(e){ console.error(e); alert('Não foi possível salvar sua anotação. Tente de novo.'); btn.disabled = false; }
+  });
+  const excluirBtn = document.getElementById('clube-cad-excluir');
+  if(excluirBtn) excluirBtn.addEventListener('click', async ()=>{
+    if(!atual) return;
+    if(!confirmDelete('Excluir esta anotação? Essa ação não pode ser desfeita.')) return;
+    await clubeExcluirAnotacao(atual.id);
+    clubeRenderCaderno(viewId);
+  });
+  document.getElementById('clube-cad-exportar').addEventListener('click', ()=>{
+    clubeExportarAnotacoes(alunoId, livro, capitulos);
+  });
+  area.querySelectorAll('[data-cap-progresso]').forEach(sel=>{
+    sel.addEventListener('change', async ()=>{
+      await clubeSetProgresso(sel.dataset.capProgresso, sel.value);
+      clubeRenderCaderno(viewId);
+    });
+  });
+  const favMatBtn = document.getElementById('clube-fav-materiais');
+  if(favMatBtn) favMatBtn.addEventListener('click', ()=>{ clubeSubView = 'materiais'; renderClubeLivro(viewId); });
+  const favDiscBtn = document.getElementById('clube-fav-discussoes');
+  if(favDiscBtn) favDiscBtn.addEventListener('click', ()=>{ clubeSubView = 'mesa'; clubeMesaFiltro = 'salvos'; renderClubeLivro(viewId); });
+}
+
 /* ================= VIEW: MATERIAIS ================= */
 function renderMateriais(){
   document.getElementById('view-materiais').innerHTML = `
@@ -17056,6 +18214,17 @@ function moveCourseInModule(courseId, dir){
   [COURSES[idx], COURSES[j]] = [COURSES[j], COURSES[idx]];
 }
 let draggedCourseId = null;
+let conteudoClubeLivroId = null; // livro do Clube do Livro selecionado no admin de Conteúdo
+/* Converte um timestamptz (ISO, vindo do Supabase) para o formato que o input type="datetime-local"
+   espera ("AAAA-MM-DDTHH:mm", em horário local do navegador) — e vice-versa, lendo o value de volta
+   com new Date(), que interpreta uma string sem fuso como horário local. */
+function toDatetimeLocal(iso){
+  if(!iso) return '';
+  const d = new Date(iso);
+  if(isNaN(d.getTime())) return '';
+  const pad = n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 function courseRowHtml(c, isFirst, isLast){
   return `
     <div class="course-row" draggable="true" data-course-row="${c.id}">
@@ -17741,11 +18910,194 @@ function renderConteudo(){
       <div class="field full"><label>Link da gravação (pode deixar em branco e adicionar depois)</label><input class="ps-input" type="text" id="new-live-link" placeholder="https://..."></div>
       <div class="actions"><button class="btn-accent" id="add-live-btn">${icon('upload')} Publicar evento</button></div>
     </div>
+
+    <h2 class="section-title">${icon('book')} Clube do Livro</h2>
+    <p class="section-sub" style="margin-top:-6px">Cadastre o livro em estudo, os capítulos, os materiais de apoio e os encontros ao vivo do Clube. Quem está matriculado só no Clube do Livro vê apenas este espaço; Formação, Pós-Graduação e Mentoria têm acesso gratuito a ele também.</p>
+    <div class="table-wrap">
+      <table class="check-table">
+        <thead><tr><th>Título</th><th>Subtítulo</th><th>Status</th><th>Ordem</th><th></th></tr></thead>
+        <tbody>
+          ${CLUBE_LIVROS.map(l=>`
+            <tr>
+              <td style="min-width:160px"><input class="ps-input" data-clube-livro-titulo="${l.id}" value="${escapeAttr(l.titulo)}"></td>
+              <td style="min-width:160px"><input class="ps-input" data-clube-livro-subtitulo="${l.id}" value="${escapeAttr(l.subtitulo)}"></td>
+              <td>
+                <select class="ps-input" data-clube-livro-status="${l.id}">
+                  <option value="em_estudo" ${l.status==='em_estudo'?'selected':''}>Em estudo</option>
+                  <option value="planejado" ${l.status==='planejado'?'selected':''}>Planejado</option>
+                  <option value="concluido" ${l.status==='concluido'?'selected':''}>Já estudado</option>
+                </select>
+              </td>
+              <td><input class="ps-input" type="number" data-clube-livro-ordem="${l.id}" value="${l.ordem}" style="width:64px"></td>
+              <td><button class="btn-mini danger" data-clube-livro-del="${l.id}">${icon('trash')} Remover</button></td>
+            </tr>
+            <tr><td colspan="5" style="padding-top:0">
+              <div class="add-form" style="margin:0 0 4px">
+                <div class="field"><label>Capa (URL da imagem)</label><input class="ps-input" type="text" data-clube-livro-capa="${l.id}" value="${escapeAttr(l.capa_url||'')}" placeholder="https://..."></div>
+                <div class="field"><label>Onde comprar (link)</label><input class="ps-input" type="text" data-clube-livro-comprar="${l.id}" value="${escapeAttr(l.onde_comprar_url||'')}" placeholder="https://..."></div>
+                <div class="field full"><label>Sobre o livro</label><textarea class="ps-input" data-clube-livro-sobre="${l.id}" placeholder="Texto exibido no modal &quot;Sobre o livro&quot;...">${escapeHtml(l.sobre_livro||'')}</textarea></div>
+              </div>
+            </td></tr>
+          `).join('') || `<tr><td colspan="5" style="color:var(--text-mute)">Nenhum livro cadastrado ainda.</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+    <div class="add-form">
+      <div class="field full"><label>Título do livro</label><input class="ps-input" type="text" id="new-clube-livro-titulo" placeholder="Ex.: É assim que aprendemos"></div>
+      <div class="field full"><label>Subtítulo</label><input class="ps-input" type="text" id="new-clube-livro-subtitulo" placeholder="Ex.: Leitura, neurociência e prática profissional"></div>
+      <div class="actions"><button class="btn-accent" id="add-clube-livro-btn">${icon('upload')} Cadastrar livro</button></div>
+    </div>
+
+    ${CLUBE_LIVROS.length? `
+    <div class="ps-section" style="margin-top:18px">
+      <label>Gerenciando capítulos, materiais e encontros do livro:</label>
+      <select class="ps-input" id="clube-admin-livro-select" style="max-width:360px">
+        ${CLUBE_LIVROS.map(l=>`<option value="${l.id}" ${conteudoClubeLivroId===l.id?'selected':''}>${escapeHtml(l.titulo)}</option>`).join('')}
+      </select>
+    </div>
+    ${(()=>{
+      const livroSel = clubeGetLivro(conteudoClubeLivroId) || CLUBE_LIVROS[0];
+      const caps = clubeCapitulosDoLivro(livroSel.id);
+      const mats = clubeMateriaisDoLivro(livroSel.id);
+      const encs = CLUBE_ENCONTROS.filter(e=>e.livro_id===livroSel.id);
+      const postsDoLivro = CLUBE_POSTS.filter(p=>p.livro_id===livroSel.id).slice(0,20);
+      return `
+      <h3 class="section-title" style="margin-top:18px">${icon('book','tiny')} Capítulos — ${escapeHtml(livroSel.titulo)}</h3>
+      <div class="table-wrap">
+        <table class="check-table">
+          <thead><tr><th>Nº</th><th>Título</th><th>Ordem</th><th></th></tr></thead>
+          <tbody>
+            ${caps.map(c=>`
+              <tr>
+                <td style="width:56px"><input class="ps-input" type="number" data-clube-cap-numero="${c.id}" value="${c.numero}" style="width:56px"></td>
+                <td style="min-width:160px"><input class="ps-input" data-clube-cap-titulo="${c.id}" value="${escapeAttr(c.titulo)}"></td>
+                <td><input class="ps-input" type="number" data-clube-cap-ordem="${c.id}" value="${c.ordem}" style="width:64px"></td>
+                <td><button class="btn-mini danger" data-clube-cap-del="${c.id}">${icon('trash')} Remover</button></td>
+              </tr>
+              <tr><td colspan="4" style="padding-top:0">
+                <div class="add-form" style="margin:0 0 4px">
+                  <div class="field full"><label>Texto de estudo deste capítulo</label><textarea class="ps-input" data-clube-cap-texto="${c.id}" placeholder="Conteúdo do capítulo exibido para o aluno...">${escapeHtml(c.texto_estudo||'')}</textarea></div>
+                </div>
+              </td></tr>
+            `).join('') || `<tr><td colspan="4" style="color:var(--text-mute)">Nenhum capítulo cadastrado ainda.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+      <div class="add-form">
+        <div class="field"><label>Número</label><input class="ps-input" type="number" id="new-clube-cap-numero" placeholder="Ex.: 1"></div>
+        <div class="field full"><label>Título (opcional)</label><input class="ps-input" type="text" id="new-clube-cap-titulo" placeholder="Ex.: A ciência da leitura"></div>
+        <div class="actions"><button class="btn-accent" id="add-clube-cap-btn">${icon('upload')} Adicionar capítulo</button></div>
+      </div>
+
+      <h3 class="section-title" style="margin-top:18px">${icon('folder','tiny')} Materiais de apoio — ${escapeHtml(livroSel.titulo)}</h3>
+      <div class="table-wrap">
+        <table class="check-table">
+          <thead><tr><th>Título</th><th>Tipo</th><th>Capítulo</th><th>Arquivo/Link</th><th></th></tr></thead>
+          <tbody>
+            ${mats.map(m=>`
+              <tr>
+                <td style="min-width:160px"><input class="ps-input" data-clube-mat-titulo="${m.id}" value="${escapeAttr(m.titulo)}"></td>
+                <td>
+                  <select class="ps-input" data-clube-mat-tipo="${m.id}">
+                    ${Object.entries(CLUBE_TIPO_MATERIAL).map(([k,v])=>`<option value="${k}" ${m.tipo===k?'selected':''}>${v}</option>`).join('')}
+                  </select>
+                </td>
+                <td>
+                  <select class="ps-input" data-clube-mat-cap="${m.id}">
+                    <option value="">Geral</option>
+                    ${caps.map(c=>`<option value="${c.id}" ${m.capitulo_id===c.id?'selected':''}>Capítulo ${c.numero}</option>`).join('')}
+                  </select>
+                </td>
+                <td style="min-width:180px">
+                  <input class="ps-input" data-clube-mat-arquivo="${m.id}" value="${escapeAttr(m.arquivo_url||'')}" placeholder="URL do arquivo" style="margin-bottom:4px">
+                  <input class="ps-input" data-clube-mat-link="${m.id}" value="${escapeAttr(m.link_url||'')}" placeholder="URL do link">
+                </td>
+                <td><button class="btn-mini danger" data-clube-mat-del="${m.id}">${icon('trash')} Remover</button></td>
+              </tr>
+            `).join('') || `<tr><td colspan="5" style="color:var(--text-mute)">Nenhum material cadastrado ainda.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+      <div class="add-form">
+        <div class="field full"><label>Título do material</label><input class="ps-input" type="text" id="new-clube-mat-titulo" placeholder="Ex.: Mapa mental — Capítulo 1"></div>
+        <div class="field"><label>Tipo</label>
+          <select class="ps-input" id="new-clube-mat-tipo">
+            ${Object.entries(CLUBE_TIPO_MATERIAL).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field"><label>Capítulo</label>
+          <select class="ps-input" id="new-clube-mat-cap">
+            <option value="">Geral (não ligado a um capítulo)</option>
+            ${caps.map(c=>`<option value="${c.id}">Capítulo ${c.numero}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field full"><label>URL do arquivo (PDF, imagem etc. — opcional)</label><input class="ps-input" type="text" id="new-clube-mat-arquivo" placeholder="https://..."></div>
+        <div class="field full"><label>URL do link (página externa — opcional)</label><input class="ps-input" type="text" id="new-clube-mat-link" placeholder="https://..."></div>
+        <div class="actions"><button class="btn-accent" id="add-clube-mat-btn">${icon('upload')} Adicionar material</button></div>
+      </div>
+
+      <h3 class="section-title" style="margin-top:18px">${icon('calendar','tiny')} Encontros ao vivo — ${escapeHtml(livroSel.titulo)}</h3>
+      <div class="table-wrap">
+        <table class="check-table">
+          <thead><tr><th>Título</th><th>Capítulo</th><th>Data/hora</th><th>Link</th><th></th></tr></thead>
+          <tbody>
+            ${encs.map(e=>`
+              <tr>
+                <td style="min-width:160px"><input class="ps-input" data-clube-enc-titulo="${e.id}" value="${escapeAttr(e.titulo)}"></td>
+                <td>
+                  <select class="ps-input" data-clube-enc-cap="${e.id}">
+                    <option value="">Geral</option>
+                    ${caps.map(c=>`<option value="${c.id}" ${e.capitulo_id===c.id?'selected':''}>Capítulo ${c.numero}</option>`).join('')}
+                  </select>
+                </td>
+                <td><input class="ps-input" type="datetime-local" data-clube-enc-data="${e.id}" value="${toDatetimeLocal(e.data_hora)}"></td>
+                <td style="min-width:160px"><input class="ps-input" data-clube-enc-link="${e.id}" value="${escapeAttr(e.link_url||'')}" placeholder="https://..."></td>
+                <td><button class="btn-mini danger" data-clube-enc-del="${e.id}">${icon('trash')} Remover</button></td>
+              </tr>
+            `).join('') || `<tr><td colspan="5" style="color:var(--text-mute)">Nenhum encontro agendado ainda.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+      <div class="add-form">
+        <div class="field full"><label>Título do encontro</label><input class="ps-input" type="text" id="new-clube-enc-titulo" placeholder="Encontro ao vivo" value="Encontro ao vivo"></div>
+        <div class="field"><label>Capítulo</label>
+          <select class="ps-input" id="new-clube-enc-cap">
+            <option value="">Geral</option>
+            ${caps.map(c=>`<option value="${c.id}">Capítulo ${c.numero}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field"><label>Data e hora</label><input class="ps-input" type="datetime-local" id="new-clube-enc-data"></div>
+        <div class="field full"><label>Link (opcional)</label><input class="ps-input" type="text" id="new-clube-enc-link" placeholder="https://..."></div>
+        <div class="actions"><button class="btn-accent" id="add-clube-enc-btn">${icon('upload')} Agendar encontro</button></div>
+      </div>
+
+      <h3 class="section-title" style="margin-top:18px">${icon('comment','tiny')} Mesa de leitores — moderação</h3>
+      <p class="section-sub" style="margin-top:-6px">Marque uma publicação como "Conversa da semana" para destacá-la no painel do aluno. Para excluir uma publicação ou resposta inadequada, abra a Mesa de leitores (como equipe interna) e use o ícone de lixeira.</p>
+      <div class="table-wrap">
+        <table class="check-table">
+          <thead><tr><th>Autor</th><th>Tipo</th><th>Texto</th><th>Destaque da semana</th></tr></thead>
+          <tbody>
+            ${postsDoLivro.map(p=>{
+              const autor = clubeAutor(p.autor_id);
+              return `
+              <tr>
+                <td style="min-width:140px">${escapeHtml(autor.name)}</td>
+                <td><span class="resp-pill">${CLUBE_TIPO_POST[p.tipo]||'Publicação'}</span></td>
+                <td style="min-width:220px;color:var(--text-mute)">${escapeHtml((p.texto||'').slice(0,100))}${(p.texto||'').length>100?'…':''}</td>
+                <td><button class="btn-mini ${p.destaque_semana?'active':''}" data-clube-post-destaque="${p.id}">${p.destaque_semana? 'Remover destaque' : 'Marcar como destaque'}</button></td>
+              </tr>`;
+            }).join('') || `<tr><td colspan="4" style="color:var(--text-mute)">Nenhuma publicação ainda.</td></tr>`}
+          </tbody>
+        </table>
+      </div>`;
+    })()}
+    ` : ''}
   `;
   bindConteudoCourseEvents();
   bindCursoModuloAdmin();
   bindCursoAulaAdmin();
   bindConteudoPalestraModelosEvents();
+  bindConteudoClubeEvents();
   document.getElementById('comunicado-save-btn').addEventListener('click', async ()=>{
     const texto = document.getElementById('comunicado-texto').value.trim();
     const ativo = document.getElementById('comunicado-ativo').checked;
@@ -17882,6 +19234,266 @@ function renderConteudo(){
       LIVE_SESSIONS.push(mapLiveSessionRow(row));
       renderConteudo();
     }catch(e){ console.error(e); btn.disabled = false; }
+  });
+}
+
+function bindConteudoClubeEvents(){
+  const root = document.getElementById('view-conteudo');
+  if(!CLUBE_LIVROS.length){
+    const addBtn = document.getElementById('add-clube-livro-btn');
+    if(addBtn) addBtn.addEventListener('click', async ()=>{
+      const titulo = document.getElementById('new-clube-livro-titulo').value.trim();
+      const subtitulo = document.getElementById('new-clube-livro-subtitulo').value.trim();
+      if(!titulo) return;
+      addBtn.disabled = true;
+      try{
+        const row = await syncClubeLivroInsert({titulo, subtitulo, status:'em_estudo', ordem: CLUBE_LIVROS.length});
+        CLUBE_LIVROS.push(row);
+        conteudoClubeLivroId = row.id;
+        renderConteudo();
+      }catch(e){ console.error(e); alert('Não foi possível cadastrar o livro.'); addBtn.disabled = false; }
+    });
+    return;
+  }
+  root.querySelectorAll('[data-clube-livro-titulo]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const l = clubeGetLivro(inp.dataset.clubeLivroTitulo); if(!l) return;
+      l.titulo = inp.value.trim(); syncClubeLivroUpdate(l.id, {titulo:l.titulo});
+    });
+  });
+  root.querySelectorAll('[data-clube-livro-subtitulo]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const l = clubeGetLivro(inp.dataset.clubeLivroSubtitulo); if(!l) return;
+      l.subtitulo = inp.value.trim(); syncClubeLivroUpdate(l.id, {subtitulo:l.subtitulo});
+    });
+  });
+  root.querySelectorAll('[data-clube-livro-status]').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const l = clubeGetLivro(sel.dataset.clubeLivroStatus); if(!l) return;
+      l.status = sel.value; syncClubeLivroUpdate(l.id, {status:l.status});
+    });
+  });
+  root.querySelectorAll('[data-clube-livro-ordem]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const l = clubeGetLivro(inp.dataset.clubeLivroOrdem); if(!l) return;
+      l.ordem = parseInt(inp.value,10) || 0; syncClubeLivroUpdate(l.id, {ordem:l.ordem});
+    });
+  });
+  root.querySelectorAll('[data-clube-livro-capa]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const l = clubeGetLivro(inp.dataset.clubeLivroCapa); if(!l) return;
+      l.capa_url = inp.value.trim() || null; syncClubeLivroUpdate(l.id, {capa_url:l.capa_url});
+    });
+  });
+  root.querySelectorAll('[data-clube-livro-comprar]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const l = clubeGetLivro(inp.dataset.clubeLivroComprar); if(!l) return;
+      l.onde_comprar_url = inp.value.trim() || null; syncClubeLivroUpdate(l.id, {onde_comprar_url:l.onde_comprar_url});
+    });
+  });
+  root.querySelectorAll('[data-clube-livro-sobre]').forEach(ta=>{
+    ta.addEventListener('change', ()=>{
+      const l = clubeGetLivro(ta.dataset.clubeLivroSobre); if(!l) return;
+      l.sobre_livro = ta.value.trim(); syncClubeLivroUpdate(l.id, {sobre_livro:l.sobre_livro});
+    });
+  });
+  root.querySelectorAll('[data-clube-livro-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(!confirmDelete('Remover este livro do Clube? Capítulos, materiais, encontros e publicações ligados a ele também serão removidos. Essa ação não pode ser desfeita.')) return;
+      const id = btn.dataset.clubeLivroDel;
+      syncClubeLivroDelete(id);
+      CLUBE_LIVROS = CLUBE_LIVROS.filter(l=>l.id!==id);
+      const capIds = new Set(CLUBE_CAPITULOS.filter(c=>c.livro_id===id).map(c=>c.id));
+      CLUBE_CAPITULOS = CLUBE_CAPITULOS.filter(c=>c.livro_id!==id);
+      CLUBE_MATERIAIS = CLUBE_MATERIAIS.filter(m=>m.livro_id!==id);
+      CLUBE_ENCONTROS = CLUBE_ENCONTROS.filter(e=>e.livro_id!==id);
+      CLUBE_POSTS = CLUBE_POSTS.filter(p=>p.livro_id!==id);
+      CLUBE_ATIVIDADES = CLUBE_ATIVIDADES.filter(a=>!capIds.has(a.capitulo_id));
+      CLUBE_PROGRESSO = CLUBE_PROGRESSO.filter(p=>!capIds.has(p.capitulo_id));
+      if(conteudoClubeLivroId===id) conteudoClubeLivroId = null;
+      renderConteudo();
+    });
+  });
+  const addLivroBtn = document.getElementById('add-clube-livro-btn');
+  if(addLivroBtn) addLivroBtn.addEventListener('click', async ()=>{
+    const titulo = document.getElementById('new-clube-livro-titulo').value.trim();
+    const subtitulo = document.getElementById('new-clube-livro-subtitulo').value.trim();
+    if(!titulo) return;
+    addLivroBtn.disabled = true;
+    try{
+      const row = await syncClubeLivroInsert({titulo, subtitulo, status:'planejado', ordem: CLUBE_LIVROS.length});
+      CLUBE_LIVROS.push(row);
+      renderConteudo();
+    }catch(e){ console.error(e); alert('Não foi possível cadastrar o livro.'); addLivroBtn.disabled = false; }
+  });
+  const livroSelect = document.getElementById('clube-admin-livro-select');
+  if(livroSelect) livroSelect.addEventListener('change', ()=>{ conteudoClubeLivroId = livroSelect.value; renderConteudo(); });
+
+  root.querySelectorAll('[data-clube-cap-numero]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const c = CLUBE_CAPITULOS.find(x=>x.id===inp.dataset.clubeCapNumero); if(!c) return;
+      c.numero = parseInt(inp.value,10) || 0; syncClubeCapituloUpdate(c.id, {numero:c.numero});
+    });
+  });
+  root.querySelectorAll('[data-clube-cap-titulo]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const c = CLUBE_CAPITULOS.find(x=>x.id===inp.dataset.clubeCapTitulo); if(!c) return;
+      c.titulo = inp.value.trim(); syncClubeCapituloUpdate(c.id, {titulo:c.titulo});
+    });
+  });
+  root.querySelectorAll('[data-clube-cap-ordem]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const c = CLUBE_CAPITULOS.find(x=>x.id===inp.dataset.clubeCapOrdem); if(!c) return;
+      c.ordem = parseInt(inp.value,10) || 0; syncClubeCapituloUpdate(c.id, {ordem:c.ordem});
+    });
+  });
+  root.querySelectorAll('[data-clube-cap-texto]').forEach(ta=>{
+    ta.addEventListener('change', ()=>{
+      const c = CLUBE_CAPITULOS.find(x=>x.id===ta.dataset.clubeCapTexto); if(!c) return;
+      c.texto_estudo = ta.value.trim(); syncClubeCapituloUpdate(c.id, {texto_estudo:c.texto_estudo});
+    });
+  });
+  root.querySelectorAll('[data-clube-cap-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(!confirmDelete('Remover este capítulo? Materiais e progresso ligados a ele também serão removidos. Essa ação não pode ser desfeita.')) return;
+      const id = btn.dataset.clubeCapDel;
+      syncClubeCapituloDelete(id);
+      CLUBE_CAPITULOS = CLUBE_CAPITULOS.filter(c=>c.id!==id);
+      CLUBE_MATERIAIS = CLUBE_MATERIAIS.filter(m=>m.capitulo_id!==id);
+      CLUBE_ATIVIDADES = CLUBE_ATIVIDADES.filter(a=>a.capitulo_id!==id);
+      CLUBE_PROGRESSO = CLUBE_PROGRESSO.filter(p=>p.capitulo_id!==id);
+      renderConteudo();
+    });
+  });
+  const addCapBtn = document.getElementById('add-clube-cap-btn');
+  if(addCapBtn) addCapBtn.addEventListener('click', async ()=>{
+    const livroSel = clubeGetLivro(conteudoClubeLivroId) || CLUBE_LIVROS[0];
+    const numero = parseInt(document.getElementById('new-clube-cap-numero').value,10);
+    const titulo = document.getElementById('new-clube-cap-titulo').value.trim();
+    if(!numero){ alert('Informe o número do capítulo.'); return; }
+    addCapBtn.disabled = true;
+    try{
+      const caps = clubeCapitulosDoLivro(livroSel.id);
+      const row = await syncClubeCapituloInsert({livro_id:livroSel.id, numero, titulo, ordem:caps.length});
+      CLUBE_CAPITULOS.push(row);
+      renderConteudo();
+    }catch(e){ console.error(e); alert('Não foi possível adicionar o capítulo (verifique se já existe outro com o mesmo número).'); addCapBtn.disabled = false; }
+  });
+
+  root.querySelectorAll('[data-clube-mat-titulo]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const m = CLUBE_MATERIAIS.find(x=>x.id===inp.dataset.clubeMatTitulo); if(!m) return;
+      m.titulo = inp.value.trim(); syncClubeMaterialUpdate(m.id, {titulo:m.titulo});
+    });
+  });
+  root.querySelectorAll('[data-clube-mat-tipo]').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const m = CLUBE_MATERIAIS.find(x=>x.id===sel.dataset.clubeMatTipo); if(!m) return;
+      m.tipo = sel.value; syncClubeMaterialUpdate(m.id, {tipo:m.tipo});
+      renderConteudo();
+    });
+  });
+  root.querySelectorAll('[data-clube-mat-cap]').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const m = CLUBE_MATERIAIS.find(x=>x.id===sel.dataset.clubeMatCap); if(!m) return;
+      m.capitulo_id = sel.value || null; syncClubeMaterialUpdate(m.id, {capitulo_id:m.capitulo_id});
+    });
+  });
+  root.querySelectorAll('[data-clube-mat-arquivo]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const m = CLUBE_MATERIAIS.find(x=>x.id===inp.dataset.clubeMatArquivo); if(!m) return;
+      m.arquivo_url = inp.value.trim() || null; syncClubeMaterialUpdate(m.id, {arquivo_url:m.arquivo_url});
+    });
+  });
+  root.querySelectorAll('[data-clube-mat-link]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const m = CLUBE_MATERIAIS.find(x=>x.id===inp.dataset.clubeMatLink); if(!m) return;
+      m.link_url = inp.value.trim() || null; syncClubeMaterialUpdate(m.id, {link_url:m.link_url});
+    });
+  });
+  root.querySelectorAll('[data-clube-mat-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(!confirmDelete('Remover este material? Essa ação não pode ser desfeita.')) return;
+      const id = btn.dataset.clubeMatDel;
+      syncClubeMaterialDelete(id);
+      CLUBE_MATERIAIS = CLUBE_MATERIAIS.filter(m=>m.id!==id);
+      CLUBE_MATERIAL_FAVORITOS.delete(id);
+      renderConteudo();
+    });
+  });
+  const addMatBtn = document.getElementById('add-clube-mat-btn');
+  if(addMatBtn) addMatBtn.addEventListener('click', async ()=>{
+    const livroSel = clubeGetLivro(conteudoClubeLivroId) || CLUBE_LIVROS[0];
+    const titulo = document.getElementById('new-clube-mat-titulo').value.trim();
+    const tipo = document.getElementById('new-clube-mat-tipo').value;
+    const capId = document.getElementById('new-clube-mat-cap').value || null;
+    const arquivo_url = document.getElementById('new-clube-mat-arquivo').value.trim() || null;
+    const link_url = document.getElementById('new-clube-mat-link').value.trim() || null;
+    if(!titulo) return;
+    addMatBtn.disabled = true;
+    try{
+      const row = await syncClubeMaterialInsert({livro_id:livroSel.id, capitulo_id:capId, tipo, titulo, arquivo_url, link_url, ordem: CLUBE_MATERIAIS.length});
+      CLUBE_MATERIAIS.push(row);
+      renderConteudo();
+    }catch(e){ console.error(e); alert('Não foi possível adicionar o material.'); addMatBtn.disabled = false; }
+  });
+
+  root.querySelectorAll('[data-clube-enc-titulo]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const e = CLUBE_ENCONTROS.find(x=>x.id===inp.dataset.clubeEncTitulo); if(!e) return;
+      e.titulo = inp.value.trim(); syncClubeEncontroUpdate(e.id, {titulo:e.titulo});
+    });
+  });
+  root.querySelectorAll('[data-clube-enc-cap]').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const e = CLUBE_ENCONTROS.find(x=>x.id===sel.dataset.clubeEncCap); if(!e) return;
+      e.capitulo_id = sel.value || null; syncClubeEncontroUpdate(e.id, {capitulo_id:e.capitulo_id});
+    });
+  });
+  root.querySelectorAll('[data-clube-enc-data]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const e = CLUBE_ENCONTROS.find(x=>x.id===inp.dataset.clubeEncData); if(!e || !inp.value) return;
+      e.data_hora = new Date(inp.value).toISOString(); syncClubeEncontroUpdate(e.id, {data_hora:e.data_hora});
+    });
+  });
+  root.querySelectorAll('[data-clube-enc-link]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const e = CLUBE_ENCONTROS.find(x=>x.id===inp.dataset.clubeEncLink); if(!e) return;
+      e.link_url = inp.value.trim() || null; syncClubeEncontroUpdate(e.id, {link_url:e.link_url});
+    });
+  });
+  root.querySelectorAll('[data-clube-enc-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(!confirmDelete('Remover este encontro? Essa ação não pode ser desfeita.')) return;
+      const id = btn.dataset.clubeEncDel;
+      syncClubeEncontroDelete(id);
+      CLUBE_ENCONTROS = CLUBE_ENCONTROS.filter(e=>e.id!==id);
+      renderConteudo();
+    });
+  });
+  const addEncBtn = document.getElementById('add-clube-enc-btn');
+  if(addEncBtn) addEncBtn.addEventListener('click', async ()=>{
+    const livroSel = clubeGetLivro(conteudoClubeLivroId) || CLUBE_LIVROS[0];
+    const titulo = document.getElementById('new-clube-enc-titulo').value.trim() || 'Encontro ao vivo';
+    const capId = document.getElementById('new-clube-enc-cap').value || null;
+    const dataVal = document.getElementById('new-clube-enc-data').value;
+    const link_url = document.getElementById('new-clube-enc-link').value.trim() || null;
+    if(!dataVal){ alert('Informe a data e hora do encontro.'); return; }
+    addEncBtn.disabled = true;
+    try{
+      const row = await syncClubeEncontroInsert({livro_id:livroSel.id, capitulo_id:capId, titulo, data_hora:new Date(dataVal).toISOString(), link_url});
+      CLUBE_ENCONTROS.push(row);
+      renderConteudo();
+    }catch(e){ console.error(e); alert('Não foi possível agendar o encontro.'); addEncBtn.disabled = false; }
+  });
+
+  root.querySelectorAll('[data-clube-post-destaque]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const p = CLUBE_POSTS.find(x=>x.id===btn.dataset.clubePostDestaque); if(!p) return;
+      p.destaque_semana = !p.destaque_semana;
+      syncClubePostDestaqueToggle(p.id, p.destaque_semana);
+      renderConteudo();
+    });
   });
 }
 
@@ -18520,6 +20132,7 @@ function tierSelectHtml(s){
     <option value="mentorado" ${atual==='mentorado'?'selected':''}>Mentorado</option>
     <option value="formacao" ${atual==='formacao'?'selected':''}>Aluno Formação</option>
     <option value="pgncc" ${atual==='pgncc'?'selected':''}>Aluno PGNCC</option>
+    <option value="clube_livro" ${atual==='clube_livro'?'selected':''}>Clube do Livro (só o Clube)</option>
   </select>
   <div class="extra-programs" title="Marque se este aluno também tem acesso ao conteúdo do outro programa, além da categoria acima (ex.: matriculado nos dois ao mesmo tempo).">
     <label><input type="checkbox" data-extra-program="${s.id}" data-program="formacao" ${(extra.includes('formacao')||atual==='formacao')?'checked':''} ${atual==='formacao'?'disabled':''}> também Formação</label>
@@ -18785,13 +20398,14 @@ function renderVisaoGeral(){
     </div>
 
     <h2 class="section-title" style="margin-top:28px">${icon('idcard')} Códigos de Acesso</h2>
-    <p class="section-sub" style="margin-top:-6px">Gere um código e passe pra pessoa usar na aba "Criar conta". Cada código só pode ser usado uma vez e já define o acesso da conta nova: Mentoria (mentorado), Formação ou PGNCC.</p>
+    <p class="section-sub" style="margin-top:-6px">Gere um código e passe pra pessoa usar na aba "Criar conta". Cada código só pode ser usado uma vez e já define o acesso da conta nova: Mentoria (mentorado), Formação, PGNCC ou Clube do Livro. Uma conta criada como "Clube do Livro" só enxerga o Clube — o resto da plataforma fica bloqueado pra ela.</p>
     <div class="add-form">
       <div class="field"><label>Tipo de acesso</label>
         <select class="ps-input" id="new-code-tier">
           <option value="mentorado">Mentoria (mentorado)</option>
           <option value="formacao">Formação</option>
           <option value="pgncc">PGNCC</option>
+          <option value="clube_livro">Clube do Livro (só o Clube)</option>
         </select>
       </div>
       <div class="field full"><label>Identificação (opcional)</label><input class="ps-input" type="text" id="new-code-label" placeholder="Ex.: nome de quem vai usar, ou turma"></div>
@@ -18807,7 +20421,7 @@ function renderVisaoGeral(){
             return `
             <tr>
               <td style="font-family:monospace;font-weight:600;white-space:nowrap">${escapeHtml(c.code)}</td>
-              <td><span class="resp-pill">${c.tier==='curso'? (c.bonus? 'Método + Bônus' : 'Método') : c.tier==='formacao'? 'Formação' : c.tier==='pgncc'? 'PGNCC' : 'Mentoria'}</span></td>
+              <td><span class="resp-pill">${c.tier==='curso'? (c.bonus? 'Método + Bônus' : 'Método') : c.tier==='formacao'? 'Formação' : c.tier==='pgncc'? 'PGNCC' : c.tier==='clube_livro'? 'Clube do Livro' : 'Mentoria'}</span></td>
               <td>${escapeHtml(c.label||'—')}</td>
               <td>${used ? `<span class="pill replay">Usado por ${escapeHtml(usedPerson)}</span>` : '<span class="pill live">Disponível</span>'}</td>
               <td>

@@ -230,6 +230,27 @@
   .btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
   .btn-primary.staff{background:linear-gradient(135deg,var(--danger),#fb7185);}
   .login-note{margin-top:16px;font-size:12px;color:var(--text-mute);line-height:1.5;}
+  .login-demo-cta{margin-top:18px;padding-top:16px;border-top:1px solid var(--border);text-align:center;}
+  .login-demo-cta .link-btn{font-size:13px;font-weight:700;}
+  /* ---- Modo demonstração: seletor de perfil (modal) e faixa fixa enquanto o visitante navega ---- */
+  .demo-perfil-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:16px;}
+  @media (min-width:620px){ .demo-perfil-grid{grid-template-columns:1fr 1fr 1fr;} }
+  .demo-perfil-card{text-align:left;border:1px solid var(--border);border-radius:14px;padding:16px;background:var(--bg-card);cursor:pointer;transition:border-color .15s,transform .15s;}
+  .demo-perfil-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .demo-perfil-card .dp-icon{width:36px;height:36px;border-radius:10px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+  .demo-perfil-card .dp-icon svg{width:18px;height:18px;}
+  .demo-perfil-card h3{font-size:14.5px;margin-bottom:6px;}
+  .demo-perfil-card p{font-size:12.5px;color:var(--text-dim);line-height:1.45;}
+  /* Sem position:fixed de propósito: fica em fluxo normal, como um elemento comum ANTES de #app no
+     HTML (ver enterDemoMode), empurrando a plataforma pra baixo sem precisar saber nada sobre o layout
+     interno dela (sidebar sticky, topbar sticky etc.) — zero risco de sobrepor ou cortar a barra
+     superior de verdade. */
+  #demo-banner{display:none;background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;padding:9px 16px;font-size:13px;font-weight:600;}
+  #demo-banner .icon{width:15px;height:15px;flex-shrink:0;}
+  #demo-banner span.dica{font-weight:400;opacity:.92;}
+  #demo-banner button{background:#fff;color:var(--accent);border:none;border-radius:8px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer;}
+  body.demo-ativo #demo-banner{display:flex;}
+  @media (max-width:640px){ #demo-banner{font-size:12px;padding:8px 10px;} }
   .login-tabs{display:flex;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:4px;gap:4px;margin:22px 0 24px;}
   .login-tabs button{flex:1;padding:10px;border-radius:9px;font-size:12.5px;font-weight:700;color:var(--text-dim);display:flex;align-items:center;justify-content:center;gap:6px;}
   .login-tabs button .icon{width:14px;height:14px;}
@@ -1785,7 +1806,17 @@
       <button class="btn-primary" id="signup-btn">Criar conta</button>
       <p class="login-note">Peça o código de acesso para a equipe interna. Ele define automaticamente o tipo da sua conta: Mentoria, Formação ou PGNCC.</p>
     </div>
+
+    <div class="login-demo-cta">
+      <button type="button" class="link-btn" id="login-demo-link">Conhecer a plataforma antes de criar conta</button>
+    </div>
   </div>
+</div>
+
+<!-- ============ MODO DEMONSTRAÇÃO: faixa no topo da plataforma (ver enterDemoMode/exitDemoMode) ============ -->
+<div id="demo-banner">
+  <span class="dica" id="demo-banner-texto">Modo demonstração — perfil fictício, nada aqui é salvo de verdade.</span>
+  <button type="button" id="demo-banner-sair">Sair da demonstração</button>
 </div>
 
 <!-- ============ APP ============ -->
@@ -1966,7 +1997,11 @@ if(/^COLE_AQUI/.test(SUPABASE_URL) || /^COLE_AQUI/.test(SUPABASE_KEY)){
   });
   throw new Error('Configure SUPABASE_URL e SUPABASE_KEY (veja README.md)');
 }
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+/* 'let' (não 'const'): o Modo demonstração troca esse cliente por um simulado (ver createDemoClient,
+   mais abaixo) para a sessão inteira, sem precisar alterar nenhum dos centenas de lugares que chamam
+   sb.from(...)/sb.storage/sb.auth/sb.rpc/sb.functions pelo código — todos continuam enxergando o mesmo
+   identificador global "sb". */
+let sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 document.addEventListener('DOMContentLoaded', ()=>{
   document.querySelectorAll('[data-config-link=\"prontuario\"]').forEach(a=>{ a.href = CONFIG_LINK_PRONTUARIO || '#'; });
   document.querySelectorAll('[data-config-link=\"neurotodasidades\"]').forEach(a=>{ a.href = CONFIG_LINK_NEUROTODASIDADES || '#'; });
@@ -8301,6 +8336,14 @@ let currentUser = null;      // usuário autenticado no Supabase
 let currentUserRole = null;  // papel REAL da conta ('aluno'|'staff') — não confundir com currentRole (visualização atual)
 let currentUserProfile = null; // linha de profiles do próprio usuário logado (fallback quando não há mentorados)
 
+/* ================= MODO DEMONSTRAÇÃO (visitante sem conta, "Conhecer a plataforma") =================
+   Deixa quem ainda não é aluno navegar pela plataforma de verdade, com um perfil fictício (escolhido na
+   hora), para conhecer como funciona antes de comprar — sem nunca mostrar conteúdo real de nenhum aluno
+   e sem gravar nada no banco de dados de verdade. Ver bootstrapDemoData() e createDemoClient() mais
+   abaixo, e enterDemoMode()/exitDemoMode() perto do final do arquivo. */
+let DEMO_MODE = false;
+let DEMO_TIER = null; // 'mentorado' | 'curso' | 'clube_livro' — tier escolhido pelo visitante na entrada
+
 /* Quem efetivamente assina uma publicação/comentário/curtida na Comunidade:
    - aluno logado → ele mesmo (currentStudentId já é o próprio auth.uid());
    - equipe interna → a própria conta da equipe interna (NUNCA o aluno selecionado em "Visão Geral"),
@@ -8421,6 +8464,10 @@ function withTimeout(promise, ms){
 }
 
 async function bootstrapData(){
+  /* Se alguma chamada acabar disparando um recarregamento dos dados durante o Modo demonstração (ex.:
+     um fluxo que chama bootstrapData() de novo), não deixa isso tentar ler o Supabase de verdade com o
+     cliente simulado nem apagar o conteúdo fictício já carregado — simplesmente re-semeia a demonstração. */
+  if(DEMO_MODE) return bootstrapDemoData(DEMO_TIER);
   const PROFILE_SELECT = '*, student_cadastro(*), diagnostico(*), module_progress(*), checklist_items(*), sessions(*), contatos(*), course_progress(*)';
   const { data: profiles, error: perr } = await sb.from('profiles').select(PROFILE_SELECT).order('name');
   if(perr) throw perr;
@@ -9793,6 +9840,8 @@ function renderLogin(){
       errEl.textContent = 'Conta criada, mas não foi possível carregar seus dados agora. Tente entrar novamente.'; errEl.style.display='block';
     }
   });
+
+  document.getElementById('login-demo-link').addEventListener('click', openDemoPerfilModal);
 }
 
 /* ================= NAV / SHELL ================= */
@@ -9904,6 +9953,14 @@ function setupNav(){
   document.getElementById('nav-prontuarios').addEventListener('click',(e)=>{
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-backdrop').classList.remove('open');
+    /* No Modo demonstração, Ferramentas NCC é outro sistema de verdade fora desta plataforma — em vez
+       de abrir esse link real pra quem está só conhecendo (ou tentar simular um sistema inteiro que
+       não faz parte deste arquivo), mostra uma explicação no mesmo padrão das telas de bloqueio. */
+    if(DEMO_MODE){
+      e.preventDefault();
+      openBloqueioMentoradosModal('Ferramentas NCC', 'Ferramentas NCC integra pesquisa científica, explicações sobre o cérebro da criança e recursos para sua prática profissional, com base nos materiais do NCC e nas evidências mais atuais da neurociência. No modo de demonstração não é possível abrir esse link de verdade — essa área faz parte da sua conta depois de assinar.');
+      return;
+    }
     if(e.currentTarget.dataset.locked){
       e.preventDefault();
       openBloqueioMentoradosModal('Ferramentas NCC', 'Ferramentas NCC integra pesquisa científica, explicações sobre o cérebro da criança e recursos para sua prática profissional, com base nos materiais do NCC e nas evidências mais atuais da neurociência.');
@@ -22376,6 +22433,316 @@ sb.auth.onAuthStateChange((event, session)=>{
 /* Ao recarregar a página, tenta restaurar a sessão que o Supabase já mantém salva no navegador antes de
    mostrar a tela de login — sem isso, todo F5 derrubava a pessoa pra tela de login mesmo com uma sessão
    ainda válida. Se não houver sessão (ou não conseguir restaurar), cai no fluxo normal de login. */
+/* ================= MODO DEMONSTRAÇÃO ("Conhecer a plataforma") =================
+   Deixa quem ainda não é aluno explorar a plataforma de verdade — mesma interface, mesmas travas por
+   tier — com um perfil fictício escolhido na hora, sem nunca mostrar conteúdo real de nenhum aluno e
+   sem gravar nada no banco de dados de verdade (ver createDemoClient, mais abaixo: troca o cliente
+   Supabase por um simulado que só finge salvar enquanto a aba estiver aberta).
+   DEMO_MODE/DEMO_TIER e o "let sb" ficam declarados mais acima, perto de currentUser. */
+const DEMO_STUDENT_ID = 'demo-eu';
+const DEMO_COLEGA1_ID = 'demo-colega-1';
+const DEMO_COLEGA2_ID = 'demo-colega-2';
+const DEMO_STAFF_ID = 'demo-equipe';
+
+let _demoIdSeq = 0;
+function demoId(prefix){ return 'demo-'+(prefix||'row')+'-'+Date.now().toString(36)+'-'+(_demoIdSeq++); }
+/* Datas relativas a "agora", pra demonstração sempre parecer atual (ex.: próximo encontro ao vivo
+   daqui a alguns dias) independente de quando for aberta. offsetDias negativo = no passado. */
+function demoISO(offsetDias){ const d = new Date(); d.setDate(d.getDate()+offsetDias); return d.toISOString(); }
+function demoDateStr(offsetDias){ return demoISO(offsetDias).slice(0,10); }
+/* Imagem de exemplo (capa de livro, foto de briefing etc.) — um SVG simples gerado na hora, só pra não
+   deixar nenhum <img> quebrado; nunca é um arquivo real de ninguém. */
+function demoPlaceholderImg(label){
+  const safe = String(label||'demo').slice(0,18);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320"><rect width="100%" height="100%" fill="#ddd6fe"/><text x="50%" y="50%" font-family="sans-serif" font-size="26" fill="#4f46e5" text-anchor="middle" dominant-baseline="middle">${safe}</text></svg>`;
+  try{ return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg))); }
+  catch(e){ return ''; }
+}
+
+const DEMO_PERFIS = [
+  { tier:'mentorado', icone:'compass', titulo:'Mentoria NCC', texto:'Acesso completo: Aulas, Comunidade, Agenda ao Vivo, Clube do Livro, Biblioteca Científica, Painel Profissional, Estúdio de Palestras, Projeto Acadêmico e Biblioteca de Negócios.' },
+  { tier:'curso', icone:'film', titulo:'Curso Gravado (Método)', texto:'Aulas do Método, Comunidade própria do curso, Clube do Livro e Biblioteca Científica. As áreas exclusivas da Mentoria aparecem com um cadeado, como numa conta real.' },
+  { tier:'clube_livro', icone:'book', titulo:'Somente Clube do Livro', texto:'Acesso só ao Clube do Livro. As demais áreas aparecem bloqueadas no menu, exatamente como numa conta real cadastrada só no Clube.' },
+];
+
+function openDemoPerfilModal(){
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal" style="max-width:640px">
+      <h2 class="section-title">${icon('compass')} Conhecer a plataforma</h2>
+      <p class="section-sub">Escolha um perfil pra explorar a plataforma como ela realmente é. É só pra conhecer: nada que você fizer aqui fica salvo, e nenhum conteúdo de aluno de verdade aparece — tudo que você vai ver é fictício, só pra mostrar como cada área funciona.</p>
+      <div class="demo-perfil-grid">
+        ${DEMO_PERFIS.map(p=>`
+          <button type="button" class="demo-perfil-card" data-demo-tier="${p.tier}">
+            <div class="dp-icon">${icon(p.icone)}</div>
+            <h3>${escapeHtml(p.titulo)}</h3>
+            <p>${escapeHtml(p.texto)}</p>
+          </button>
+        `).join('')}
+      </div>
+      <p class="section-sub" style="margin-top:14px;font-size:12px;">A Ferramentas NCC é outro sistema, fora desta plataforma — no modo demonstração, o item do menu mostra uma explicação em vez de abrir o link de verdade.</p>
+    </div>`;
+  modalReturnTo = null;
+  modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.querySelectorAll('#modal [data-demo-tier]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.getElementById('modal-backdrop').classList.remove('open');
+      enterDemoMode(btn.dataset.demoTier);
+    });
+  });
+}
+
+function enterDemoMode(tier){
+  DEMO_MODE = true;
+  DEMO_TIER = tier;
+  sb = createDemoClient();
+  bootstrapDemoData(tier);
+  currentUser = { id: DEMO_STUDENT_ID };
+  currentUserRole = 'aluno';
+  currentUserProfile = null;
+  currentStudentId = DEMO_STUDENT_ID;
+  document.body.classList.add('demo-ativo');
+  const nomesPerfil = { mentorado:'Mentoria NCC', curso:'Curso Gravado (Método)', clube_livro:'Clube do Livro' };
+  const textoEl = document.getElementById('demo-banner-texto');
+  if(textoEl) textoEl.textContent = `Modo demonstração — perfil fictício "${nomesPerfil[tier]||tier}". Nada aqui é salvo de verdade.`;
+  enterApp();
+}
+
+function exitDemoMode(){
+  /* Recarregar é de propósito: garante que nenhum resquício do estado fictício (sb trocado, arrays
+     globais semeados, currentUser fictício etc.) sobra pra uma próxima visita nessa mesma aba — volta
+     limpo pra tela de login de verdade. */
+  window.location.reload();
+}
+
+/* ---- Cliente Supabase simulado: insert/update/upsert/delete "funcionam" (devolvem um resultado
+   plausível, com id/datas gerados), mas nada é persistido — some ao recarregar a página. Leituras
+   (.select sem ter vindo de um insert/update/upsert na mesma chamada) sempre devolvem vazio, porque o
+   conteúdo do Modo demonstração já é semeado direto nos arrays globais (ver bootstrapDemoData) sem
+   passar pelo Supabase — é assim que o resto do código (que só lê desses arrays em memória, nunca
+   re-busca no banco depois de montar a tela) já funciona normalmente pro aluno de verdade também. */
+function createDemoClient(){
+  const demoBlobUrls = {}; // "bucket/path" -> URL (blob: do arquivo escolhido, ou um placeholder)
+  function makeBuilder(table){
+    let _single=false, _maybeSingle=false, _isWrite=false, _result=null;
+    const builder = {
+      select(){ return builder; },
+      insert(payload){
+        const rows = (Array.isArray(payload)?payload:[payload]).map(r=>({
+          id:(r&&r.id)||demoId(table), created_at:new Date().toISOString(), updated_at:new Date().toISOString(), ...r,
+        }));
+        _result = { data: rows, error: null }; _isWrite = true; return builder;
+      },
+      update(payload){ _result = { data:[{ ...payload, updated_at:new Date().toISOString() }], error:null }; _isWrite = true; return builder; },
+      upsert(payload){
+        const rows = (Array.isArray(payload)?payload:[payload]).map(r=>({ id:(r&&r.id)||demoId(table), ...r }));
+        _result = { data: rows, error: null }; _isWrite = true; return builder;
+      },
+      delete(){ _result = { data:[], error:null }; _isWrite = true; return builder; },
+      eq(){return builder;}, neq(){return builder;}, match(){return builder;}, in(){return builder;},
+      is(){return builder;}, gte(){return builder;}, lte(){return builder;}, gt(){return builder;}, lt(){return builder;},
+      not(){return builder;}, contains(){return builder;}, order(){return builder;}, range(){return builder;}, limit(){return builder;},
+      single(){ _single = true; return builder; },
+      maybeSingle(){ _maybeSingle = true; return builder; },
+      then(resolve, reject){
+        let result;
+        if(_isWrite){
+          result = _result || { data:[], error:null };
+          if(_single || _maybeSingle) result = { data:(result.data && result.data[0]) || null, error:null };
+        } else {
+          result = { data:(_single || _maybeSingle) ? null : [], error:null };
+        }
+        return Promise.resolve(result).then(resolve, reject);
+      },
+      catch(reject){ return builder.then(undefined, reject); },
+    };
+    return builder;
+  }
+  const DEMO_FN_RESPOSTAS = {
+    'perguntar-estudo': { resposta:'No modo de demonstração, as respostas da IA são simuladas. Na versão real, a IA lê o PDF enviado e responde só com base no que está escrito nele.' },
+    'gerar-fala-palestra': { naTela:'(texto de exemplo)', fala:'No modo de demonstração, o conteúdo da fala é simulado. Na versão real, a IA monta esse texto a partir do material enviado no Briefing ou de pesquisa científica real.', referencias:'' },
+  };
+  return {
+    from(table){ return makeBuilder(table); },
+    rpc(){ return Promise.resolve({ data:null, error:null }); },
+    functions: { invoke(name){ return Promise.resolve({ data: DEMO_FN_RESPOSTAS[name] || {}, error:null }); } },
+    storage: { from(bucket){ return {
+      upload(path, file){
+        try{ if(file && typeof file!=='string') demoBlobUrls[bucket+'/'+path] = URL.createObjectURL(file); }catch(e){}
+        return Promise.resolve({ data:{ path }, error:null });
+      },
+      getPublicUrl(path){ return { data:{ publicUrl: demoBlobUrls[bucket+'/'+path] || demoPlaceholderImg(bucket) } }; },
+      createSignedUrl(path){ return Promise.resolve({ data:{ signedUrl: demoBlobUrls[bucket+'/'+path] || demoPlaceholderImg(bucket) }, error:null }); },
+      remove(){ return Promise.resolve({ data:[], error:null }); },
+    };}},
+    auth: {
+      getSession(){ return Promise.resolve({ data:{ session:null } }); },
+      updateUser(){ return Promise.resolve({ data:{}, error:{ message:'Indisponível no modo de demonstração.' } }); },
+      signUp(){ return Promise.resolve({ data:{ session:null }, error:{ message:'Indisponível no modo de demonstração.' } }); },
+      signOut(){ return Promise.resolve({ error:null }); },
+      signInWithPassword(){ return Promise.resolve({ data:{}, error:{ message:'Indisponível no modo de demonstração.' } }); },
+      resetPasswordForEmail(){ return Promise.resolve({ data:{}, error:null }); },
+    },
+  };
+}
+
+/* ---- Conteúdo fictício do Modo demonstração ----
+   Semeia os mesmos arrays globais que bootstrapData() preenche a partir do Supabase — a partir daqui o
+   resto do código (telas, cálculos, filtros) funciona exatamente igual ao de um aluno de verdade, sem
+   nenhuma mudança. Reaproveita as mesmas funções de mapeamento (mapProfileRow, mapLiveSessionRow,
+   mapPostRow, mapProjetoAcademicoRow, mergePalestraBriefing, projetoAcademicoEsqueletoPadrao) usadas
+   pelo carregamento real, pra garantir o mesmo formato em todo canto. Cobre as áreas que a Daiane pediu
+   pra apresentar: Início, Aulas, Comunidade, Agenda ao Vivo, Clube do Livro, Biblioteca Científica,
+   Painel Profissional, Estúdio de Palestras, Projeto Acadêmico e Biblioteca de Negócios (esta última é
+   só conteúdo estático, sem dado pra semear). Semeia o mesmo conteúdo pra qualquer perfil escolhido —
+   quem não tem acesso àquela área simplesmente não a vê, pelas mesmas travas de tier já existentes
+   (setRole/getViewingTier), sem precisar duplicar lógica aqui. */
+function bootstrapDemoData(tier){
+  const rawProfiles = [
+    { id:DEMO_STUDENT_ID, name:'Ana Demonstração', initials:'AD', color:'#6366f1', role:'aluno', turma:'Demonstração', avatar_url:null,
+      tier, extra_programs:[], bonus:false, aulas_liberadas:false,
+      student_cadastro:{ nome_completo:'Ana Demonstração', email:'demonstracao@exemplo.com', telefone:'(00) 00000-0000', cpf:'000.000.000-00', cidade:'Cidade Exemplo - UF', data_matricula:demoDateStr(-120), data_nascimento:'1990-01-01', duracao_meses:12, plano: tier==='mentorado'?'Mentoria NCC':(tier==='curso'?'Curso Gravado':'Clube do Livro') },
+      diagnostico:{ nicho:'Pediatria comportamental (exemplo)', subnicho:'Primeira infância (exemplo)', tempo_consultorio:'3 anos (exemplo)', unica_renda:'Sim (exemplo)', nota:'8 (exemplo)', persona_definida:'Sim (exemplo)', faturamento_medio:'—', pacientes_ativos:12, indicadores_semanais:'—', leads_mes:4, taxa_conversao:'—', maior_gargalo:'Captação de pacientes (exemplo)', objetivo_12meses:'Dobrar a agenda (exemplo)', horas_semana:'20h (exemplo)', wispform_submitted_at:demoISO(-100) },
+      module_progress:[ {module_id:'introducao', done:5}, {module_id:'ser', done:2} ],
+      course_progress:[ {course_id:'demo-aula-1', pct:100, watch_pct:100}, {course_id:'demo-aula-2', pct:40, watch_pct:40} ],
+      checklist_items:[], sessions:[], contatos:[],
+    },
+    { id:DEMO_COLEGA1_ID, name:'Bruno Exemplo', initials:'BE', color:'#0ea5e9', role:'aluno', turma:'Demonstração', avatar_url:null,
+      tier, extra_programs:[], bonus:false, aulas_liberadas:false,
+      student_cadastro:{}, diagnostico:{ wispform_submitted_at:demoISO(-90) },
+      module_progress:[], course_progress:[], checklist_items:[], sessions:[], contatos:[],
+    },
+    { id:DEMO_COLEGA2_ID, name:'Carla Modelo', initials:'CM', color:'#f59e0b', role:'aluno', turma:'Demonstração', avatar_url:null,
+      tier, extra_programs:[], bonus:false, aulas_liberadas:false,
+      student_cadastro:{}, diagnostico:{ wispform_submitted_at:demoISO(-90) },
+      module_progress:[], course_progress:[], checklist_items:[], sessions:[], contatos:[],
+    },
+  ];
+
+  STUDENTS.length = 0;
+  rawProfiles.forEach(p=>STUDENTS.push(mapProfileRow(p)));
+
+  PEOPLE = {};
+  rawProfiles.forEach(p=>{ PEOPLE[p.id] = {id:p.id, name:p.name, initials:p.initials, color:p.color, avatarUrl:p.avatar_url||null, role:p.role}; });
+  PEOPLE[DEMO_STAFF_ID] = { id:DEMO_STAFF_ID, name:'Equipe NCC', initials:'EQ', color:'#10b981', avatarUrl:null, role:'staff' };
+
+  // ---- Aulas (Método) ----
+  COURSES.length = 0;
+  COURSES.push(
+    { id:'demo-aula-1', modId:'introducao', cat:'Módulo 1', title:'Aula 1 do Módulo 1 (exemplo)', duration:'18 min', tint:['#3f6a58','#bec6b1'], desc:'Conteúdo ilustrativo, só pra mostrar como funciona a tela de Aulas — no modo de demonstração não há vídeo de verdade.', videoLink:'', materiais:[], cursoId:'metodo', moduloId:null, capaUrl:null },
+    { id:'demo-aula-2', modId:'introducao', cat:'Módulo 1', title:'Aula 2 do Módulo 1 (exemplo)', duration:'22 min', tint:['#3f6a58','#bec6b1'], desc:'Conteúdo ilustrativo, só pra mostrar como funciona a tela de Aulas — no modo de demonstração não há vídeo de verdade.', videoLink:'', materiais:[], cursoId:'metodo', moduloId:null, capaUrl:null },
+    { id:'demo-aula-3', modId:'ser', cat:'Módulo 2', title:'Aula 1 do Módulo 2 (exemplo)', duration:'15 min', tint:['#4338ca','#bec6b1'], desc:'Conteúdo ilustrativo, só pra mostrar como funciona a tela de Aulas — no modo de demonstração não há vídeo de verdade.', videoLink:'', materiais:[], cursoId:'metodo', moduloId:null, capaUrl:null },
+  );
+  CURSO_MODULOS.length = 0;
+
+  COMUNICADO_ALUNO.texto = 'Bem-vindo(a) ao modo de demonstração! Este é um recado de exemplo, igual ao que a equipe publica pra todos os alunos aqui na tela de Início.';
+  COMUNICADO_ALUNO.ativo = true;
+  COMUNICADO_ALUNO.updatedAt = new Date().toISOString();
+
+  MATERIALS.length = 0;
+
+  NOVIDADES.length = 0;
+  NOVIDADES.push({ id:'demo-novidade-1', titulo:'Exemplo de novidade do mural', texto:'Este é um exemplo do tipo de conteúdo que a equipe publica no mural "O que está acontecendo no mundo sobre a Infância".', link:'', fonte:'Exemplo', ativo:true, createdAt: demoISO(-3) });
+  NOVIDADE_COMMENTS = {};
+
+  // ---- Comunidade ----
+  const rawPosts = [
+    { id:'demo-post-1', author_id:DEMO_COLEGA1_ID, type:'conquista', text:'Adorei a aula desta semana — já comecei a aplicar com um paciente! (exemplo)', course_id:null, audience:tier, notify_author:false, mentions:[], mention_all:false, likes_count:2, created_at: demoISO(-2),
+      community_comments:[ { id:'demo-com-1', author_id:DEMO_STAFF_ID, text:'Que ótimo! Conta pra gente como foi. (exemplo)', reply_to_comment_id:null, notify_author:false, mentions:[], mention_all:false } ] },
+    { id:'demo-post-2', author_id:DEMO_COLEGA2_ID, type:'duvida', text:'Alguém mais teve dificuldade no exercício do módulo 2? (exemplo)', course_id:null, audience:tier, notify_author:false, mentions:[], mention_all:false, likes_count:0, created_at: demoISO(-1), community_comments:[] },
+    { id:'demo-post-3', author_id:DEMO_STAFF_ID, type:'interacao', text:'Lembrete: o próximo encontro ao vivo é nesta semana — já pode ver na Agenda ao Vivo! (exemplo)', course_id:null, audience:tier, notify_author:false, mentions:[], mention_all:false, likes_count:3, created_at: demoISO(0), community_comments:[] },
+  ];
+  MEUS_LIKES = new Set();
+  COMMUNITY_POSTS.length = 0;
+  rawPosts.forEach(r=>COMMUNITY_POSTS.push(mapPostRow(r)));
+  EU_JA_APRESENTEI = true;
+  AULAS_COMENTADAS.clear();
+  MURAL_ESTADO.mentorado = { fim:false, carregando:false };
+  MURAL_ESTADO.curso = { fim:false, carregando:false };
+  PENDENCIAS = [];
+  NOTIFICACOES = [];
+
+  // ---- Agenda ao Vivo ----
+  LIVE_SESSIONS.length = 0;
+  const rawLive = [
+    { id:'demo-live-1', title:'Encontro ao vivo de exemplo: Plantão de Dúvidas', event_date: demoDateStr(5), event_time:'20h', event_hour:'20:00', description:'Encontro ilustrativo — no modo de demonstração não é possível participar de verdade.', tipo:null, audience:'todos', link_gravacao:'', student_id:null },
+    { id:'demo-live-2', title:'Encontro ao vivo de exemplo: Consultório Simulado', event_date: demoDateStr(12), event_time:'19h30', event_hour:'19:30', description:'Encontro ilustrativo.', tipo:null, audience:'mentorado', link_gravacao:'', student_id:null },
+    { id:'demo-live-3', title:'Encontro ao vivo de exemplo (gravação disponível)', event_date: demoDateStr(-10), event_time:'20h', event_hour:'20:00', description:'Encontro ilustrativo já realizado.', tipo:null, audience:'todos', link_gravacao:'', student_id:null },
+  ];
+  rawLive.forEach(row=>LIVE_SESSIONS.push(mapLiveSessionRow(row)));
+  WATCHED_LIVE = new Set();
+
+  // ---- Biblioteca Científica (Estúdos) ----
+  ESTUDOS.length = 0;
+  ESTUDOS.push({ id:'demo-estudo-1', alunoId:DEMO_STUDENT_ID, titulo:'Sleep and emotional regulation in early childhood (exemplo)', nomeArquivo:'exemplo-artigo.pdf', arquivoPath:null, createdAt: demoISO(-5) });
+  ESTUDO_MENSAGENS = { 'demo-estudo-1': [
+    { id:'demo-em-1', autor:'aluno', texto:'Quais os principais achados do estudo?', createdAt: demoISO(-5) },
+    { id:'demo-em-2', autor:'ia', texto:'Este é um exemplo de resposta. Na versão real, a IA responde com base só no texto do PDF que você enviar — aqui no modo de demonstração as respostas são simuladas.', createdAt: demoISO(-5) },
+  ]};
+
+  // ---- Estúdio de Palestras do NCC (só Mentoria) ----
+  PALESTRAS.length = 0;
+  PALESTRAS.push({
+    id:'demo-palestra-1', alunoId:DEMO_STUDENT_ID, titulo:'Palestra de exemplo: Desenvolvimento Infantil', subtitulo:'Modelo ilustrativo', evento:'Evento de exemplo',
+    duracaoEstimada:'30 min',
+    conteudo:[ { id:'demo-sec-1', nome:'Introdução', slides:[ { id:'demo-slide-1', titulo:'Abertura', tempo:'2 min', evidencia:'', naTela:'Texto de exemplo', notas:'', fala:'Texto de exemplo de fala — na versão real, a IA monta esse conteúdo a partir do Briefing e dos PDFs anexados.' } ] } ],
+    referencias:'', pendencias:[], publicoChave:'Público de exemplo',
+    imagemTemaUrl:'', imagemTemaPrompt:'',
+    briefing: mergePalestraBriefing({}),
+    createdAt: demoISO(-7), updatedAt: demoISO(-1),
+  });
+  PALESTRA_MODELOS.length = 0;
+
+  // ---- Projeto Acadêmico (Dashboard da Mentoria, só Mentoria) ----
+  const etapasDemo = projetoAcademicoEsqueletoPadrao();
+  etapasDemo[0].status = 'concluido'; etapasDemo[0].notasAluno = 'Etapa concluída (exemplo).';
+  etapasDemo[1].status = 'em_andamento'; etapasDemo[1].notasAluno = 'Em andamento (exemplo).';
+  PROJETOS_ACADEMICOS.length = 0;
+  PROJETOS_ACADEMICOS.push(mapProjetoAcademicoRow({ id:'demo-projeto-1', aluno_id:DEMO_STUDENT_ID, titulo:'Projeto de exemplo', tema:'Tema de exemplo (ilustrativo)', etapas:etapasDemo, created_at: demoISO(-20), updated_at: demoISO(-1) }));
+
+  // ---- Clube do Livro ----
+  CLUBE_LIVROS.length = 0;
+  CLUBE_LIVROS.push({ id:'demo-livro-1', titulo:'Livro de exemplo', subtitulo:'Edição ilustrativa', capa_url: demoPlaceholderImg('Livro exemplo'), sobre_livro:'Este é um livro de exemplo, só pra mostrar como funciona o Clube do Livro no modo de demonstração.', onde_comprar_url:'#', status:'em_estudo', ordem:1, ciclo_fim: demoDateStr(60) });
+  CLUBE_CAPITULOS.length = 0;
+  CLUBE_CAPITULOS.push(
+    { id:'demo-cap-1', livro_id:'demo-livro-1', numero:1, titulo:'Capítulo 1 (exemplo)', texto_estudo:'Texto de exemplo do capítulo 1, só pra mostrar como funciona a tela de capítulos.', ordem:1 },
+    { id:'demo-cap-2', livro_id:'demo-livro-1', numero:2, titulo:'Capítulo 2 (exemplo)', texto_estudo:'Texto de exemplo do capítulo 2.', ordem:2 },
+    { id:'demo-cap-3', livro_id:'demo-livro-1', numero:3, titulo:'Capítulo 3 (exemplo)', texto_estudo:'Texto de exemplo do capítulo 3.', ordem:3 },
+  );
+  CLUBE_MATERIAIS.length = 0;
+  CLUBE_MATERIAIS.push({ id:'demo-mat-1', livro_id:'demo-livro-1', capitulo_id:'demo-cap-1', tipo:'guia_leitura', titulo:'Guia de leitura (exemplo)', descricao:'Material de exemplo.', arquivo_url:'', link_url:'', ordem:1 });
+  CLUBE_MATERIAL_FAVORITOS = new Set();
+  CLUBE_ATIVIDADES.length = 0;
+  CLUBE_ATIVIDADES.push(
+    { id:'demo-ativ-1', capitulo_id:'demo-cap-1', aluno_id:DEMO_STUDENT_ID, resposta:'Resposta de exemplo da atividade "Da leitura à prática".' },
+    { id:'demo-ativ-2', capitulo_id:'demo-cap-1', aluno_id:DEMO_COLEGA1_ID, resposta:'Resposta de exemplo do colega.' },
+  );
+  CLUBE_PROGRESSO.length = 0;
+  CLUBE_PROGRESSO.push(
+    { capitulo_id:'demo-cap-1', aluno_id:DEMO_STUDENT_ID, status:'concluido' },
+    { capitulo_id:'demo-cap-2', aluno_id:DEMO_STUDENT_ID, status:'em_leitura' },
+  );
+  CLUBE_ENCONTROS.length = 0;
+  CLUBE_POSTS.length = 0;
+  CLUBE_POSTS.push(
+    { id:'demo-cpost-1', livro_id:'demo-livro-1', capitulo_id:'demo-cap-1', autor_id:DEMO_STUDENT_ID, tipo:'reflexao', texto:'Reflexão de exemplo sobre o capítulo 1.', destaque_semana:false, created_at: demoISO(-4) },
+    { id:'demo-cpost-2', livro_id:'demo-livro-1', capitulo_id:'demo-cap-1', autor_id:DEMO_COLEGA1_ID, tipo:'pergunta', texto:'Pergunta de exemplo sobre o capítulo 1.', destaque_semana:false, created_at: demoISO(-3) },
+    { id:'demo-cpost-3', livro_id:'demo-livro-1', capitulo_id:'demo-cap-2', autor_id:DEMO_COLEGA2_ID, tipo:'experiencia', texto:'Relato de exemplo da experiência no clube.', destaque_semana:true, created_at: demoISO(-1) },
+  );
+  CLUBE_POST_RESPOSTAS.length = 0;
+  CLUBE_POST_RESPOSTAS.push({ id:'demo-cresp-1', post_id:'demo-cpost-2', autor_id:DEMO_STUDENT_ID, texto:'Resposta de exemplo à pergunta do colega.', created_at: demoISO(-2) });
+  CLUBE_POST_REACOES.length = 0;
+  CLUBE_POST_SALVOS = new Set();
+  CLUBE_ANOTACOES.length = 0;
+  CLUBE_CONFIG = { id:'global', premio_imagem_url:null };
+  clubeLivroAtualId = 'demo-livro-1';
+  clubeSubView = 'capitulos';
+  clubeCapituloAtualId = null;
+  clubeAnotacaoAtualId = null;
+}
+
+document.getElementById('demo-banner-sair').addEventListener('click', exitDemoMode);
+
 (async function initApp(){
   document.getElementById('login-screen').style.display = 'none';
   try{

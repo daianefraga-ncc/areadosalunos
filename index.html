@@ -19209,7 +19209,8 @@ function renderConteudo(){
   bindConteudoPalestraModelosEvents();
   bindConteudoClubeEvents();
   bindConteudoToggleEvents();
-  document.getElementById('comunicado-save-btn').addEventListener('click', async ()=>{
+  const comunicadoSaveBtn = document.getElementById('comunicado-save-btn');
+  if(comunicadoSaveBtn) comunicadoSaveBtn.addEventListener('click', async ()=>{
     const texto = document.getElementById('comunicado-texto').value.trim();
     const ativo = document.getElementById('comunicado-ativo').checked;
     const btn = document.getElementById('comunicado-save-btn');
@@ -19222,7 +19223,8 @@ function renderConteudo(){
       renderConteudo();
     }catch(e){ console.error(e); alert('Não foi possível salvar o comunicado. Tente de novo.'); btn.disabled = false; }
   });
-  document.getElementById('add-novidade-btn').addEventListener('click', async ()=>{
+  const addNovidadeBtn = document.getElementById('add-novidade-btn');
+  if(addNovidadeBtn) addNovidadeBtn.addEventListener('click', async ()=>{
     const titulo = document.getElementById('new-novidade-titulo').value.trim();
     const texto = document.getElementById('new-novidade-texto').value.trim();
     const fonte = document.getElementById('new-novidade-fonte').value.trim();
@@ -19253,7 +19255,8 @@ function renderConteudo(){
       renderConteudo();
     });
   });
-  document.getElementById('add-course-btn').addEventListener('click',()=>{
+  const addCourseBtn = document.getElementById('add-course-btn');
+  if(addCourseBtn) addCourseBtn.addEventListener('click',()=>{
     const title = document.getElementById('new-course-title').value.trim();
     const modId = document.getElementById('new-course-mod').value;
     const mod = getModule(modId);
@@ -19285,7 +19288,8 @@ function renderConteudo(){
       renderConteudo();
     });
   });
-  document.getElementById('add-material-btn').addEventListener('click', async ()=>{
+  const addMaterialBtn = document.getElementById('add-material-btn');
+  if(addMaterialBtn) addMaterialBtn.addEventListener('click', async ()=>{
     const title = document.getElementById('new-material-title').value.trim();
     const link = document.getElementById('new-material-link').value.trim();
     if(!title || !link) return;
@@ -19315,14 +19319,16 @@ function renderConteudo(){
       syncLiveSessionUpdate(l.id, {link_gravacao: l.linkGravacao || null});
     });
   });
-  document.getElementById('new-live-tipo').addEventListener('change', ()=>{
+  const newLiveTipoSel = document.getElementById('new-live-tipo');
+  if(newLiveTipoSel) newLiveTipoSel.addEventListener('change', ()=>{
     const isIndividual = document.getElementById('new-live-tipo').value === 'individual';
     document.getElementById('new-live-student-wrap').style.display = isIndividual ? 'flex' : 'none';
     /* Reuniões 1:1 são sempre só do próprio mentorado, então o público (mentoria x método) não se
        aplica — só faz sentido escolher pra encontros coletivos. */
     document.getElementById('new-live-audience-wrap').style.display = isIndividual ? 'none' : 'flex';
   });
-  document.getElementById('add-live-btn').addEventListener('click', async ()=>{
+  const addLiveBtn = document.getElementById('add-live-btn');
+  if(addLiveBtn) addLiveBtn.addEventListener('click', async ()=>{
     const title = document.getElementById('new-live-title').value.trim();
     const tipo = document.getElementById('new-live-tipo').value;
     const audience = document.getElementById('new-live-audience').value;

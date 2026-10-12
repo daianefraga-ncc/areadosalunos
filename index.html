@@ -1623,6 +1623,7 @@
   .type-pill.clube-tipo-pergunta.active{background:var(--individual-soft);color:var(--individual);border-color:transparent;}
   .type-pill.clube-tipo-reflexao.active{background:var(--shared-soft);color:var(--shared);border-color:transparent;}
   .type-pill.clube-tipo-aplicacao.active{background:var(--success-soft);color:var(--success);border-color:transparent;}
+  .type-pill.clube-tipo-experiencia.active{background:var(--accent-soft);color:var(--accent-2);border-color:transparent;}
   .clube-mesa-feed{display:flex;flex-direction:column;gap:12px;}
   .clube-post{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;}
   .clube-post-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
@@ -1632,6 +1633,7 @@
   .clube-post-tipo-pergunta{background:var(--individual-soft);color:var(--individual);}
   .clube-post-tipo-reflexao{background:var(--shared-soft);color:var(--shared);}
   .clube-post-tipo-aplicacao{background:var(--success-soft);color:var(--success);}
+  .clube-post-tipo-experiencia{background:var(--accent-soft);color:var(--accent-2);}
   .clube-post-cap-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--bg-elev);color:var(--text-mute);white-space:nowrap;}
   .clube-post-tempo{font-size:11px;color:var(--text-mute);}
   .clube-post-del{background:none;border:none;padding:4px;cursor:pointer;color:var(--text-mute);flex-shrink:0;}
@@ -1675,6 +1677,25 @@
   .clube-admin-capa-row{display:flex;align-items:center;gap:10px;}
   .clube-admin-capa-thumb{width:46px;height:64px;border-radius:6px;background:var(--bg-elev);display:flex;align-items:center;justify-content:center;color:var(--text-mute);overflow:hidden;flex-shrink:0;}
   .clube-admin-capa-thumb img{width:100%;height:100%;object-fit:cover;}
+  .clube-ranking-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:18px;}
+  .clube-ranking-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+  .clube-ranking-titulo{font-weight:800;font-size:14.5px;display:flex;align-items:center;gap:6px;}
+  .clube-ranking-sub{margin:4px 0 0;font-size:12px;color:var(--text-mute);}
+  .clube-ranking-ciclo{font-size:11px;font-weight:700;color:var(--text-mute);background:var(--bg-elev);border-radius:20px;padding:4px 10px;white-space:nowrap;}
+  .clube-ranking-lista{display:flex;flex-direction:column;gap:2px;}
+  .clube-ranking-linha{display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:8px;}
+  .clube-ranking-linha.minha-linha{background:var(--accent-soft);}
+  .clube-ranking-pos{width:26px;flex-shrink:0;font-weight:800;font-size:12.5px;color:var(--text-mute);}
+  .clube-ranking-nome{flex:1;min-width:0;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .clube-ranking-pontos{font-weight:800;font-size:12.5px;color:var(--accent-2);white-space:nowrap;}
+  .clube-ranking-divider{text-align:center;color:var(--text-mute);font-size:12px;letter-spacing:2px;padding:2px 0;}
+  .clube-ranking-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+  .clube-pontos-lista{display:flex;flex-direction:column;gap:10px;margin:14px 0;}
+  .clube-pontos-linha{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg-elev);border-radius:var(--radius-sm);padding:10px 12px;}
+  .clube-pontos-texto{font-size:13px;line-height:1.5;}
+  .clube-pontos-valores{text-align:right;flex-shrink:0;}
+  .clube-pontos-valores strong{display:block;font-size:14px;color:var(--accent-2);}
+  .clube-pontos-valores span{display:block;font-size:10.5px;color:var(--text-mute);margin-top:1px;}
   @media (max-width:880px){
     .sidebar{position:fixed;left:-260px;top:0;transition:left .2s;z-index:50;box-shadow:var(--shadow-side);}
     .sidebar.open{left:0;}
@@ -7784,7 +7805,7 @@ function mapLiveSessionRow(row){
 let MATERIALS = []; // populado em runtime a partir do Supabase (ver bootstrapData)
 
 /* ---- Clube do Livro (populado em runtime a partir do Supabase, ver bootstrapData) ---- */
-let CLUBE_LIVROS = [];        // livros da Biblioteca do Clube: {id, titulo, subtitulo, capa_url, sobre_livro, onde_comprar_url, status, ordem}
+let CLUBE_LIVROS = [];        // livros da Biblioteca do Clube: {id, titulo, subtitulo, capa_url, sobre_livro, onde_comprar_url, status, ordem, ciclo_fim}
 let CLUBE_CAPITULOS = [];     // {id, livro_id, numero, titulo, texto_estudo, ordem}
 let CLUBE_MATERIAIS = [];     // {id, livro_id, capitulo_id, tipo, titulo, descricao, arquivo_url, link_url, ordem}
 let CLUBE_MATERIAL_FAVORITOS = new Set(); // material_id favoritados pela própria conta
@@ -7798,15 +7819,31 @@ let CLUBE_POST_SALVOS = new Set(); // post_id salvos pela própria conta
 let CLUBE_ANOTACOES = [];     // Meu caderno: {id, aluno_id, livro_id, capitulo_id, titulo, pagina, compreendi, conexao_atuacao, estudar_melhor}
 // Estado de navegação dentro do Clube do Livro (não persistido).
 let clubeLivroAtualId = null;
-let clubeSubView = 'capitulos'; // 'capitulos' | 'materiais' | 'mesa' | 'caderno'
+let clubeSubView = 'capitulos'; // 'capitulos' | 'materiais' | 'mesa' | 'caderno' | 'ranking'
 let clubeCapituloAtualId = null;
 let clubeAnotacaoAtualId = null; // null = "nova anotação" ainda não salva
 let clubeMateriaisFiltro = { busca:'', capitulo:'todos', tipo:'todos' };
-let clubeMesaFiltro = 'todos'; // 'todos' | 'pergunta' | 'reflexao' | 'aplicacao' | 'minhas' | 'salvas'
+let clubeMesaFiltro = 'todos'; // 'todos' | 'pergunta' | 'reflexao' | 'aplicacao' | 'experiencia' | 'minhas' | 'salvas'
 const CLUBE_TIPO_MATERIAL = { mapa_mental:'Mapa mental', guia_leitura:'Guia de leitura', glossario:'Glossário', referencias:'Referências', outro:'Material' };
-const CLUBE_TIPO_POST = { pergunta:'Pergunta', reflexao:'Reflexão', aplicacao:'Aplicação na prática' };
-const CLUBE_TIPO_POST_REACAO = { pergunta:'Também tenho essa dúvida', reflexao:'Me fez pensar', aplicacao:'Também vou aplicar' };
+const CLUBE_TIPO_POST = { pergunta:'Pergunta', reflexao:'Reflexão', aplicacao:'Aplicação na prática', experiencia:'Minha experiência no clube' };
+const CLUBE_TIPO_POST_REACAO = { pergunta:'Também tenho essa dúvida', reflexao:'Me fez pensar', aplicacao:'Também vou aplicar', experiencia:'Também senti isso' };
 const CLUBE_PROGRESSO_LABEL = { nao_iniciado:'Não iniciado', em_leitura:'Em leitura', concluido:'Concluído' };
+/* Placeholder do composer da Mesa de leitores: muda conforme o tipo de publicação selecionado — o tipo
+   "experiencia" usa o texto exato combinado com a Daiane para o relato de fim de livro. */
+const CLUBE_COMPOSER_PLACEHOLDER = {
+  pergunta: 'Compartilhe uma pergunta, reflexão ou aplicação prática sobre a leitura...',
+  reflexao: 'Compartilhe uma pergunta, reflexão ou aplicação prática sobre a leitura...',
+  aplicacao: 'Compartilhe uma pergunta, reflexão ou aplicação prática sobre a leitura...',
+  experiencia: 'Conte o que achou da leitura e das aulas: o que ajudou você a compreender melhor o cérebro da criança, o que pode levar para sua atuação e o que podemos melhorar.',
+};
+/* Regras de pontuação do Ranking de leitores — ver clubeRankingDoLivro(). Valores e legendas combinados
+   com a Daiane; o ranking é só do livro em estudo atual (reseta por livro, não é cumulativo). */
+const CLUBE_PONTOS_REGRAS = [
+  { texto:'Publicar uma reflexão pertinente ao capítulo', pontos:5, limite:'Uma por semana' },
+  { texto:'Responder a um colega acrescentando uma ideia ou pergunta pertinente', pontos:3, limite:'Duas por semana' },
+  { texto:'Concluir a atividade "Da leitura à prática"', pontos:10, limite:'Uma por capítulo' },
+  { texto:'Contar sua experiência no clube (ao final do livro)', pontos:10, limite:'10 pontos por livro' },
+];
 
 /* Mural "O que está acontecendo no mundo sobre a Infância" — notícias/conteúdos curtos que a equipe
    publica para os alunos verem na tela de Início (card que abre um modal com a lista completa, ver
@@ -9835,7 +9872,7 @@ function setupNav(){
     document.getElementById('sidebar-backdrop').classList.remove('open');
     if(e.currentTarget.dataset.locked){
       e.preventDefault();
-      openBloqueioMentoradosModal('Ferramentas NCC', 'O sistema de prontuários é exclusivo para mentorados da Mentoria. Fale com a equipe e conheça as condições para migrar seu acesso.');
+      openBloqueioMentoradosModal('Ferramentas NCC', 'Ferramentas NCC integra pesquisa científica, explicações sobre o cérebro da criança e recursos para sua prática profissional, com base nos materiais do NCC e nas evidências mais atuais da neurociência.');
     }
   });
   document.getElementById('nav-neurotodasidades').addEventListener('click',(e)=>{
@@ -10434,7 +10471,7 @@ function acessoRapidoHtml(){
     <button type="button" class="novidades-cta" id="open-painel-clinica">
       <img class="nc-icon" src="${ICON_CLINICA_DATA_URI}" alt="">
       <div class="nc-title">Organize seus acompanhamentos</div>
-      <div class="nc-desc">Acompanhe a evolução e os objetivos de quem você atende, com base no conhecimento atualizado da neurociência.</div>
+      <div class="nc-desc">Acompanhe objetivos e evolução de quem você atende, com base na neurociência atualizada.</div>
     </button>
   `);
   cards.push(`
@@ -14643,6 +14680,7 @@ function renderClubeLivro(viewId){
       <div class="ae-tab ${clubeSubView==='materiais'?'active':''}" data-sub="materiais">Materiais de apoio</div>
       <div class="ae-tab ${clubeSubView==='mesa'?'active':''}" data-sub="mesa">Mesa de leitores</div>
       <div class="ae-tab ${clubeSubView==='caderno'?'active':''}" data-sub="caderno">Meu caderno</div>
+      <div class="ae-tab ${clubeSubView==='ranking'?'active':''}" data-sub="ranking">Ranking de leitores</div>
     </div>
     <div id="clube-subview-area"></div>
   `;
@@ -14661,7 +14699,7 @@ function renderClubeLivro(viewId){
 }
 
 function renderClubeSubview(viewId){
-  const map = { capitulos:clubeRenderCapitulos, materiais:clubeRenderMateriais, mesa:clubeRenderMesa, caderno:clubeRenderCaderno };
+  const map = { capitulos:clubeRenderCapitulos, materiais:clubeRenderMateriais, mesa:clubeRenderMesa, caderno:clubeRenderCaderno, ranking:clubeRenderRanking };
   map[clubeSubView](viewId);
 }
 
@@ -14752,6 +14790,172 @@ function clubeWireMateriaisBotoes(container){
   });
 }
 
+/* -------- Ranking de leitores (ver combinado com a Daiane) --------
+   Pontuação só do livro em estudo atual (não é cumulativo entre livros — reseta a cada novo livro).
+   Regras (ver CLUBE_PONTOS_REGRAS acima):
+   - Reflexão pertinente ao capítulo: 5 pts, até 1 por semana.
+   - Responder a um colega: 3 pts, até 2 por semana.
+   - Atividade "Da leitura à prática": 10 pts por capítulo (o modelo de dados já é 1 registro por
+     capítulo por aluno, então cada capítulo só pode contar uma vez naturalmente).
+   - "Sua experiência no clube" (post tipo 'experiencia' na Mesa de leitores): 10 pts, uma vez por livro.
+   Só conta pontos de alunos (role !== 'staff'), pra um staff testando/postando não aparecer no ranking. */
+function clubeIsoWeekKey(dateStr){
+  const d = new Date(dateStr);
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+  return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,'0')}`;
+}
+function clubeRankingDoLivro(livro){
+  const capIds = new Set(clubeCapitulosDoLivro(livro.id).map(c=>c.id));
+  const postsDoLivro = CLUBE_POSTS.filter(p=>p.livro_id===livro.id);
+  const postIds = new Set(postsDoLivro.map(p=>p.id));
+  const pontosPorAluno = {};
+  function addPontos(id, pts){ if(!id || !pts) return; pontosPorAluno[id] = (pontosPorAluno[id]||0) + pts; }
+  function ehAluno(id){ const p = getPerson(id); return p && p.role!=='staff'; }
+
+  const semanasReflexaoPorAluno = {};
+  postsDoLivro.filter(p=>p.tipo==='reflexao' && ehAluno(p.autor_id)).forEach(p=>{
+    const wk = clubeIsoWeekKey(p.created_at);
+    (semanasReflexaoPorAluno[p.autor_id] = semanasReflexaoPorAluno[p.autor_id] || new Set()).add(wk);
+  });
+  Object.entries(semanasReflexaoPorAluno).forEach(([alunoId, semanas])=> addPontos(alunoId, semanas.size*5));
+
+  const respostasPorAlunoSemana = {};
+  CLUBE_POST_RESPOSTAS.filter(r=>postIds.has(r.post_id) && ehAluno(r.autor_id)).forEach(r=>{
+    const wk = clubeIsoWeekKey(r.created_at);
+    const porSemana = respostasPorAlunoSemana[r.autor_id] = respostasPorAlunoSemana[r.autor_id] || {};
+    porSemana[wk] = (porSemana[wk]||0) + 1;
+  });
+  Object.entries(respostasPorAlunoSemana).forEach(([alunoId, semanas])=>{
+    let contadas = 0;
+    Object.values(semanas).forEach(qtd=>{ contadas += Math.min(qtd, 2); });
+    addPontos(alunoId, contadas*3);
+  });
+
+  const capsPorAluno = {};
+  CLUBE_ATIVIDADES.filter(a=>capIds.has(a.capitulo_id) && ehAluno(a.aluno_id)).forEach(a=>{
+    (capsPorAluno[a.aluno_id] = capsPorAluno[a.aluno_id] || new Set()).add(a.capitulo_id);
+  });
+  Object.entries(capsPorAluno).forEach(([alunoId, caps])=> addPontos(alunoId, caps.size*10));
+
+  const comExperiencia = new Set();
+  postsDoLivro.filter(p=>p.tipo==='experiencia' && ehAluno(p.autor_id)).forEach(p=> comExperiencia.add(p.autor_id));
+  comExperiencia.forEach(alunoId=> addPontos(alunoId, 10));
+
+  const ranking = Object.entries(pontosPorAluno).map(([alunoId, pontos])=>{
+    const autor = clubeAutor(alunoId);
+    return { alunoId, pontos, nome:autor.name, initials:autor.initials, color:autor.color, avatarUrl:autor.avatarUrl };
+  });
+  ranking.sort((a,b)=> b.pontos-a.pontos || a.nome.localeCompare(b.nome));
+  return ranking;
+}
+function openClubeComoGanharPontosModal(){
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <div class="cat">Ranking de leitores</div>
+      <h3>Como ganhar pontos</h3>
+      <p style="color:var(--text-mute);font-size:12.5px;margin-top:-8px">A pontuação é só do livro em estudo atual.</p>
+      <div class="clube-pontos-lista">
+        ${CLUBE_PONTOS_REGRAS.map(r=>`
+          <div class="clube-pontos-linha">
+            <div class="clube-pontos-texto">${escapeHtml(r.texto)}</div>
+            <div class="clube-pontos-valores"><strong>${r.pontos} pts</strong><span>${escapeHtml(r.limite)}</span></div>
+          </div>`).join('')}
+      </div>
+      <div class="modal-actions"><button class="btn-accent" id="clube-pontos-fechar">Entendi</button></div>
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('clube-pontos-fechar').addEventListener('click', closeModal);
+}
+function clubeRankingLinhaHtml(r, posicao, meuId, suffix){
+  return `
+    <div class="clube-ranking-linha ${meuId && r.alunoId===meuId?'minha-linha':''}">
+      <span class="clube-ranking-pos">${posicao}º</span>
+      ${initialsAvatar(r.initials, r.color, 28, r.avatarUrl)}
+      <span class="clube-ranking-nome">${escapeHtml(r.nome)}${suffix||''}</span>
+      <span class="clube-ranking-pontos">${r.pontos} pts</span>
+    </div>`;
+}
+/* Cartão resumido (top 5 + posição do aluno conectado), exibido na aba "Capítulos e aulas". */
+function clubeRankingCardHtml(livro){
+  const ranking = clubeRankingDoLivro(livro);
+  const top5 = ranking.slice(0,5);
+  const meuId = clubeContextAlunoId();
+  const minhaPos = meuId ? ranking.findIndex(r=>r.alunoId===meuId) : -1;
+  const estouNoTop5 = minhaPos>=0 && minhaPos<5;
+  return `
+    <div class="clube-ranking-card">
+      <div class="clube-ranking-head">
+        <div>
+          <div class="clube-ranking-titulo">${icon('award','tiny')} Ranking de leitores</div>
+          <p class="clube-ranking-sub">Livro em estudo: <strong>${escapeHtml(livro.titulo)}</strong></p>
+        </div>
+        ${livro.ciclo_fim? `<span class="clube-ranking-ciclo">${icon('calendar','tiny')} Ciclo até ${formatDateBR(livro.ciclo_fim)}</span>` : ''}
+      </div>
+      ${ranking.length? `
+      <div class="clube-ranking-lista">
+        ${top5.map((r,i)=>clubeRankingLinhaHtml(r, i+1, meuId, meuId && r.alunoId===meuId? ' (você)' : '')).join('')}
+        ${minhaPos>=0 && !estouNoTop5? `
+          <div class="clube-ranking-divider">···</div>
+          ${clubeRankingLinhaHtml(ranking[minhaPos], minhaPos+1, meuId, ' (você)')}
+        ` : ''}
+        ${minhaPos<0 && meuId? `
+          <div class="clube-ranking-divider">···</div>
+          <div class="clube-ranking-linha minha-linha">
+            <span class="clube-ranking-pos">—</span>
+            <span class="clube-ranking-nome">Você ainda não pontuou neste livro</span>
+            <span class="clube-ranking-pontos">0 pts</span>
+          </div>` : ''}
+      </div>` : `<p class="empty-state">Ninguém pontuou ainda neste livro. Seja o primeiro!</p>`}
+      <div class="clube-ranking-acoes">
+        <button type="button" class="btn-outline btn-mini" id="clube-ranking-como-ganhar">${icon('help','tiny')} Como ganhar pontos</button>
+        <button type="button" class="btn-outline btn-mini" id="clube-ranking-ver-completo">Ver classificação completa ${icon('next','tiny')}</button>
+      </div>
+    </div>`;
+}
+function clubeWireRankingCardBotoes(area, viewId){
+  const comoGanharBtn = area.querySelector('#clube-ranking-como-ganhar');
+  if(comoGanharBtn) comoGanharBtn.addEventListener('click', openClubeComoGanharPontosModal);
+  const verCompletoBtn = area.querySelector('#clube-ranking-ver-completo');
+  if(verCompletoBtn) verCompletoBtn.addEventListener('click', ()=>{
+    clubeSubView = 'ranking';
+    const tabs = document.querySelector('#view-'+viewId+' #clube-tabs');
+    if(tabs) tabs.querySelectorAll('.ae-tab').forEach(t=>t.classList.toggle('active', t.dataset.sub==='ranking'));
+    renderClubeSubview(viewId);
+  });
+}
+/* Aba própria "Ranking de leitores": lista completa, não só o top 5. */
+function clubeRenderRanking(viewId){
+  const area = document.querySelector('#view-'+viewId+' #clube-subview-area');
+  if(!area) return;
+  const livro = clubeGetLivro(clubeLivroAtualId);
+  const ranking = clubeRankingDoLivro(livro);
+  const meuId = clubeContextAlunoId();
+  area.innerHTML = `
+    <div class="clube-ranking-card">
+      <div class="clube-ranking-head">
+        <div>
+          <div class="clube-ranking-titulo">${icon('award','tiny')} Classificação completa</div>
+          <p class="clube-ranking-sub">Livro em estudo: <strong>${escapeHtml(livro.titulo)}</strong></p>
+        </div>
+        ${livro.ciclo_fim? `<span class="clube-ranking-ciclo">${icon('calendar','tiny')} Ciclo até ${formatDateBR(livro.ciclo_fim)}</span>` : ''}
+      </div>
+      ${ranking.length? `
+      <div class="clube-ranking-lista">
+        ${ranking.map((r,i)=>clubeRankingLinhaHtml(r, i+1, meuId, meuId && r.alunoId===meuId? ' (você)' : '')).join('')}
+      </div>` : `<p class="empty-state">Ninguém pontuou ainda neste livro. Seja o primeiro!</p>`}
+      <div class="clube-ranking-acoes">
+        <button type="button" class="btn-outline btn-mini" id="clube-ranking-como-ganhar">${icon('help','tiny')} Como ganhar pontos</button>
+      </div>
+    </div>`;
+  const comoGanharBtn = area.querySelector('#clube-ranking-como-ganhar');
+  if(comoGanharBtn) comoGanharBtn.addEventListener('click', openClubeComoGanharPontosModal);
+}
+
 function clubeRenderCapitulos(viewId){
   const area = document.querySelector('#view-'+viewId+' #clube-subview-area');
   if(!area) return;
@@ -14768,6 +14972,7 @@ function clubeRenderCapitulos(viewId){
   const alunoId = clubeContextAlunoId();
   const materiais = clubeMateriaisDoCapitulo(cap.id);
   area.innerHTML = `
+    ${clubeRankingCardHtml(livro)}
     <div class="clube-capitulos-wrap">
       <div class="clube-capitulos-lista">
         <div class="clube-capitulos-lista-titulo">Percurso de leitura</div>
@@ -14821,6 +15026,7 @@ function clubeRenderCapitulos(viewId){
   const ativBtn = document.getElementById('clube-cap-atividade-btn');
   if(ativBtn) ativBtn.addEventListener('click', ()=>openClubeAtividadeModal(cap.id, alunoId? clubeAtividadeResposta(cap.id, alunoId) : ''));
   clubeWireMateriaisBotoes(area);
+  clubeWireRankingCardBotoes(area, viewId);
 }
 
 function clubeMaterialCardHtml(m, capLabel){
@@ -15030,7 +15236,7 @@ function clubeRenderMesa(viewId){
   const todosDoLivro = CLUBE_POSTS.filter(p=>p.livro_id===livro.id);
   const destaque = todosDoLivro.find(p=>p.destaque_semana);
   let lista = todosDoLivro;
-  if(clubeMesaFiltro==='pergunta' || clubeMesaFiltro==='reflexao' || clubeMesaFiltro==='aplicacao'){
+  if(clubeMesaFiltro==='pergunta' || clubeMesaFiltro==='reflexao' || clubeMesaFiltro==='aplicacao' || clubeMesaFiltro==='experiencia'){
     lista = todosDoLivro.filter(p=>p.tipo===clubeMesaFiltro);
   } else if(clubeMesaFiltro==='minhas'){
     lista = todosDoLivro.filter(p=>p.autor_id===meuId);
@@ -15044,13 +15250,14 @@ function clubeRenderMesa(viewId){
     {id:'pergunta', label:'Perguntas'},
     {id:'reflexao', label:'Reflexões'},
     {id:'aplicacao', label:'Aplicações na prática'},
+    {id:'experiencia', label:'Experiências no clube'},
   ];
   area.innerHTML = `
     <div class="clube-mesa-wrap">
       <div class="clube-mesa-main">
         ${meuId? `
         <div class="clube-composer">
-          <textarea class="ps-input" id="clube-post-texto" placeholder="Compartilhe uma pergunta, reflexão ou aplicação prática sobre a leitura..."></textarea>
+          <textarea class="ps-input" id="clube-post-texto" placeholder="${escapeAttr(CLUBE_COMPOSER_PLACEHOLDER[clubeNovoPostTipo]||CLUBE_COMPOSER_PLACEHOLDER.pergunta)}"></textarea>
           <div class="clube-composer-footer">
             <select class="ps-input" id="clube-post-cap">
               <option value="">Capítulo (opcional)</option>
@@ -15099,6 +15306,8 @@ function clubeRenderMesa(viewId){
       btn.addEventListener('click', ()=>{
         clubeNovoPostTipo = btn.dataset.tipo;
         tipoSelect.querySelectorAll('[data-tipo]').forEach(b=>b.classList.toggle('active', b===btn));
+        const ta = document.getElementById('clube-post-texto');
+        if(ta) ta.placeholder = CLUBE_COMPOSER_PLACEHOLDER[clubeNovoPostTipo] || CLUBE_COMPOSER_PLACEHOLDER.pergunta;
       });
     });
   }
@@ -19088,6 +19297,7 @@ function renderConteudo(){
                   </div>
                 </div>
                 <div class="field"><label>Onde comprar (link)</label><input class="ps-input" type="text" data-clube-livro-comprar="${l.id}" value="${escapeAttr(l.onde_comprar_url||'')}" placeholder="https://..."></div>
+                <div class="field"><label>Encerramento do ciclo (Ranking de leitores)</label><input class="ps-input" type="date" data-clube-livro-ciclo-fim="${l.id}" value="${escapeAttr(l.ciclo_fim||'')}"></div>
                 <div class="field full"><label>Texto curto sobre o livro</label><textarea class="ps-input" data-clube-livro-sobre="${l.id}" placeholder="Um resumo curto, exibido direto abaixo do título do livro para o aluno..." style="min-height:60px">${escapeHtml(l.sobre_livro||'')}</textarea></div>
               </div>
             </td></tr>` : ''}
@@ -19465,6 +19675,12 @@ function bindConteudoClubeEvents(){
     inp.addEventListener('change', ()=>{
       const l = clubeGetLivro(inp.dataset.clubeLivroComprar); if(!l) return;
       l.onde_comprar_url = inp.value.trim() || null; syncClubeLivroUpdate(l.id, {onde_comprar_url:l.onde_comprar_url});
+    });
+  });
+  root.querySelectorAll('[data-clube-livro-ciclo-fim]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const l = clubeGetLivro(inp.dataset.clubeLivroCicloFim); if(!l) return;
+      l.ciclo_fim = inp.value || null; syncClubeLivroUpdate(l.id, {ciclo_fim:l.ciclo_fim});
     });
   });
   root.querySelectorAll('[data-clube-livro-sobre]').forEach(ta=>{

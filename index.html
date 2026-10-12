@@ -10252,10 +10252,11 @@ function renderCurrentView(){
     return;
   }
   /* Quem está cadastrado só no Clube do Livro (tier 'clube_livro') não tem acesso a mais nada —
-     qualquer outra view (inclusive "Início", que mostraria conteúdo de curso/mentoria que essa conta
-     não tem) mostra o Clube do Livro no lugar. Ver bloqueio dos itens do menu em setRole(). */
-  if(currentRole==='aluno' && getViewingTier()==='clube_livro' && currentView!=='clubelivro'){
-    if(currentView==='inicio'){ renderClubeLivro('inicio'); renderAniversarioCanto(); return; }
+     qualquer outra view mostra o bloqueio no lugar. "Início" é exceção: mostra o mini-dashboard de
+     boas-vindas (ver renderInicioClube, chamado de dentro de renderInicio) igual às outras contas,
+     só sem os indicadores de mentoria que não se aplicam. "Clube do Livro" (nav próprio) continua
+     liberado, claro. Ver bloqueio dos itens do menu em setRole(). */
+  if(currentRole==='aluno' && getViewingTier()==='clube_livro' && currentView!=='clubelivro' && currentView!=='inicio'){
     renderBloqueioClube(currentView);
     renderAniversarioCanto();
     return;
@@ -12589,6 +12590,7 @@ function renderInicioCurso(s){
 function renderInicio(){
   const s = getStudent(currentStudentId);
   if(s && s.tier==='curso' && currentRole==='aluno'){ renderInicioCurso(s); return; }
+  if(s && s.tier==='clube_livro' && currentRole==='aluno'){ renderInicioClube(s); return; }
   if(needsWispform(s)){ renderWispformWizard(s); return; }
   const overall = overallProgress(s);
   const nextTask = s.checklist.find(t=>t.responsavel==='Mentorado' && t.status!=='Concluída');
@@ -12644,6 +12646,45 @@ function renderInicio(){
   bindCourseTiles();
   document.querySelectorAll('[data-goto]').forEach(el=>el.addEventListener('click',()=>goTo(el.dataset.goto)));
   bindOpenCourseTags(document.getElementById('view-inicio'));
+  bindEssenciaBannerCarrossel();
+  bindAcessoRapido();
+}
+/* ---- Início de quem está cadastrado só no Clube do Livro (tier 'clube_livro') ----
+   Mesma saudação, comunicado, fileira de status e banners de eventos que as outras contas veem —
+   só sem Indicadores Profissionais, Continue assistindo e Últimos na comunidade, que são sobre
+   mentoria/Método e não se aplicam a quem só tem o Clube do Livro. "Progresso geral", "Próxima meta"
+   e "Turma" podem aparecer vazios/zerados pra essas contas — é esperado, combinado com a Daiane. */
+function renderInicioClube(s){
+  const overall = overallProgress(s);
+  const nextTask = s.checklist.find(t=>t.responsavel==='Mentorado' && t.status!=='Concluída');
+  const nextLive = LIVE_SESSIONS.find(l=>l.type==='upcoming' && (l.studentId===s.id || (l.studentId==null && l.audience===(s.tier||'mentorado'))));
+  const heroPts = STUDENT_POINTS[s.id] || {conquistas:0};
+  const heroDias = diasRestantes(s);
+
+  document.getElementById('view-inicio').innerHTML = `
+    <div class="hero">
+      <div>
+        <h1>Olá, ${s.name.split(' ')[0]}</h1>
+        <p>Bem-vindo(a) de volta à sua área do Neurociência do Comportamento da Criança.</p>
+      </div>
+      <div class="hero-mini-stats">
+        <div class="hero-mini-stat"><div class="hero-mini-value">${heroPts.conquistas||0}</div><div class="hero-mini-label">Conquistas</div></div>
+        <div class="hero-mini-stat"><div class="hero-mini-value">${Math.max(0,heroDias)}</div><div class="hero-mini-label">${heroDias<0? 'Dias em atraso' : 'Dias faltantes'}</div></div>
+      </div>
+      ${initialsAvatar(s.initials,s.color,56,s.avatarUrl)}
+    </div>
+    ${comunicadoBannerHtml()}
+    <div class="stat-row">
+      <div class="stat-card clickable" data-goto="dashboard"><div class="label">Progresso geral</div><div class="value shared">${overall}%</div></div>
+      <div class="stat-card clickable" data-goto="metas"><div class="label">Próxima meta</div><div class="value" style="font-size:14px">${nextTask? nextTask.tarefa : 'Tudo em dia'}</div></div>
+      <div class="stat-card"><div class="label">Próximo encontro ao vivo</div><div class="value accent" style="font-size:14px">${nextLive? nextLive.date+' · '+nextLive.time.split('·')[0] : '—'}</div></div>
+      <div class="stat-card"><div class="label">Turma</div><div class="value" style="font-size:14px">${s.turma||'—'}</div></div>
+    </div>
+
+    ${essenciaBannerHtml()}
+    ${acessoRapidoHtml()}
+  `;
+  document.querySelectorAll('[data-goto]').forEach(el=>el.addEventListener('click',()=>goTo(el.dataset.goto)));
   bindEssenciaBannerCarrossel();
   bindAcessoRapido();
 }

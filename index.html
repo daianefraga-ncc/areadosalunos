@@ -1696,6 +1696,12 @@
   .clube-pontos-valores{text-align:right;flex-shrink:0;}
   .clube-pontos-valores strong{display:block;font-size:14px;color:var(--accent-2);}
   .clube-pontos-valores span{display:block;font-size:10.5px;color:var(--text-mute);margin-top:1px;}
+  .clube-premio-bloco{margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
+  .clube-premio-titulo{font-weight:800;font-size:13px;margin-bottom:8px;}
+  .clube-premio-imagem{width:100%;max-width:280px;border-radius:var(--radius-sm);overflow:hidden;margin-bottom:10px;background:var(--bg-elev);}
+  .clube-premio-imagem img{width:100%;display:block;object-fit:cover;}
+  .clube-premio-texto{font-size:12.5px;line-height:1.6;color:var(--text-dim);margin:0 0 8px;}
+  .clube-premio-texto:last-child{margin-bottom:0;}
   @media (max-width:880px){
     .sidebar{position:fixed;left:-260px;top:0;transition:left .2s;z-index:50;box-shadow:var(--shadow-side);}
     .sidebar.open{left:0;}
@@ -7817,6 +7823,7 @@ let CLUBE_POST_RESPOSTAS = [];// {id, post_id, autor_id, texto, created_at}
 let CLUBE_POST_REACOES = [];  // {post_id, aluno_id}
 let CLUBE_POST_SALVOS = new Set(); // post_id salvos pela própria conta
 let CLUBE_ANOTACOES = [];     // Meu caderno: {id, aluno_id, livro_id, capitulo_id, titulo, pagina, compreendi, conexao_atuacao, estudar_melhor}
+let CLUBE_CONFIG = { id:'global', premio_imagem_url:null }; // config única do Clube (não por livro): foto do prêmio do Ranking de leitores
 // Estado de navegação dentro do Clube do Livro (não persistido).
 let clubeLivroAtualId = null;
 let clubeSubView = 'capitulos'; // 'capitulos' | 'materiais' | 'mesa' | 'caderno' | 'ranking'
@@ -7839,10 +7846,10 @@ const CLUBE_COMPOSER_PLACEHOLDER = {
 /* Regras de pontuação do Ranking de leitores — ver clubeRankingDoLivro(). Valores e legendas combinados
    com a Daiane; o ranking é só do livro em estudo atual (reseta por livro, não é cumulativo). */
 const CLUBE_PONTOS_REGRAS = [
-  { texto:'Publicar uma reflexão pertinente ao capítulo', pontos:5, limite:'Uma por semana' },
-  { texto:'Responder a um colega acrescentando uma ideia ou pergunta pertinente', pontos:3, limite:'Duas por semana' },
-  { texto:'Concluir a atividade "Da leitura à prática"', pontos:10, limite:'Uma por capítulo' },
-  { texto:'Contar sua experiência no clube (ao final do livro)', pontos:10, limite:'10 pontos por livro' },
+  { texto:'Publicar uma reflexão pertinente ao capítulo', pontos:10, limite:'Uma por semana' },
+  { texto:'Responder a um colega acrescentando uma ideia ou pergunta pertinente', pontos:10, limite:'Duas por semana' },
+  { texto:'Concluir a atividade "Da leitura à prática"', pontos:15, limite:'Uma por capítulo' },
+  { texto:'Contar sua experiência no clube.', pontos:25, limite:'25 pontos por livro' },
 ];
 
 /* Mural "O que está acontecendo no mundo sobre a Infância" — notícias/conteúdos curtos que a equipe
@@ -8592,7 +8599,7 @@ async function bootstrapData(){
   // não precisa filtrar aqui, a RLS de cada tabela já cuida disso sozinha.
   const [{data:clubeLivrosRows},{data:clubeCapRows},{data:clubeMatRows},{data:clubeMatFavRows},
          {data:clubeAtivRows},{data:clubeProgRows},{data:clubeEncontrosRows},{data:clubePostsRows},{data:clubeRespRows},
-         {data:clubeReacRows},{data:clubeSalvosRows},{data:clubeNotasRows}] = await Promise.all([
+         {data:clubeReacRows},{data:clubeSalvosRows},{data:clubeNotasRows},{data:clubeConfigRows}] = await Promise.all([
     sb.from('clube_livros').select('*').order('ordem').order('created_at'),
     sb.from('clube_capitulos').select('*').order('numero'),
     sb.from('clube_materiais').select('*').order('ordem').order('created_at'),
@@ -8605,6 +8612,7 @@ async function bootstrapData(){
     sb.from('clube_post_reacoes').select('*'),
     sb.from('clube_post_salvos').select('*'),
     sb.from('clube_anotacoes').select('*').order('updated_at',{ascending:false}),
+    sb.from('clube_config').select('*').eq('id','global').maybeSingle(),
   ]);
   CLUBE_LIVROS = clubeLivrosRows || [];
   CLUBE_CAPITULOS = clubeCapRows || [];
@@ -8618,6 +8626,7 @@ async function bootstrapData(){
   CLUBE_POST_REACOES = clubeReacRows || [];
   CLUBE_POST_SALVOS = new Set((clubeSalvosRows||[]).map(r=>r.post_id));
   CLUBE_ANOTACOES = clubeNotasRows || [];
+  CLUBE_CONFIG = clubeConfigRows || { id:'global', premio_imagem_url:null };
 
   // Registros Internos: buscado à parte, e só quando é equipe interna — o aluno nunca faz essa
   // consulta, então esse conteúdo jamais chega ao navegador dele (nem via RLS, nem por não pedir).
@@ -9050,6 +9059,30 @@ async function uploadClubeCapaFile(file, livroId){
   if(upErr) throw upErr;
   const { data } = sb.storage.from('clube-capas').getPublicUrl(path);
   return data.publicUrl;
+}
+/* Foto do prêmio do Ranking de leitores (camiseta + caneca do Clube) — uma imagem só, reaproveitada em
+   todos os livros (não é por livro, ver CLUBE_CONFIG). Reusa o mesmo bucket 'clube-capas'. */
+async function uploadClubePremioFile(file){
+  let toUpload = file;
+  try{
+    toUpload = await Promise.race([
+      resizeImageForUpload(file, CLUBE_CAPA_ALVO_BYTES, CLUBE_CAPA_MAX_DIM),
+      new Promise((_,rej)=> setTimeout(()=>rej(new Error('Tempo esgotado ao processar a imagem.')), 12000))
+    ]);
+  }catch(e){
+    console.error('Falha ao redimensionar imagem do prêmio, tentando enviar original:', e);
+    toUpload = file;
+  }
+  const ext = (toUpload.name||'').split('.').pop() || 'jpg';
+  const path = `premio-${Date.now()}.${ext.toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg'}`;
+  const { error: upErr } = await sb.storage.from('clube-capas').upload(path, toUpload, {upsert:true, cacheControl:'31536000', contentType: toUpload.type || undefined});
+  if(upErr) throw upErr;
+  const { data } = sb.storage.from('clube-capas').getPublicUrl(path);
+  return data.publicUrl;
+}
+function syncClubeConfigUpdate(fields){
+  CLUBE_CONFIG = { ...CLUBE_CONFIG, ...fields };
+  syncNow(sb.from('clube_config').update({...fields, updated_at:new Date().toISOString()}).eq('id','global'));
 }
 /* ---- Programas extras do aluno (matrícula em Formação e/ou Pós-Graduação além do tier principal) ---- */
 function syncStudentExtraProgramsUpdate(id, extraPrograms){
@@ -14809,6 +14842,9 @@ function clubeIsoWeekKey(dateStr){
   return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,'0')}`;
 }
 function clubeRankingDoLivro(livro){
+  // Pontos por regra, lidos direto de CLUBE_PONTOS_REGRAS (mesma ordem usada no modal "Como ganhar
+  // pontos") — pra tabela exibida e o cálculo real nunca ficarem dessincronizados de novo.
+  const [PTS_REFLEXAO, PTS_RESPOSTA, PTS_ATIVIDADE, PTS_EXPERIENCIA] = CLUBE_PONTOS_REGRAS.map(r=>r.pontos);
   const capIds = new Set(clubeCapitulosDoLivro(livro.id).map(c=>c.id));
   const postsDoLivro = CLUBE_POSTS.filter(p=>p.livro_id===livro.id);
   const postIds = new Set(postsDoLivro.map(p=>p.id));
@@ -14821,7 +14857,7 @@ function clubeRankingDoLivro(livro){
     const wk = clubeIsoWeekKey(p.created_at);
     (semanasReflexaoPorAluno[p.autor_id] = semanasReflexaoPorAluno[p.autor_id] || new Set()).add(wk);
   });
-  Object.entries(semanasReflexaoPorAluno).forEach(([alunoId, semanas])=> addPontos(alunoId, semanas.size*5));
+  Object.entries(semanasReflexaoPorAluno).forEach(([alunoId, semanas])=> addPontos(alunoId, semanas.size*PTS_REFLEXAO));
 
   const respostasPorAlunoSemana = {};
   CLUBE_POST_RESPOSTAS.filter(r=>postIds.has(r.post_id) && ehAluno(r.autor_id)).forEach(r=>{
@@ -14832,18 +14868,18 @@ function clubeRankingDoLivro(livro){
   Object.entries(respostasPorAlunoSemana).forEach(([alunoId, semanas])=>{
     let contadas = 0;
     Object.values(semanas).forEach(qtd=>{ contadas += Math.min(qtd, 2); });
-    addPontos(alunoId, contadas*3);
+    addPontos(alunoId, contadas*PTS_RESPOSTA);
   });
 
   const capsPorAluno = {};
   CLUBE_ATIVIDADES.filter(a=>capIds.has(a.capitulo_id) && ehAluno(a.aluno_id)).forEach(a=>{
     (capsPorAluno[a.aluno_id] = capsPorAluno[a.aluno_id] || new Set()).add(a.capitulo_id);
   });
-  Object.entries(capsPorAluno).forEach(([alunoId, caps])=> addPontos(alunoId, caps.size*10));
+  Object.entries(capsPorAluno).forEach(([alunoId, caps])=> addPontos(alunoId, caps.size*PTS_ATIVIDADE));
 
   const comExperiencia = new Set();
   postsDoLivro.filter(p=>p.tipo==='experiencia' && ehAluno(p.autor_id)).forEach(p=> comExperiencia.add(p.autor_id));
-  comExperiencia.forEach(alunoId=> addPontos(alunoId, 10));
+  comExperiencia.forEach(alunoId=> addPontos(alunoId, PTS_EXPERIENCIA));
 
   const ranking = Object.entries(pontosPorAluno).map(([alunoId, pontos])=>{
     const autor = clubeAutor(alunoId);
@@ -14857,13 +14893,22 @@ function openClubeComoGanharPontosModal(){
     <div class="modal-body form-modal">
       <div class="cat">Ranking de leitores</div>
       <h3>Como ganhar pontos</h3>
-      <p style="color:var(--text-mute);font-size:12.5px;margin-top:-8px">A pontuação é só do livro em estudo atual.</p>
       <div class="clube-pontos-lista">
         ${CLUBE_PONTOS_REGRAS.map(r=>`
           <div class="clube-pontos-linha">
             <div class="clube-pontos-texto">${escapeHtml(r.texto)}</div>
             <div class="clube-pontos-valores"><strong>${r.pontos} pts</strong><span>${escapeHtml(r.limite)}</span></div>
           </div>`).join('')}
+      </div>
+      <div class="clube-premio-bloco">
+        <div class="clube-premio-titulo">Sobre o prêmio</div>
+        ${CLUBE_CONFIG.premio_imagem_url? `<div class="clube-premio-imagem"><img src="${escapeAttr(CLUBE_CONFIG.premio_imagem_url)}" alt="Prêmio do Clube do Livro NCC"></div>` : ''}
+        <p class="clube-premio-texto">Uma camiseta e uma caneca do clube.</p>
+      </div>
+      <div class="clube-premio-bloco">
+        <div class="clube-premio-titulo">Como funciona a pontuação</div>
+        <p class="clube-premio-texto">Ao final da leitura de cada livro, o primeiro colocado no ranking ganha uma camiseta e uma caneca térmica exclusivas do Clube do Livro NCC.</p>
+        <p class="clube-premio-texto">Participe das atividades, compartilhe suas reflexões e contribua com as conversas na Mesa de leitores. Os pontos seguem as regras do ranking, e o resultado será anunciado após a conferência da equipe.</p>
       </div>
       <div class="modal-actions"><button class="btn-accent" id="clube-pontos-fechar">Entendi</button></div>
     </div>`;
@@ -19267,6 +19312,14 @@ function renderConteudo(){
     ${conteudoSectionHeaderHtml('sec-clube', 'book', 'Clube do Livro')}
     ${conteudoAberto('sec-clube')? `
     <p class="section-sub" style="margin-top:-6px">Cadastre o livro em estudo, os capítulos, os materiais de apoio e os encontros ao vivo do Clube. Quem está matriculado só no Clube do Livro vê apenas este espaço; Formação, Pós-Graduação e Mentoria têm acesso gratuito a ele também.</p>
+    <div class="ps-section" style="margin-bottom:18px">
+      <label>Prêmio do Ranking de leitores (foto exibida em "Como ganhar pontos" — vale para todos os livros)</label>
+      <div class="clube-admin-capa-row">
+        <div class="clube-admin-capa-thumb" style="width:64px;height:64px">${CLUBE_CONFIG.premio_imagem_url? `<img src="${escapeAttr(CLUBE_CONFIG.premio_imagem_url)}" alt="">` : icon('award','tiny')}</div>
+        <button type="button" class="btn-mini" id="clube-premio-imagem-btn">${icon('upload','tiny')} ${CLUBE_CONFIG.premio_imagem_url?'Trocar imagem':'Anexar imagem'}</button>
+        <input type="file" accept="image/*" id="clube-premio-imagem-file" style="display:none">
+      </div>
+    </div>
     <div class="table-wrap">
       <table class="check-table">
         <thead><tr><th></th><th>Título</th><th>Subtítulo</th><th>Status</th><th>Ordem</th><th></th></tr></thead>
@@ -19611,6 +19664,24 @@ function renderConteudo(){
 
 function bindConteudoClubeEvents(){
   const root = document.getElementById('view-conteudo');
+  // Prêmio do Ranking de leitores: é um ajuste único do Clube (não por livro), então vem antes do
+  // "early return" de baixo — precisa ficar disponível mesmo quando ainda não há nenhum livro cadastrado.
+  const premioBtn = document.getElementById('clube-premio-imagem-btn');
+  if(premioBtn) premioBtn.addEventListener('click', ()=>{
+    const input = document.getElementById('clube-premio-imagem-file');
+    if(input) input.click();
+  });
+  const premioFile = document.getElementById('clube-premio-imagem-file');
+  if(premioFile) premioFile.addEventListener('change', async ()=>{
+    const file = premioFile.files && premioFile.files[0];
+    if(!file) return;
+    premioBtn.disabled = true; premioBtn.textContent = 'Enviando...';
+    try{
+      const url = await uploadClubePremioFile(file);
+      syncClubeConfigUpdate({premio_imagem_url:url});
+      renderConteudo();
+    }catch(e){ console.error('imagem do prêmio', e); alert('Não foi possível enviar essa imagem. Tente de novo.'); premioBtn.disabled = false; premioBtn.innerHTML = `${icon('upload','tiny')} ${CLUBE_CONFIG.premio_imagem_url?'Trocar imagem':'Anexar imagem'}`; }
+  });
   if(!CLUBE_LIVROS.length){
     const addBtn = document.getElementById('add-clube-livro-btn');
     if(addBtn) addBtn.addEventListener('click', async ()=>{

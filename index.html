@@ -7737,9 +7737,9 @@ const TIPO_ENCONTRO_LABELS = {
   mastermind: 'Mastermind',
   plantao_duvidas: 'Plantão de Dúvidas',
   consultorio_simulado: 'Consultório Simulado',
-  individual: 'Encontro 1:1',
+  individual: 'Encontro Individual',
 };
-const LIVE_AUDIENCE_LABELS = { mentorado:'Mentoria', curso:'Método', pgncc:'Pós-Graduação NCC' };
+const LIVE_AUDIENCE_LABELS = { mentorado:'Mentoria', curso:'Método', pgncc:'Pós-Graduação NCC', formacao:'Formação NCC', clube_livro:'Clube do Livro', todos:'Eventos NCC' };
 function formatHoraBR(hhmm){
   if(!hhmm) return '';
   const [h,m] = hhmm.split(':');
@@ -7767,8 +7767,9 @@ function mapLiveSessionRow(row){
     _eventDate: row.event_date,
     _eventHour: row.event_hour || '',
     tipo: row.tipo || null,
-    /* Público do encontro coletivo: 'mentorado' (mentoria) ou 'curso' (Método/curso gravado) — encontros
-       individuais (studentId preenchido) ignoram isso, sempre visíveis só pro aluno específico. */
+    /* Público do encontro coletivo: 'mentorado', 'pgncc', 'formacao', 'clube_livro' ou 'todos' (visível
+       pra qualquer aluno, independente do nível) — 'curso' é valor legado (Método, tier aposentado).
+       Encontros individuais (studentId preenchido) ignoram isso, sempre visíveis só pro aluno específico. */
     audience: row.audience || 'mentorado',
     linkGravacao: row.link_gravacao || '',
     /* null = encontro coletivo, visível na Agenda ao Vivo de todos; preenchido = reunião individual
@@ -14391,6 +14392,7 @@ function renderAgenda(){
   const visible = LIVE_SESSIONS.filter(l=>{
     if(l.studentId!=null) return l.studentId===currentStudentId;
     if(currentRole==='staff') return true;
+    if(l.audience==='todos') return true; // Eventos NCC: visível pra todo mundo, qualquer nível
     if(bonusView) return l.audience==='mentorado'; // Método + Bônus vê a agenda da mentoria (com cadeado fora de terça/sexta)
     return l.audience===getViewingTier();
   });
@@ -18983,17 +18985,17 @@ function renderConteudo(){
       <div class="field full"><label>Título do evento</label><input class="ps-input" type="text" id="new-live-title" placeholder="Ex.: Encontro em grupo — Planejamento de Q4"></div>
       <div class="field"><label>Tipo de encontro</label>
         <select class="ps-input" id="new-live-tipo">
-          <option value="mastermind">Mastermind</option>
           <option value="plantao_duvidas">Plantão de Dúvidas</option>
-          <option value="consultorio_simulado">Consultório Simulado</option>
-          <option value="individual">Encontro 1:1</option>
+          <option value="individual">Encontro Individual</option>
         </select>
       </div>
       <div class="field" id="new-live-audience-wrap"><label>Público</label>
         <select class="ps-input" id="new-live-audience">
           <option value="mentorado">Mentoria (mentorados)</option>
-          <option value="curso">Método (curso gravado)</option>
           <option value="pgncc">Pós-Graduação NCC</option>
+          <option value="formacao">Formação NCC</option>
+          <option value="clube_livro">Clube do Livro</option>
+          <option value="todos">Eventos NCC (todos os alunos)</option>
         </select>
       </div>
       <div class="field" id="new-live-student-wrap" style="display:none">

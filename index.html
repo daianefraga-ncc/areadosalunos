@@ -1572,6 +1572,7 @@
   .clube-hero-info p{margin:0 0 14px;color:var(--text-mute);font-size:13.5px;}
   .clube-hero-sobre{color:var(--text-dim)!important;line-height:1.6;}
   .clube-hero-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .clube-hero-actions .btn-outline{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
   .clube-biblioteca-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;}
   .clube-biblioteca-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;cursor:pointer;transition:border-color .12s;}
   .clube-biblioteca-card:hover{border-color:var(--accent);}
@@ -7849,7 +7850,7 @@ const CLUBE_PONTOS_REGRAS = [
   { texto:'Publicar uma reflexão pertinente ao capítulo', pontos:10, limite:'Uma por semana' },
   { texto:'Responder a um colega acrescentando uma ideia ou pergunta pertinente', pontos:10, limite:'Duas por semana' },
   { texto:'Concluir a atividade "Da leitura à prática"', pontos:15, limite:'Uma por capítulo' },
-  { texto:'Contar sua experiência no clube.', pontos:25, limite:'25 pontos por livro' },
+  { texto:'Contar sua experiência no clube.', pontos:25, limite:'25 pontos por capítulo' },
 ];
 
 /* Mural "O que está acontecendo no mundo sobre a Infância" — notícias/conteúdos curtos que a equipe
@@ -14926,54 +14927,9 @@ function clubeRankingLinhaHtml(r, posicao, meuId, suffix){
     </div>`;
 }
 /* Cartão resumido (top 5 + posição do aluno conectado), exibido na aba "Capítulos e aulas". */
-function clubeRankingCardHtml(livro){
-  const ranking = clubeRankingDoLivro(livro);
-  const top5 = ranking.slice(0,5);
-  const meuId = clubeContextAlunoId();
-  const minhaPos = meuId ? ranking.findIndex(r=>r.alunoId===meuId) : -1;
-  const estouNoTop5 = minhaPos>=0 && minhaPos<5;
-  return `
-    <div class="clube-ranking-card">
-      <div class="clube-ranking-head">
-        <div>
-          <div class="clube-ranking-titulo">${icon('award','tiny')} Ranking de leitores</div>
-          <p class="clube-ranking-sub">Livro em estudo: <strong>${escapeHtml(livro.titulo)}</strong></p>
-        </div>
-        ${livro.ciclo_fim? `<span class="clube-ranking-ciclo">${icon('calendar','tiny')} Ciclo até ${formatDateBR(livro.ciclo_fim)}</span>` : ''}
-      </div>
-      ${ranking.length? `
-      <div class="clube-ranking-lista">
-        ${top5.map((r,i)=>clubeRankingLinhaHtml(r, i+1, meuId, meuId && r.alunoId===meuId? ' (você)' : '')).join('')}
-        ${minhaPos>=0 && !estouNoTop5? `
-          <div class="clube-ranking-divider">···</div>
-          ${clubeRankingLinhaHtml(ranking[minhaPos], minhaPos+1, meuId, ' (você)')}
-        ` : ''}
-        ${minhaPos<0 && meuId? `
-          <div class="clube-ranking-divider">···</div>
-          <div class="clube-ranking-linha minha-linha">
-            <span class="clube-ranking-pos">—</span>
-            <span class="clube-ranking-nome">Você ainda não pontuou neste livro</span>
-            <span class="clube-ranking-pontos">0 pts</span>
-          </div>` : ''}
-      </div>` : `<p class="empty-state">Ninguém pontuou ainda neste livro. Seja o primeiro!</p>`}
-      <div class="clube-ranking-acoes">
-        <button type="button" class="btn-outline btn-mini" id="clube-ranking-como-ganhar">${icon('help','tiny')} Como ganhar pontos</button>
-        <button type="button" class="btn-outline btn-mini" id="clube-ranking-ver-completo">Ver classificação completa ${icon('next','tiny')}</button>
-      </div>
-    </div>`;
-}
-function clubeWireRankingCardBotoes(area, viewId){
-  const comoGanharBtn = area.querySelector('#clube-ranking-como-ganhar');
-  if(comoGanharBtn) comoGanharBtn.addEventListener('click', openClubeComoGanharPontosModal);
-  const verCompletoBtn = area.querySelector('#clube-ranking-ver-completo');
-  if(verCompletoBtn) verCompletoBtn.addEventListener('click', ()=>{
-    clubeSubView = 'ranking';
-    const tabs = document.querySelector('#view-'+viewId+' #clube-tabs');
-    if(tabs) tabs.querySelectorAll('.ae-tab').forEach(t=>t.classList.toggle('active', t.dataset.sub==='ranking'));
-    renderClubeSubview(viewId);
-  });
-}
-/* Aba própria "Ranking de leitores": lista completa, não só o top 5. */
+/* O cartão de ranking (resumo com top 5) só aparece na própria aba "Ranking de leitores" — ver
+   clubeRenderRanking logo abaixo. Já apareceu em "Capítulos e aulas" também, mas a Daiane pediu pra
+   tirar de lá e deixar só nessa aba. */
 function clubeRenderRanking(viewId){
   const area = document.querySelector('#view-'+viewId+' #clube-subview-area');
   if(!area) return;
@@ -15017,7 +14973,6 @@ function clubeRenderCapitulos(viewId){
   const alunoId = clubeContextAlunoId();
   const materiais = clubeMateriaisDoCapitulo(cap.id);
   area.innerHTML = `
-    ${clubeRankingCardHtml(livro)}
     <div class="clube-capitulos-wrap">
       <div class="clube-capitulos-lista">
         <div class="clube-capitulos-lista-titulo">Percurso de leitura</div>
@@ -15071,7 +15026,6 @@ function clubeRenderCapitulos(viewId){
   const ativBtn = document.getElementById('clube-cap-atividade-btn');
   if(ativBtn) ativBtn.addEventListener('click', ()=>openClubeAtividadeModal(cap.id, alunoId? clubeAtividadeResposta(cap.id, alunoId) : ''));
   clubeWireMateriaisBotoes(area);
-  clubeWireRankingCardBotoes(area, viewId);
 }
 
 function clubeMaterialCardHtml(m, capLabel){

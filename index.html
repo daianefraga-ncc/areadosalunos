@@ -14743,11 +14743,10 @@ function clubeRenderCapitulos(viewId){
         <div class="clube-cap-head">
           <div>
             <h3>Capítulo ${cap.numero}${cap.titulo? ' · '+escapeHtml(cap.titulo):''}</h3>
-            <p class="clube-cap-sub">Seu espaço de estudo</p>
           </div>
           <span class="clube-tag clube-tag-gratuito">Acesso gratuito</span>
         </div>
-        ${cap.texto_estudo? `<div class="clube-cap-texto">${formatEstudoTexto(cap.texto_estudo)}</div>` : `<p class="empty-state">Conteúdo deste capítulo ainda não foi publicado.</p>`}
+        ${cap.texto_estudo? `<div class="clube-cap-texto">${formatEstudoTexto(cap.texto_estudo)}</div>` : ''}
         <div class="clube-cap-encontro">
           <div>${icon('calendar','tiny')} <strong>Encontro ao vivo</strong><br><span style="color:var(--text-mute);font-size:12px">Acompanhe o calendário do clube</span></div>
           <button type="button" class="btn-accent" id="clube-cap-encontro-btn">Ver próximo encontro ${icon('next','tiny')}</button>

@@ -1595,6 +1595,7 @@
   .clube-cap-sub{margin:3px 0 0;font-size:12px;color:var(--text-mute);}
   .clube-cap-texto{font-size:13.5px;line-height:1.75;color:var(--text);margin-bottom:16px;}
   .clube-cap-encontro,.clube-cap-atividade{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--bg-elev);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;font-size:12.5px;}
+  #clube-cap-encontro-btn,#clube-cap-atividade-btn{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;font-size:12.5px;flex-shrink:0;}
   .clube-cap-materiais{margin-bottom:12px;}
   .clube-cap-materiais-titulo{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:var(--text-mute);margin-bottom:6px;}
   .clube-mat-linha{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
@@ -10424,7 +10425,7 @@ function acessoRapidoHtml(){
       <button type="button" class="novidades-cta" id="open-novidades-mural">
         <img class="nc-icon" src="${NOVIDADES_ICON_DATA_URI}" alt="">
         <div class="nc-title">Notícias do mundo sobre a Infância</div>
-        <div class="nc-desc">Selecionadas pela equipe — comente e copie para levar ao Prontuário.</div>
+        <div class="nc-desc">Selecionadas pela equipe. Comente e copie para criar conteúdos para suas redes sociais com a Ferramenta NCC.</div>
       </button>
     `);
   }
@@ -10432,14 +10433,14 @@ function acessoRapidoHtml(){
     <button type="button" class="novidades-cta" id="open-painel-clinica">
       <img class="nc-icon" src="${ICON_CLINICA_DATA_URI}" alt="">
       <div class="nc-title">Organize seus acompanhamentos</div>
-      <div class="nc-desc">Quem você acompanha, evolução e objetivos — tudo num só lugar.</div>
+      <div class="nc-desc">Acompanhe a evolução e os objetivos de quem você atende, com base no conhecimento atualizado da neurociência.</div>
     </button>
   `);
   cards.push(`
     <button type="button" class="novidades-cta" id="open-painel-escola">
       <img class="nc-icon" src="${ICON_ESCOLA_DATA_URI}" alt="">
       <div class="nc-title">Recursos para professores e gestores escolares</div>
-      <div class="nc-desc">Atividades, roteiros e formações pensados pra quem atua na escola.</div>
+      <div class="nc-desc">Atividades, roteiros e formações para aplicar o conhecimento atualizado da neurociência no cotidiano escolar.</div>
     </button>
   `);
   cards.push(`

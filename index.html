@@ -2088,7 +2088,7 @@ const NAV_LABELS = {
   agenda:['calendar','Agenda ao Vivo'], materiais:['folder','Materiais'], clubelivro:['book','Clube do Livro'],
   dashboard:['chart','Dashboard do Curso'], dashboardmentoria:['chart','Dashboard da Mentoria'],
   painel:['compass','Painel Profissional'],
-  biblioteca:['biblioteca','Biblioteca de Negócios'],
+  biblioteca:['biblioteca','Desenvolvimento de Serviços para a Infância'],
   estudos:['book','Biblioteca Científica'],
   palestras:['mic','Estúdio de Palestras do NCC'],
   projetoacademico:['briefcase','Projeto Acadêmico'],
@@ -9995,8 +9995,8 @@ function openBloqueioMentoradosModal(titulo, texto){
   document.getElementById('bloqueio-fechar').addEventListener('click', closeModal);
 }
 /* Tela de bloqueio (a página inteira, não um modal) pra qualquer área exclusiva de mentorados da
-   Mentoria NCC (Painel Profissional, Montar Palestra, Projeto Acadêmico, Biblioteca de Negócios,
-   Dashboard da Mentoria) — mesmo padrão visual já usado no bloqueio da Agenda ao Vivo. O item continua
+   Mentoria NCC (Painel Profissional, Montar Palestra, Projeto Acadêmico, Desenvolvimento de Serviços
+   para a Infância, Dashboard da Mentoria) — mesmo padrão visual já usado no bloqueio da Agenda ao Vivo. O item continua
    aparecendo no menu pra todo mundo (com cadeado), e é só ao clicar que aparece esse aviso pra quem não
    é mentorado, convidando a falar com a equipe sobre o pacote. */
 function renderBloqueioMentorados(viewId, titulo, previewHtml){
@@ -10187,7 +10187,7 @@ function setRole(role){
      de 'aluno', então esses itens continuam sempre visíveis para ele.
      O índice é igual pra qualquer tier de aluno — nada fica escondido por tier. O que muda é um cadeado
      ao lado do item quando ele não se aplica àquele tier (ex.: Painel Profissional/Montar
-     Palestra/Projeto Acadêmico/Biblioteca de Negócios/Dashboard da Mentoria pra quem não é da Mentoria
+     Palestra/Projeto Acadêmico/Desenvolvimento de Serviços para a Infância/Dashboard da Mentoria pra quem não é da Mentoria
      NCC) — ao clicar, a própria tela do item mostra o aviso convidando a falar com a equipe sobre o
      pacote, em vez de simplesmente escondê-lo (mesmo padrão já usado na Agenda ao Vivo e nas
      Ferramentas NCC pro Curso Gravado). getViewingTier() resolve pro tier de quem está sendo visto — a
@@ -15672,7 +15672,7 @@ const BUSINESS_LIBRARY = [
   ]},
 ];
 
-/* ================= VIEW: BIBLIOTECA DE NEGÓCIOS =================
+/* ================= VIEW: DESENVOLVIMENTO DE SERVIÇOS PARA A INFÂNCIA =================
    Catálogo de modelos de negócio complementares, organizado por frente estratégica (ver BUSINESS_LIBRARY acima). */
 function bibliotecaHtml(){
   return `
@@ -15695,8 +15695,8 @@ function bibliotecaHtml(){
       </div>
     </div>
 
-    <h2 class="section-title">Biblioteca de Negócios</h2>
-    <p class="section-sub">Modelos de negócio complementares para os profissionais NCC.</p>
+    <h2 class="section-title">Desenvolvimento de Serviços para a Infância</h2>
+    <p class="section-sub">Um ambiente para profissionais que desejam estruturar serviços para crianças, famílias e escolas, com conhecimento científico, ferramentas práticas e acompanhamento da implementação.</p>
     ${BUSINESS_LIBRARY.map(f=>`
       <div class="category-block">
         ${f.titulo? `<h2 class="section-title">${f.titulo}</h2><p class="category-sub">${f.sub}</p>` : ''}
@@ -15715,7 +15715,7 @@ function bibliotecaHtml(){
   `;
 }
 function renderBiblioteca(){
-  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('biblioteca', 'Biblioteca de Negócios', bibliotecaHtml()); return; }
+  if(currentRole==='aluno' && getViewingTier()!=='mentorado'){ renderBloqueioMentorados('biblioteca', 'Desenvolvimento de Serviços para a Infância', bibliotecaHtml()); return; }
   document.getElementById('view-biblioteca').innerHTML = bibliotecaHtml();
   document.getElementById('biblioteca-abrir-cursos').addEventListener('click', ()=>{ window.open(CONFIG_LINK_PRONTUARIO || '#', '_blank', 'noopener'); });
   document.getElementById('biblioteca-abrir-programas').addEventListener('click', ()=>{ window.open(CONFIG_LINK_PRONTUARIO || '#', '_blank', 'noopener'); });
@@ -22462,7 +22462,7 @@ function demoPlaceholderImg(label){
 }
 
 const DEMO_PERFIS = [
-  { tier:'mentorado', icone:'compass', titulo:'Mentoria NCC', texto:'Acesso completo: Aulas, Comunidade, Agenda ao Vivo, Clube do Livro, Biblioteca Científica, Painel Profissional, Estúdio de Palestras, Projeto Acadêmico e Biblioteca de Negócios.' },
+  { tier:'mentorado', icone:'compass', titulo:'Mentoria NCC', texto:'Acesso completo: Aulas, Comunidade, Agenda ao Vivo, Clube do Livro, Biblioteca Científica, Painel Profissional, Estúdio de Palestras, Projeto Acadêmico e Desenvolvimento de Serviços para a Infância.' },
   { tier:'formacao', icone:'award', titulo:'Aluno Formação NCC', texto:'Aulas, Comunidade, Agenda ao Vivo, Clube do Livro, Biblioteca Científica, Ferramentas NCC e acompanhamento individual (Sessões 1:1 e Metas). As áreas exclusivas da Mentoria aparecem com um cadeado, como numa conta real.' },
   { tier:'pgncc', icone:'idcard', titulo:'Aluno Pós-Graduação NCC', texto:'Aulas, Comunidade, Agenda ao Vivo, Clube do Livro, Biblioteca Científica, Ferramentas NCC e acompanhamento individual (Sessões 1:1 e Metas). As áreas exclusivas da Mentoria aparecem com um cadeado, como numa conta real.' },
   { tier:'clube_livro', icone:'book', titulo:'Somente Clube do Livro', texto:'Acesso só ao Clube do Livro. As demais áreas aparecem bloqueadas no menu, exatamente como numa conta real cadastrada só no Clube.' },
@@ -22615,8 +22615,8 @@ function createDemoClient(){
    mapPostRow, mapProjetoAcademicoRow, mergePalestraBriefing, projetoAcademicoEsqueletoPadrao) usadas
    pelo carregamento real, pra garantir o mesmo formato em todo canto. Cobre as áreas que a Daiane pediu
    pra apresentar: Início, Aulas, Comunidade, Agenda ao Vivo, Clube do Livro, Biblioteca Científica,
-   Painel Profissional, Estúdio de Palestras, Projeto Acadêmico e Biblioteca de Negócios (esta última é
-   só conteúdo estático, sem dado pra semear). Semeia o mesmo conteúdo pra qualquer perfil escolhido —
+   Painel Profissional, Estúdio de Palestras, Projeto Acadêmico e Desenvolvimento de Serviços para a
+   Infância (esta última é só conteúdo estático, sem dado pra semear). Semeia o mesmo conteúdo pra qualquer perfil escolhido —
    quem não tem acesso àquela área simplesmente não a vê, pelas mesmas travas de tier já existentes
    (setRole/getViewingTier), sem precisar duplicar lógica aqui. */
 function bootstrapDemoData(tier){

@@ -7138,7 +7138,7 @@ function aeLoteCardHtml(l){
   return `
     <div class="ae-lote-card" data-id="${l.id}">
       <div class="ae-lote-head">
-        <div class="ae-lote-titulo">LOTE ${l.numero_lote} <span class="ae-lote-sub">• ${aulas.length} aula${aulas.length===1?'':'s'}${l.modulo_label? ' • '+escapeHtml(l.modulo_label):''}</span></div>
+        <div class="ae-lote-titulo">CICLO DE AULAS ${l.numero_lote} <span class="ae-lote-sub">• ${aulas.length} aula${aulas.length===1?'':'s'}${l.modulo_label? ' • '+escapeHtml(l.modulo_label):''}</span></div>
         <button class="btn-mini icon-only" data-lote-editar="${l.id}">${icon('edit','tiny')}</button>
       </div>
       <div class="ae-lote-aulas">
@@ -7174,14 +7174,14 @@ function aeRenderPlanejamento(){
   const meses = Object.keys(porMes).sort();
   el.innerHTML = `
     <div class="modal-actions" style="margin:0 0 16px">
-      <button class="btn-accent" id="ae-lote-novo">${icon('plus','tiny')} Novo lote de aulas</button>
+      <button class="btn-accent" id="ae-lote-novo">${icon('plus','tiny')} Novo ciclo de aulas</button>
     </div>
     ${meses.length? meses.map(mes=>`
       <h3 class="ae-planejamento-mes">Planejamento Mensal das Aulas — ${aeMesLabel(mes)}</h3>
       <div class="ae-lotes-grid">
         ${porMes[mes].slice().sort((a,b)=>a.numero_lote-b.numero_lote).map(aeLoteCardHtml).join('')}
       </div>
-    `).join('') : '<p class="empty-state">Nenhum lote de aulas planejado ainda.</p>'}
+    `).join('') : '<p class="empty-state">Nenhum ciclo de aulas planejado ainda.</p>'}
     <div class="ae-entrega-etapas">
       <div class="ae-entrega-head">${icon('list','tiny')} Entrega de cada etapa</div>
       <div class="ae-entrega-grid">
@@ -7217,10 +7217,10 @@ function openLoteModal(id){
   document.getElementById('modal').innerHTML = `
     <div class="modal-body form-modal" style="max-width:640px">
       <div class="cat">Agenda da Equipe — Planejamento de Aulas</div>
-      <h3>${existente? 'Editar lote' : 'Novo lote de aulas'}</h3>
+      <h3>${existente? 'Editar ciclo de aulas' : 'Novo ciclo de aulas'}</h3>
       <div class="ps-section fin-form-grid">
         <div><label class="ps-label">Mês de referência *</label><input class="ps-input" type="month" id="lote-mes" value="${mesInputVal}"></div>
-        <div><label class="ps-label">Número do lote *</label><input class="ps-input" type="number" min="1" id="lote-numero" value="${d.numero_lote}"></div>
+        <div><label class="ps-label">Número do ciclo *</label><input class="ps-input" type="number" min="1" id="lote-numero" value="${d.numero_lote}"></div>
         <div style="grid-column:1/-1"><label class="ps-label">Módulo(s)</label><input class="ps-input" id="lote-modulo" value="${escapeAttr(d.modulo_label||'')}" placeholder="Ex.: Módulo 3"></div>
         <div style="grid-column:1/-1"><label class="ps-label">Aulas (uma por linha: código — título) *</label><textarea class="ps-input" id="lote-aulas" placeholder="A2 — O que é temperamento?">${escapeHtml(aulasTxt)}</textarea></div>
         <div><label class="ps-label">Pesquisa</label><input class="ps-input" type="date" id="lote-pesquisa" value="${d.data_pesquisa||''}"></div>
@@ -7236,11 +7236,11 @@ function openLoteModal(id){
         <div><label class="ps-label">Status</label>
           <select class="ps-input" id="lote-status">${Object.entries(AE_LOTE_STATUS).map(([k,v])=>`<option value="${k}" ${d.status===k?'selected':''}>${v}</option>`).join('')}</select>
         </div>
-        <div style="grid-column:1/-1"><label class="ps-label">Premissas</label><textarea class="ps-input" id="lote-premissas" placeholder="Observações gerais sobre o lote">${escapeHtml(d.premissas||'')}</textarea></div>
+        <div style="grid-column:1/-1"><label class="ps-label">Premissas</label><textarea class="ps-input" id="lote-premissas" placeholder="Observações gerais sobre o ciclo">${escapeHtml(d.premissas||'')}</textarea></div>
       </div>
       <div class="modal-actions">
-        <button class="btn-accent" id="lote-salvar">${existente? 'Salvar alterações' : 'Criar lote'}</button>
-        ${existente? `<button class="btn-outline" id="lote-excluir" style="color:var(--danger);border-color:var(--danger)">${icon('trash','tiny')} Excluir lote</button>`:''}
+        <button class="btn-accent" id="lote-salvar">${existente? 'Salvar alterações' : 'Criar ciclo de aulas'}</button>
+        ${existente? `<button class="btn-outline" id="lote-excluir" style="color:var(--danger);border-color:var(--danger)">${icon('trash','tiny')} Excluir ciclo de aulas</button>`:''}
         <button class="btn-outline" id="lote-cancelar">Cancelar</button>
       </div>
     </div>`;
@@ -7251,7 +7251,7 @@ function openLoteModal(id){
     const mesVal = document.getElementById('lote-mes').value;
     const numero = parseInt(document.getElementById('lote-numero').value, 10);
     const aulasTxtVal = document.getElementById('lote-aulas').value;
-    if(!mesVal || !numero || !aulasTxtVal.trim()){ alert('Preencha o mês de referência, o número do lote e ao menos uma aula.'); return; }
+    if(!mesVal || !numero || !aulasTxtVal.trim()){ alert('Preencha o mês de referência, o número do ciclo e ao menos uma aula.'); return; }
     const aulas = aulasTxtVal.split('\n').map(s=>s.trim()).filter(Boolean).map(linha=>{
       const sep = linha.match(/\s[—-]\s/);
       if(sep){
@@ -7288,7 +7288,7 @@ function openLoteModal(id){
   });
   const btnExcluir = document.getElementById('lote-excluir');
   if(btnExcluir) btnExcluir.addEventListener('click', async ()=>{
-    if(!confirmDelete('Excluir este lote de aulas? Essa ação não pode ser desfeita.')) return;
+    if(!confirmDelete('Excluir este ciclo de aulas? Essa ação não pode ser desfeita.')) return;
     btnExcluir.disabled = true;
     await aeExcluirLote(existente.id);
     closeModal();
@@ -15676,6 +15676,9 @@ const BUSINESS_LIBRARY = [
    Catálogo de modelos de negócio complementares, organizado por frente estratégica (ver BUSINESS_LIBRARY acima). */
 function bibliotecaHtml(){
   return `
+    <h2 class="section-title">Desenvolvimento de Serviços para a Infância</h2>
+    <p class="section-sub">Um ambiente para profissionais que desejam estruturar serviços para crianças, famílias e escolas, com conhecimento científico, ferramentas práticas e acompanhamento da implementação.</p>
+
     <div class="category-block">
       <h2 class="section-title">Meus Cursos e Programas</h2>
       <p class="category-sub">Cursos e programas que você criou a partir do método NCC, gerenciados no NCC Integração.</p>
@@ -15695,8 +15698,6 @@ function bibliotecaHtml(){
       </div>
     </div>
 
-    <h2 class="section-title">Desenvolvimento de Serviços para a Infância</h2>
-    <p class="section-sub">Um ambiente para profissionais que desejam estruturar serviços para crianças, famílias e escolas, com conhecimento científico, ferramentas práticas e acompanhamento da implementação.</p>
     ${BUSINESS_LIBRARY.map(f=>`
       <div class="category-block">
         ${f.titulo? `<h2 class="section-title">${f.titulo}</h2><p class="category-sub">${f.sub}</p>` : ''}

@@ -65,6 +65,24 @@
     --stage-conectar:#a5705d;
     --stage-transformar:#dca360;
     --stage-gerenciar:#5b3d1a;
+    /* Cores das 14 "Área" da Agenda da Equipe (Calendário mensal/legenda) — uma cor fixa por área, numa
+       progressão de matiz só pra dar o máximo de distinção visual entre as etiquetas (não tem significado
+       narrativo como as --stage-* acima). Pessoal/Formação NCC/PGNCC/Clube do Livro são as 4 áreas novas
+       pedidas pela Daiane. */
+    --area-aulas_cursos:#bf7469; --area-aulas_cursos-soft:rgba(191,116,105,0.16);
+    --area-noticias_infancia:#bf9769; --area-noticias_infancia-soft:rgba(191,151,105,0.16);
+    --area-atualizacao_cientifica:#bfb969; --area-atualizacao_cientifica-soft:rgba(191,185,105,0.16);
+    --area-redes_sociais:#a2bf69; --area-redes_sociais-soft:rgba(162,191,105,0.16);
+    --area-alunos_suporte:#80bf69; --area-alunos_suporte-soft:rgba(128,191,105,0.16);
+    --area-eventos_palestras:#69bf74; --area-eventos_palestras-soft:rgba(105,191,116,0.16);
+    --area-gestao_plataforma:#69bf97; --area-gestao_plataforma-soft:rgba(105,191,151,0.16);
+    --area-gestao_academica:#69bfb9; --area-gestao_academica-soft:rgba(105,191,185,0.16);
+    --area-comercial:#69a2bf; --area-comercial-soft:rgba(105,162,191,0.16);
+    --area-financeiro_administrativo:#6980bf; --area-financeiro_administrativo-soft:rgba(105,128,191,0.16);
+    --area-pessoal:#7469bf; --area-pessoal-soft:rgba(116,105,191,0.16);
+    --area-formacao_ncc:#9769bf; --area-formacao_ncc-soft:rgba(151,105,191,0.16);
+    --area-pgncc:#b969bf; --area-pgncc-soft:rgba(185,105,191,0.16);
+    --area-clube_livro:#bf69a2; --area-clube_livro-soft:rgba(191,105,162,0.16);
     --shadow-drop:0 12px 30px rgba(20,12,4,0.45);
     --shadow-soft:0 2px 8px rgba(20,12,4,0.38);
     --shadow-col:-10px 0 12px -8px rgba(20,12,4,0.5);
@@ -129,6 +147,20 @@
     --stage-conectar:#6a4a3d;
     --stage-transformar:#b9803f;
     --stage-gerenciar:#43290f;
+    --area-aulas_cursos:#77362c; --area-aulas_cursos-soft:rgba(119,54,44,0.13);
+    --area-noticias_infancia:#77542c; --area-noticias_infancia-soft:rgba(119,84,44,0.13);
+    --area-atualizacao_cientifica:#77722c; --area-atualizacao_cientifica-soft:rgba(119,114,44,0.13);
+    --area-redes_sociais:#5e772c; --area-redes_sociais-soft:rgba(94,119,44,0.13);
+    --area-alunos_suporte:#40772c; --area-alunos_suporte-soft:rgba(64,119,44,0.13);
+    --area-eventos_palestras:#2c7736; --area-eventos_palestras-soft:rgba(44,119,54,0.13);
+    --area-gestao_plataforma:#2c7754; --area-gestao_plataforma-soft:rgba(44,119,84,0.13);
+    --area-gestao_academica:#2c7772; --area-gestao_academica-soft:rgba(44,119,114,0.13);
+    --area-comercial:#2c5e77; --area-comercial-soft:rgba(44,94,119,0.13);
+    --area-financeiro_administrativo:#2c4077; --area-financeiro_administrativo-soft:rgba(44,64,119,0.13);
+    --area-pessoal:#362c77; --area-pessoal-soft:rgba(54,44,119,0.13);
+    --area-formacao_ncc:#542c77; --area-formacao_ncc-soft:rgba(84,44,119,0.13);
+    --area-pgncc:#722c77; --area-pgncc-soft:rgba(114,44,119,0.13);
+    --area-clube_livro:#772c5e; --area-clube_livro-soft:rgba(119,44,94,0.13);
     --shadow-drop:0 12px 30px rgba(60,45,28,0.15);
     --shadow-soft:0 2px 8px rgba(60,45,28,0.12);
     --shadow-col:-10px 0 12px -8px rgba(60,45,28,0.18);
@@ -1460,20 +1492,41 @@
   .ae-cal-cell.ae-cal-outro-mes{opacity:0.4;}
   .ae-cal-cell .ae-cal-daynum{font-weight:700;font-size:11px;margin-bottom:3px;}
   .ae-cal-item{display:block;max-width:100%;background:var(--bg-card);border-radius:4px;padding:2px 4px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;box-sizing:border-box;}
-  .ae-cal-item.ae-cal-cat-gravacao{background:var(--shared-soft);color:var(--shared);}
-  .ae-cal-item.ae-cal-cat-publicacao{background:var(--success-soft);color:var(--success);}
-  .ae-cal-item.ae-cal-cat-noticias{background:rgba(220,163,96,0.18);color:var(--stage-transformar);}
-  .ae-cal-item.ae-cal-cat-ncc_plat{background:var(--individual-soft);color:var(--individual);}
-  .ae-cal-item.ae-cal-cat-redes_sociais{background:var(--accent-soft);color:var(--accent);}
+  /* Uma cor por "Área" da atividade (ver AE_AREAS/aeCalCategoria) — tanto na etiqueta do dia quanto na
+     bolinha da legenda acima do calendário. "outras" é só um reforço de segurança pra área antiga/sem
+     correspondência; hoje todo cadastro novo sempre tem uma área válida. */
+  .ae-cal-item.ae-cal-cat-aulas_cursos{background:var(--area-aulas_cursos-soft);color:var(--area-aulas_cursos);}
+  .ae-cal-item.ae-cal-cat-noticias_infancia{background:var(--area-noticias_infancia-soft);color:var(--area-noticias_infancia);}
+  .ae-cal-item.ae-cal-cat-atualizacao_cientifica{background:var(--area-atualizacao_cientifica-soft);color:var(--area-atualizacao_cientifica);}
+  .ae-cal-item.ae-cal-cat-redes_sociais{background:var(--area-redes_sociais-soft);color:var(--area-redes_sociais);}
+  .ae-cal-item.ae-cal-cat-alunos_suporte{background:var(--area-alunos_suporte-soft);color:var(--area-alunos_suporte);}
+  .ae-cal-item.ae-cal-cat-eventos_palestras{background:var(--area-eventos_palestras-soft);color:var(--area-eventos_palestras);}
+  .ae-cal-item.ae-cal-cat-gestao_plataforma{background:var(--area-gestao_plataforma-soft);color:var(--area-gestao_plataforma);}
+  .ae-cal-item.ae-cal-cat-gestao_academica{background:var(--area-gestao_academica-soft);color:var(--area-gestao_academica);}
+  .ae-cal-item.ae-cal-cat-comercial{background:var(--area-comercial-soft);color:var(--area-comercial);}
+  .ae-cal-item.ae-cal-cat-financeiro_administrativo{background:var(--area-financeiro_administrativo-soft);color:var(--area-financeiro_administrativo);}
+  .ae-cal-item.ae-cal-cat-pessoal{background:var(--area-pessoal-soft);color:var(--area-pessoal);}
+  .ae-cal-item.ae-cal-cat-formacao_ncc{background:var(--area-formacao_ncc-soft);color:var(--area-formacao_ncc);}
+  .ae-cal-item.ae-cal-cat-pgncc{background:var(--area-pgncc-soft);color:var(--area-pgncc);}
+  .ae-cal-item.ae-cal-cat-clube_livro{background:var(--area-clube_livro-soft);color:var(--area-clube_livro);}
   .ae-cal-item.ae-cal-cat-outras{background:var(--bg-elev);color:var(--text-dim);}
   .ae-cal-legenda{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;font-size:10.5px;color:var(--text-mute);}
   .ae-cal-legenda-item{display:inline-flex;align-items:center;gap:4px;}
   .ae-cal-legenda-dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
-  .ae-cal-legenda-dot.ae-cal-cat-gravacao{background:var(--shared);}
-  .ae-cal-legenda-dot.ae-cal-cat-publicacao{background:var(--success);}
-  .ae-cal-legenda-dot.ae-cal-cat-noticias{background:var(--stage-transformar);}
-  .ae-cal-legenda-dot.ae-cal-cat-ncc_plat{background:var(--individual);}
-  .ae-cal-legenda-dot.ae-cal-cat-redes_sociais{background:var(--accent);}
+  .ae-cal-legenda-dot.ae-cal-cat-aulas_cursos{background:var(--area-aulas_cursos);}
+  .ae-cal-legenda-dot.ae-cal-cat-noticias_infancia{background:var(--area-noticias_infancia);}
+  .ae-cal-legenda-dot.ae-cal-cat-atualizacao_cientifica{background:var(--area-atualizacao_cientifica);}
+  .ae-cal-legenda-dot.ae-cal-cat-redes_sociais{background:var(--area-redes_sociais);}
+  .ae-cal-legenda-dot.ae-cal-cat-alunos_suporte{background:var(--area-alunos_suporte);}
+  .ae-cal-legenda-dot.ae-cal-cat-eventos_palestras{background:var(--area-eventos_palestras);}
+  .ae-cal-legenda-dot.ae-cal-cat-gestao_plataforma{background:var(--area-gestao_plataforma);}
+  .ae-cal-legenda-dot.ae-cal-cat-gestao_academica{background:var(--area-gestao_academica);}
+  .ae-cal-legenda-dot.ae-cal-cat-comercial{background:var(--area-comercial);}
+  .ae-cal-legenda-dot.ae-cal-cat-financeiro_administrativo{background:var(--area-financeiro_administrativo);}
+  .ae-cal-legenda-dot.ae-cal-cat-pessoal{background:var(--area-pessoal);}
+  .ae-cal-legenda-dot.ae-cal-cat-formacao_ncc{background:var(--area-formacao_ncc);}
+  .ae-cal-legenda-dot.ae-cal-cat-pgncc{background:var(--area-pgncc);}
+  .ae-cal-legenda-dot.ae-cal-cat-clube_livro{background:var(--area-clube_livro);}
   .ae-cal-legenda-dot.ae-cal-cat-outras{background:var(--text-mute);}
   .ae-semana-wrap{overflow-x:auto;}
   .ae-semana-grid{width:100%;border-collapse:collapse;min-width:920px;}
@@ -6824,6 +6877,7 @@ const AE_AREAS = {
   redes_sociais:'Redes sociais', alunos_suporte:'Alunos e suporte', eventos_palestras:'Eventos e palestras',
   gestao_plataforma:'Gestão da plataforma', gestao_academica:'Gestão acadêmica', comercial:'Comercial',
   financeiro_administrativo:'Financeiro e Administrativo',
+  pessoal:'Pessoal', formacao_ncc:'Formação NCC', pgncc:'PGNCC', clube_livro:'Clube do Livro',
 };
 const AE_DOMINIOS = { ncc_plat:'NCC Plat', redes_sociais:'Redes Sociais', gestao_aulas:'Gestão de Aulas' };
 const AE_STATUS = { a_fazer:'A fazer', em_andamento:'Em andamento', aguardando_outra_pessoa:'Aguardando outra pessoa', concluida:'Concluída' };
@@ -7059,19 +7113,14 @@ function aeRenderSemana(){
     });
   });
 }
-const AE_CAL_CATEGORIAS = {
-  gravacao: 'Gravação de aula', publicacao: 'Publicação de aula', noticias: 'Notícias da Infância',
-  ncc_plat: 'NCC Plat (demais)', redes_sociais: 'Redes sociais (demais)', outras: 'Outras rotinas internas',
-};
+/* A legenda/cor do Calendário mensal segue direto a "Área" de cada atividade (AE_AREAS) — uma cor por
+   área, pra diferenciar de verdade o que é o quê (antes era um agrupamento mais genérico por
+   domínio/etapa, bem menos útil visualmente). "Área" é obrigatória ao criar/editar a atividade, então na
+   prática toda atividade sempre cai numa das cores reais; a legenda mostra só as 14 áreas de verdade — a
+   classe CSS "outras" (ver .ae-cal-cat-outras) existe só como reforço de segurança visual pra um cadastro
+   antigo com uma área que não exista mais, sem precisar aparecer na legenda. */
 function aeCalCategoria(a){
-  if(a.dominio==='gestao_aulas'){
-    if(a.etapa_pipeline==='gravacao') return 'gravacao';
-    if(a.etapa_pipeline==='publicacao') return 'publicacao';
-  }
-  if(a.area==='noticias_infancia') return 'noticias';
-  if(a.dominio==='ncc_plat') return 'ncc_plat';
-  if(a.dominio==='redes_sociais') return 'redes_sociais';
-  return 'outras';
+  return AE_AREAS[a.area] ? a.area : 'outras';
 }
 function aeRenderCalendario(){
   const ano = aeCalMonth.getFullYear(), mes = aeCalMonth.getMonth();
@@ -7102,7 +7151,7 @@ function aeRenderCalendario(){
       <strong>${aeCalMonth.toLocaleDateString('pt-BR',{month:'long', year:'numeric'})}</strong>
       <button class="btn-mini icon-only" id="ae-cal-next">${icon('next','tiny')}</button>
     </div>
-    <div class="ae-cal-legenda">${Object.entries(AE_CAL_CATEGORIAS).map(([k,v])=>`<span class="ae-cal-legenda-item"><span class="ae-cal-legenda-dot ae-cal-cat-${k}"></span>${v}</span>`).join('')}</div>
+    <div class="ae-cal-legenda">${Object.entries(AE_AREAS).map(([k,v])=>`<span class="ae-cal-legenda-item"><span class="ae-cal-legenda-dot ae-cal-cat-${k}"></span>${v}</span>`).join('')}</div>
     <div class="ae-cal-grid">
       ${AE_DIAS_SEMANA.map(d=>`<div class="ae-cal-head">${d}</div>`).join('')}
       ${cel}

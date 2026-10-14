@@ -7310,6 +7310,14 @@ async function aeAtualizar(id, payload){
   if(idx>=0) AE_ATIVIDADES[idx] = data;
   return data;
 }
+/* Exclusão definitiva (diferente de "Arquivar", que só marca arquivada:true e mantém o histórico) —
+   usada no botão "Excluir" do modal de detalhe, pra quando o compromisso foi criado por engano ou não
+   faz mais sentido guardar nem arquivado. */
+async function aeExcluirAtividade(id){
+  const { error } = await sb.from('equipe_atividades').delete().eq('id', id);
+  if(error) throw error;
+  AE_ATIVIDADES = AE_ATIVIDADES.filter(a=>a.id!==id);
+}
 async function aePropagarRecorrencia(a, campos){
   // Aplica os mesmos campos (ex.: responsavel_id/revisor_id/prioridade/descricao) às próximas
   // ocorrências ainda não feitas da mesma rotina — nunca altera o histórico das anteriores.
@@ -7494,6 +7502,7 @@ function aeRenderDetalheModal(a, materiais, comentarios, historico){
       <div class="modal-actions">
         <button class="btn-accent" id="ae-d-editar">${icon('edit','tiny')} Editar</button>
         ${!a.arquivada? `<button class="btn-outline" id="ae-d-arquivar">${icon('folder','tiny')} Arquivar</button>`:''}
+        <button class="btn-outline" id="ae-d-excluir" style="color:var(--danger);border-color:var(--danger)">${icon('trash','tiny')} Excluir</button>
         <button class="btn-outline" id="ae-d-fechar">Fechar</button>
       </div>
     </div>`;
@@ -7533,6 +7542,11 @@ function aeRenderDetalheModal(a, materiais, comentarios, historico){
     if(!confirm('Arquivar esta atividade? O histórico continua guardado.')) return;
     try{ await aeAtualizar(a.id, {arquivada: true}); closeModal(); if(currentView==='agendaequipe') renderAgendaEquipe(); }
     catch(e){ console.error(e); alert('Não foi possível arquivar.'); }
+  });
+  document.getElementById('ae-d-excluir').addEventListener('click', async ()=>{
+    if(!confirmDelete('Excluir este compromisso? Essa ação não pode ser desfeita (diferente de arquivar, não fica guardado no histórico).')) return;
+    try{ await aeExcluirAtividade(a.id); closeModal(); if(currentView==='agendaequipe') renderAgendaEquipe(); }
+    catch(e){ console.error(e); alert('Não foi possível excluir.'); }
   });
 }
 

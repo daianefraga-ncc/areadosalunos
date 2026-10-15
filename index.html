@@ -14791,17 +14791,28 @@ function renderClubeLivro(viewId){
   if(!clubeLivroAtualId || !clubeGetLivro(clubeLivroAtualId)) clubeLivroAtualId = (clubeLivroPadrao()||{}).id || null;
 
   if(clubeMostrandoBiblioteca && CLUBE_LIVROS.length>1){
-    container.innerHTML = `
-      <nav class="clube-breadcrumb"><span>${icon('home','tiny')} Biblioteca do clube</span></nav>
-      <h2 class="section-title">Biblioteca do Clube</h2>
-      <div class="clube-biblioteca-grid">
-        ${CLUBE_LIVROS.map(l=>`
+    /* Agrupa a Biblioteca do Clube por status, com a área "Livros já estudados" (status concluido)
+       bem separada e nomeada — é onde ficam os livros encerrados, com acesso aos capítulos, materiais
+       e às aulas gravadas (aba "Aulas gravadas" dentro do livro, ver clubeRenderAulas). */
+    const gruposBiblioteca = [
+      {status:'em_estudo', label:'Livro em estudo'},
+      {status:'concluido', label:'Livros já estudados'},
+      {status:'planejado', label:'Em breve'},
+    ];
+    const clubeBibliotecaCardHtml = (l)=>`
           <div class="clube-biblioteca-card" data-livro="${l.id}">
             <div class="clube-biblioteca-capa">${l.capa_url? `<img src="${escapeAttr(l.capa_url)}" alt="">` : escapeHtml(l.titulo)}</div>
             <div class="clube-biblioteca-titulo">${escapeHtml(l.titulo)}</div>
-            ${l.status==='em_estudo'? `<span class="clube-tag">Livro em estudo</span>` : l.status==='concluido'? `<span class="clube-tag clube-tag-concluido">Já estudado</span>` : ''}
-          </div>`).join('')}
-      </div>`;
+            ${l.status==='em_estudo'? `<span class="clube-tag">Livro em estudo</span>` : l.status==='concluido'? `<span class="clube-tag clube-tag-concluido">Já estudado</span>` : `<span class="clube-tag">Em breve</span>`}
+          </div>`;
+    container.innerHTML = `
+      <nav class="clube-breadcrumb"><span>${icon('home','tiny')} Biblioteca do clube</span></nav>
+      <h2 class="section-title">Biblioteca do Clube</h2>
+      ${gruposBiblioteca.map(g=>{
+        const livrosDoGrupo = CLUBE_LIVROS.filter(l=>l.status===g.status);
+        if(!livrosDoGrupo.length) return '';
+        return `<h3 class="ps-h" style="margin-top:18px">${g.label}</h3><div class="clube-biblioteca-grid">${livrosDoGrupo.map(clubeBibliotecaCardHtml).join('')}</div>`;
+      }).join('')}`;
     container.querySelectorAll('[data-livro]').forEach(card=>{
       card.addEventListener('click', ()=>{
         clubeLivroAtualId = card.dataset.livro; clubeMostrandoBiblioteca = false;
@@ -14822,7 +14833,7 @@ function renderClubeLivro(viewId){
     <div class="clube-hero">
       <div class="clube-hero-capa">${livro.capa_url? `<img src="${escapeAttr(livro.capa_url)}" alt="">` : escapeHtml(livro.titulo)}</div>
       <div class="clube-hero-info">
-        ${livro.status==='em_estudo'? `<span class="clube-tag">Livro em estudo</span>` : ''}
+        ${livro.status==='em_estudo'? `<span class="clube-tag">Livro em estudo</span>` : livro.status==='concluido'? `<span class="clube-tag clube-tag-concluido">Já estudado</span>` : ''}
         <h2>${escapeHtml(livro.titulo)}</h2>
         ${livro.subtitulo? `<p>${escapeHtml(livro.subtitulo)}</p>` : ''}
         ${livro.sobre_livro? `<p class="clube-hero-sobre">${escapeHtml(livro.sobre_livro)}</p>` : ''}
@@ -14833,6 +14844,7 @@ function renderClubeLivro(viewId){
     </div>
     <div class="ae-tabs" id="clube-tabs">
       <div class="ae-tab ${clubeSubView==='capitulos'?'active':''}" data-sub="capitulos">Capítulos e aulas</div>
+      <div class="ae-tab ${clubeSubView==='aulas'?'active':''}" data-sub="aulas">Aulas gravadas</div>
       <div class="ae-tab ${clubeSubView==='materiais'?'active':''}" data-sub="materiais">Materiais de apoio</div>
       <div class="ae-tab ${clubeSubView==='mesa'?'active':''}" data-sub="mesa">Mesa de leitores</div>
       <div class="ae-tab ${clubeSubView==='caderno'?'active':''}" data-sub="caderno">Meu caderno</div>
@@ -14855,8 +14867,53 @@ function renderClubeLivro(viewId){
 }
 
 function renderClubeSubview(viewId){
-  const map = { capitulos:clubeRenderCapitulos, materiais:clubeRenderMateriais, mesa:clubeRenderMesa, caderno:clubeRenderCaderno, ranking:clubeRenderRanking };
+  const map = { capitulos:clubeRenderCapitulos, aulas:clubeRenderAulas, materiais:clubeRenderMateriais, mesa:clubeRenderMesa, caderno:clubeRenderCaderno, ranking:clubeRenderRanking };
   map[clubeSubView](viewId);
+}
+
+/* Aba "Aulas gravadas" — todos os encontros do livro (ver CLUBE_ENCONTROS), separados em "Próximos
+   encontros" (data no futuro) e "Aulas gravadas" (data já passou), igual ao padrão usado em Agenda ao
+   Vivo (ver renderAgenda/"Gravações anteriores"). É aqui que um livro "Já estudado" (status concluido)
+   continua acessível para o aluno rever as aulas gravadas durante o período em que foi estudado — a
+   equipe cadastra o link de cada encontro em Conteúdo → Clube do Livro → Encontros ao vivo. */
+function clubeRenderAulas(viewId){
+  const area = document.querySelector('#view-'+viewId+' #clube-subview-area');
+  if(!area) return;
+  const livro = clubeGetLivro(clubeLivroAtualId);
+  const capitulos = clubeCapitulosDoLivro(livro.id);
+  const capLabelOf = (capId)=>{ const c = capitulos.find(x=>x.id===capId); return c? `Capítulo ${c.numero}` : ''; };
+  const agora = Date.now();
+  const todos = CLUBE_ENCONTROS.filter(e=>e.livro_id===livro.id);
+  const proximos = todos.filter(e=>new Date(e.data_hora).getTime()>=agora).sort((a,b)=>new Date(a.data_hora)-new Date(b.data_hora));
+  const passados = todos.filter(e=>new Date(e.data_hora).getTime()<agora).sort((a,b)=>new Date(b.data_hora)-new Date(a.data_hora));
+  const cardHtml = (e, isPast)=>{
+    const d = new Date(e.data_hora);
+    const dataParts = new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo', day:'2-digit', month:'2-digit'}).formatToParts(d);
+    const dia = dataParts.find(p=>p.type==='day').value;
+    const mes = MESES_ABREV[Number(dataParts.find(p=>p.type==='month').value)-1].toUpperCase();
+    const hora = d.toLocaleTimeString('pt-BR',{timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit'});
+    const capLabel = capLabelOf(e.capitulo_id);
+    return `
+    <div class="agenda-card ${isPast?'past':''}">
+      <div class="agenda-date"><div class="d">${dia}</div><div class="m">${mes}</div></div>
+      <div class="agenda-info">
+        <div class="title">${escapeHtml(e.titulo)} ${isPast? `<span class="pill replay">Gravação</span>` : `<span class="pill live">Ao vivo</span>`}</div>
+        <div class="meta">${hora}${capLabel? ' — '+capLabel : ''}</div>
+      </div>
+      ${isPast
+        ? (e.link_url
+            ? `<a class="btn-outline" href="${escapeAttr(e.link_url)}" target="_blank" rel="noopener">${icon('play','tiny')} Assistir</a>`
+            : `<span class="btn-outline disabled" title="A equipe interna ainda não adicionou o link desta gravação">${icon('play','tiny')} Assistir</span>`)
+        : (e.link_url? `<a class="btn-outline" href="${escapeAttr(e.link_url)}" target="_blank" rel="noopener">${icon('externallink','tiny')} Entrar no encontro</a>` : '')}
+    </div>`;
+  };
+  area.innerHTML = `
+    ${proximos.length? `
+    <h3 class="section-title" style="margin-top:0">${icon('calendar','tiny')} Próximos encontros</h3>
+    <div class="agenda-list" style="margin-bottom:22px">${proximos.map(e=>cardHtml(e,false)).join('')}</div>` : ''}
+    <h3 class="section-title" style="margin-top:0">${icon('video','tiny')} Aulas gravadas</h3>
+    ${passados.length? `<div class="agenda-list">${passados.map(e=>cardHtml(e,true)).join('')}</div>` : `<p class="section-sub">Ainda não há aulas gravadas deste livro.</p>`}
+  `;
 }
 
 function openClubeProximoEncontroModal(livro, cap){
@@ -14880,12 +14937,26 @@ function openClubeProximoEncontroModal(livro, cap){
         </div>
       ` : `
         <p class="empty-state">Nenhum encontro agendado ainda para este livro. Assim que a equipe marcar um, ele aparece aqui.</p>
-        <div class="modal-actions"><button class="btn-outline" id="clube-encontro-fechar">Fechar</button></div>
+        <div class="modal-actions">
+          <button class="btn-outline" id="clube-encontro-ver-aulas">${icon('video','tiny')} Ver aulas gravadas</button>
+          <button class="btn-outline" id="clube-encontro-fechar">Fechar</button>
+        </div>
       `}
     </div>`;
   modalReturnTo = null; modalCloseGuard = null;
   document.getElementById('modal-backdrop').classList.add('open');
   document.getElementById('clube-encontro-fechar').addEventListener('click', closeModal);
+  const verAulasBtn = document.getElementById('clube-encontro-ver-aulas');
+  if(verAulasBtn) verAulasBtn.addEventListener('click', ()=>{
+    closeModal();
+    clubeSubView = 'aulas';
+    const tabsEl = document.querySelector('#clube-tabs');
+    if(!tabsEl) return;
+    const viewEl = tabsEl.closest('[id^="view-"]');
+    if(!viewEl) return;
+    tabsEl.querySelectorAll('.ae-tab').forEach(x=>x.classList.toggle('active', x.dataset.sub==='aulas'));
+    renderClubeSubview(viewEl.id.replace('view-',''));
+  });
 }
 
 function openClubeAtividadeModal(capId, respostaAtual){
@@ -19531,6 +19602,7 @@ function renderConteudo(){
       </div>
 
       <h3 class="section-title" style="margin-top:18px">${icon('calendar','tiny')} Encontros ao vivo — ${escapeHtml(livroSel.titulo)}</h3>
+      <p class="section-sub" style="margin-top:-6px">Depois que a data passar, cada encontro aparece automaticamente na aba "Aulas gravadas" do livro para o aluno. Cole o link da gravação no campo "Link" (pode deixar em branco e voltar depois) para liberar o botão "Assistir" lá.</p>
       <div class="table-wrap">
         <table class="check-table">
           <thead><tr><th>Título</th><th>Capítulo</th><th>Data/hora</th><th>Link</th><th></th></tr></thead>

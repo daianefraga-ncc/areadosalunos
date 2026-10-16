@@ -14903,29 +14903,17 @@ function renderClubeSubview(viewId){
   map[clubeSubView](viewId);
 }
 
-/* Aba "Aulas gravadas" — todos os encontros do livro (ver CLUBE_ENCONTROS), separados em "Próximos
-   encontros" (data no futuro) e "Aulas gravadas" (data já passou), igual ao padrão usado em Agenda ao
-   Vivo (ver renderAgenda/"Gravações anteriores"). É aqui que um livro "Já estudado" (status concluido)
-   continua acessível para o aluno rever as aulas gravadas durante o período em que foi estudado — a
-   equipe cadastra o link de cada encontro em Conteúdo → Clube do Livro → Encontros ao vivo. */
-function clubeRenderAulas(viewId){
-  const area = document.querySelector('#view-'+viewId+' #clube-subview-area');
-  if(!area) return;
-  const livro = clubeGetLivro(clubeLivroAtualId);
-  const capitulos = clubeCapitulosDoLivro(livro.id);
-  const capLabelOf = (capId)=>{ const c = capitulos.find(x=>x.id===capId); return c? `Capítulo ${c.numero}` : ''; };
-  const agora = Date.now();
-  const todos = CLUBE_ENCONTROS.filter(e=>e.livro_id===livro.id);
-  const proximos = todos.filter(e=>new Date(e.data_hora).getTime()>=agora).sort((a,b)=>new Date(a.data_hora)-new Date(b.data_hora));
-  const passados = todos.filter(e=>new Date(e.data_hora).getTime()<agora).sort((a,b)=>new Date(b.data_hora)-new Date(a.data_hora));
-  const cardHtml = (e, isPast)=>{
-    const d = new Date(e.data_hora);
-    const dataParts = new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo', day:'2-digit', month:'2-digit'}).formatToParts(d);
-    const dia = dataParts.find(p=>p.type==='day').value;
-    const mes = MESES_ABREV[Number(dataParts.find(p=>p.type==='month').value)-1].toUpperCase();
-    const hora = d.toLocaleTimeString('pt-BR',{timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit'});
-    const capLabel = capLabelOf(e.capitulo_id);
-    return `
+/* Card de um encontro do Clube do Livro (ver CLUBE_ENCONTROS) — usado tanto na lista de "Próximos
+   encontros" (dentro de "Capítulos e aulas", ver clubeRenderCapitulos) quanto, se algum dia for preciso
+   de novo, em qualquer outra lista de encontros. isPast muda o selo ("Ao vivo"/"Gravação") e a ação do
+   botão (entrar no encontro / assistir a gravação). */
+function clubeEncontroCardHtml(e, isPast, capLabel){
+  const d = new Date(e.data_hora);
+  const dataParts = new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo', day:'2-digit', month:'2-digit'}).formatToParts(d);
+  const dia = dataParts.find(p=>p.type==='day').value;
+  const mes = MESES_ABREV[Number(dataParts.find(p=>p.type==='month').value)-1].toUpperCase();
+  const hora = d.toLocaleTimeString('pt-BR',{timeZone:'America/Sao_Paulo', hour:'2-digit', minute:'2-digit'});
+  return `
     <div class="agenda-card ${isPast?'past':''}">
       <div class="agenda-date"><div class="d">${dia}</div><div class="m">${mes}</div></div>
       <div class="agenda-info">
@@ -14938,10 +14926,16 @@ function clubeRenderAulas(viewId){
             : `<span class="btn-outline disabled" title="A equipe interna ainda não adicionou o link desta gravação">${icon('play','tiny')} Assistir</span>`)
         : (e.link_url? `<a class="btn-outline" href="${escapeAttr(e.link_url)}" target="_blank" rel="noopener">${icon('externallink','tiny')} Entrar no encontro</a>` : '')}
     </div>`;
-  };
-  /* Aulas gravadas direto no capítulo (ver campo "Link da aula gravada" no admin de cada capítulo) —
-     aparecem aqui também, não só na página do próprio capítulo, pra ficarem todas reunidas num só
-     lugar junto com as gravações de encontros ao vivo abaixo. */
+}
+
+/* Aba "Aulas gravadas" — só as aulas cadastradas direto em cada capítulo (campo "Link da aula gravada"
+   no admin). Os "Próximos encontros" ficam na aba "Capítulos e aulas" (ver clubeRenderCapitulos), por
+   pedido da Daiane — essa aba aqui é só sobre o que já está gravado e pronto pra assistir. */
+function clubeRenderAulas(viewId){
+  const area = document.querySelector('#view-'+viewId+' #clube-subview-area');
+  if(!area) return;
+  const livro = clubeGetLivro(clubeLivroAtualId);
+  const capitulos = clubeCapitulosDoLivro(livro.id);
   const capsComAula = capitulos.filter(c=>c.aula_gravada_url).sort((a,b)=>a.numero-b.numero);
   const capCardHtml = (c)=>`
     <div class="clube-cap-encontro">
@@ -14949,14 +14943,8 @@ function clubeRenderAulas(viewId){
       <a class="btn-accent" href="${escapeAttr(c.aula_gravada_url)}" target="_blank" rel="noopener">${icon('play','tiny')} Assistir aula</a>
     </div>`;
   area.innerHTML = `
-    ${proximos.length? `
-    <h3 class="section-title" style="margin-top:0">${icon('calendar','tiny')} Próximos encontros</h3>
-    <div class="agenda-list" style="margin-bottom:22px">${proximos.map(e=>cardHtml(e,false)).join('')}</div>` : ''}
-    ${capsComAula.length? `
-    <h3 class="section-title" style="margin-top:0">${icon('video','tiny')} Aulas por capítulo</h3>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px">${capsComAula.map(capCardHtml).join('')}</div>` : ''}
-    <h3 class="section-title" style="margin-top:0">${icon('calendar','tiny')} Gravações de encontros ao vivo</h3>
-    ${passados.length? `<div class="agenda-list">${passados.map(e=>cardHtml(e,true)).join('')}</div>` : `<p class="section-sub">Ainda não há gravações de encontros deste livro.</p>`}
+    <h3 class="section-title" style="margin-top:0">${icon('video','tiny')} Aulas gravadas</h3>
+    ${capsComAula.length? `<div style="display:flex;flex-direction:column;gap:10px">${capsComAula.map(capCardHtml).join('')}</div>` : `<p class="section-sub">Ainda não há aulas gravadas deste livro.</p>`}
   `;
 }
 
@@ -15199,10 +15187,18 @@ function clubeRenderCapitulos(viewId){
   if(!area) return;
   const livro = clubeGetLivro(clubeLivroAtualId);
   const capitulos = clubeCapitulosDoLivro(livro.id);
+  /* "Próximos encontros" mora aqui (na primeira aba, "Capítulos e aulas"), por pedido da Daiane — a aba
+     "Aulas gravadas" (clubeRenderAulas) ficou só com o que já está gravado. */
+  const agora = Date.now();
+  const capLabelOf = (capId)=>{ const c = capitulos.find(x=>x.id===capId); return c? `Capítulo ${c.numero}` : ''; };
+  const proximosEncontros = CLUBE_ENCONTROS.filter(e=>e.livro_id===livro.id && new Date(e.data_hora).getTime()>=agora).sort((a,b)=>new Date(a.data_hora)-new Date(b.data_hora));
+  const proximosEncontrosHtml = proximosEncontros.length? `
+    <h3 class="section-title" style="margin-top:0">${icon('calendar','tiny')} Próximos encontros</h3>
+    <div class="agenda-list" style="margin-bottom:22px">${proximosEncontros.map(e=>clubeEncontroCardHtml(e,false,capLabelOf(e.capitulo_id))).join('')}</div>` : '';
   if(!capitulos.length){
-    area.innerHTML = currentRole==='staff'
+    area.innerHTML = proximosEncontrosHtml + (currentRole==='staff'
       ? `<div class="empty-state">Nenhum capítulo cadastrado ainda. Adicione o primeiro capítulo em Conteúdo → Clube do Livro.</div>`
-      : `<div class="empty-state">Os capítulos deste livro ainda não foram publicados.</div>`;
+      : `<div class="empty-state">Os capítulos deste livro ainda não foram publicados.</div>`);
     return;
   }
   if(!clubeCapituloAtualId || !capitulos.find(c=>c.id===clubeCapituloAtualId)) clubeCapituloAtualId = capitulos[0].id;
@@ -15210,6 +15206,7 @@ function clubeRenderCapitulos(viewId){
   const alunoId = clubeContextAlunoId();
   const materiais = clubeMateriaisDoCapitulo(cap.id);
   area.innerHTML = `
+    ${proximosEncontrosHtml}
     <div class="clube-capitulos-wrap">
       <div class="clube-capitulos-lista">
         <div class="clube-capitulos-lista-titulo">Percurso de leitura</div>

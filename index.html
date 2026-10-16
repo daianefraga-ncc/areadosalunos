@@ -15219,6 +15219,11 @@ function clubeRenderCapitulos(viewId){
           <span class="clube-tag clube-tag-gratuito">Acesso gratuito</span>
         </div>
         ${cap.texto_estudo? `<div class="clube-cap-texto">${formatEstudoTexto(cap.texto_estudo)}</div>` : ''}
+        ${cap.aula_gravada_url? `
+        <div class="clube-cap-encontro">
+          <div>${icon('video','tiny')} <strong>Aula gravada deste capítulo</strong><br><span style="color:var(--text-mute);font-size:12px">Assista à aula sobre este capítulo</span></div>
+          <a class="btn-accent" href="${escapeAttr(cap.aula_gravada_url)}" target="_blank" rel="noopener">${icon('play','tiny')} Assistir aula</a>
+        </div>` : ''}
         <div class="clube-cap-encontro">
           <div>${icon('calendar','tiny')} <strong>Encontro ao vivo</strong><br><span style="color:var(--text-mute);font-size:12px">Acompanhe o calendário do clube</span></div>
           <button type="button" class="btn-accent" id="clube-cap-encontro-btn">Ver próximo encontro ${icon('next','tiny')}</button>
@@ -19573,6 +19578,7 @@ function renderConteudo(){
               </tr>
               ${aberto? `<tr><td colspan="5" style="padding-top:0">
                 <div class="add-form" style="margin:0 0 4px">
+                  <div class="field full"><label>Link da aula gravada deste capítulo</label><input class="ps-input" type="text" data-clube-cap-aula="${c.id}" value="${escapeAttr(c.aula_gravada_url||'')}" placeholder="https://... (YouTube, Panda Video etc.)"></div>
                   <div class="field full"><label>Texto de estudo deste capítulo</label><textarea class="ps-input" data-clube-cap-texto="${c.id}" placeholder="Conteúdo do capítulo exibido para o aluno...">${escapeHtml(c.texto_estudo||'')}</textarea></div>
                 </div>
               </td></tr>` : ''}
@@ -19995,6 +20001,12 @@ function bindConteudoClubeEvents(){
     ta.addEventListener('change', ()=>{
       const c = CLUBE_CAPITULOS.find(x=>x.id===ta.dataset.clubeCapTexto); if(!c) return;
       c.texto_estudo = ta.value.trim(); syncClubeCapituloUpdate(c.id, {texto_estudo:c.texto_estudo});
+    });
+  });
+  root.querySelectorAll('[data-clube-cap-aula]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const c = CLUBE_CAPITULOS.find(x=>x.id===inp.dataset.clubeCapAula); if(!c) return;
+      c.aula_gravada_url = inp.value.trim() || null; syncClubeCapituloUpdate(c.id, {aula_gravada_url:c.aula_gravada_url});
     });
   });
   root.querySelectorAll('[data-clube-cap-del]').forEach(btn=>{

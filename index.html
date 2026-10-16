@@ -1648,7 +1648,8 @@
   .clube-hero-sobre{color:var(--text-dim)!important;line-height:1.6;}
   .clube-hero-actions{display:flex;gap:10px;flex-wrap:wrap;}
   .clube-hero-actions .btn-outline{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
-  .clube-biblioteca-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(124px,1fr));gap:14px;}
+  .clube-biblioteca-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+  @media (max-width:380px){ .clube-biblioteca-grid{grid-template-columns:1fr;} }
   .clube-biblioteca-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;cursor:pointer;transition:border-color .12s;}
   .clube-biblioteca-card:hover{border-color:var(--accent);}
   .clube-biblioteca-capa{height:140px;border-radius:6px;background:var(--bg-elev);display:flex;align-items:center;justify-content:center;text-align:center;font-weight:700;font-size:12px;color:var(--text-mute);margin-bottom:10px;overflow:hidden;padding:8px;}

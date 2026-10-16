@@ -14939,12 +14939,24 @@ function clubeRenderAulas(viewId){
         : (e.link_url? `<a class="btn-outline" href="${escapeAttr(e.link_url)}" target="_blank" rel="noopener">${icon('externallink','tiny')} Entrar no encontro</a>` : '')}
     </div>`;
   };
+  /* Aulas gravadas direto no capítulo (ver campo "Link da aula gravada" no admin de cada capítulo) —
+     aparecem aqui também, não só na página do próprio capítulo, pra ficarem todas reunidas num só
+     lugar junto com as gravações de encontros ao vivo abaixo. */
+  const capsComAula = capitulos.filter(c=>c.aula_gravada_url).sort((a,b)=>a.numero-b.numero);
+  const capCardHtml = (c)=>`
+    <div class="clube-cap-encontro">
+      <div>${icon('video','tiny')} <strong>Capítulo ${c.numero}${c.titulo? ' · '+escapeHtml(c.titulo):''}</strong><br><span style="color:var(--text-mute);font-size:12px">Aula gravada deste capítulo</span></div>
+      <a class="btn-accent" href="${escapeAttr(c.aula_gravada_url)}" target="_blank" rel="noopener">${icon('play','tiny')} Assistir aula</a>
+    </div>`;
   area.innerHTML = `
     ${proximos.length? `
     <h3 class="section-title" style="margin-top:0">${icon('calendar','tiny')} Próximos encontros</h3>
     <div class="agenda-list" style="margin-bottom:22px">${proximos.map(e=>cardHtml(e,false)).join('')}</div>` : ''}
-    <h3 class="section-title" style="margin-top:0">${icon('video','tiny')} Aulas gravadas</h3>
-    ${passados.length? `<div class="agenda-list">${passados.map(e=>cardHtml(e,true)).join('')}</div>` : `<p class="section-sub">Ainda não há aulas gravadas deste livro.</p>`}
+    ${capsComAula.length? `
+    <h3 class="section-title" style="margin-top:0">${icon('video','tiny')} Aulas por capítulo</h3>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px">${capsComAula.map(capCardHtml).join('')}</div>` : ''}
+    <h3 class="section-title" style="margin-top:0">${icon('calendar','tiny')} Gravações de encontros ao vivo</h3>
+    ${passados.length? `<div class="agenda-list">${passados.map(e=>cardHtml(e,true)).join('')}</div>` : `<p class="section-sub">Ainda não há gravações de encontros deste livro.</p>`}
   `;
 }
 

@@ -9605,7 +9605,7 @@ function generateAccessCodeString(tier, bonus){
   const abc = accessCodeAlphabet();
   let rand = '';
   for(let i=0;i<6;i++) rand += abc[Math.floor(Math.random()*abc.length)];
-  const prefixes = {curso: bonus ? 'BONUS-' : 'METODO-', formacao: 'FORMACAO-', pgncc: 'PGNCC-'};
+  const prefixes = {curso: bonus ? 'BONUS-' : 'METODO-', formacao: 'FORMACAO-', pgncc: 'PGNCC-', clube_livro: 'CLUBE-'};
   return (prefixes[tier] || 'MENTOR-') + rand;
 }
 /* Gera e grava um código novo, tentando de novo em caso (raríssimo) de colisão com um já existente. */
@@ -9620,6 +9620,37 @@ async function syncAccessCodeGenerate(tier, label, bonus){
 }
 function syncAccessCodeDelete(id){
   syncNow(sb.from('access_codes').delete().eq('id', id));
+}
+/* Modal com o resultado da geração em lote de códigos de acesso (ver listener de gen-code-lote-btn em
+   renderVisaoGeral) — lista "Identificação — CÓDIGO", uma por linha, com botão pra copiar tudo de uma
+   vez e colar num WhatsApp/e-mail pra distribuir. */
+function openCodigosLoteResultModal(gerados, falhasNomes){
+  const resumo = gerados.map(c=>`${c.label || '(sem nome)'} — ${c.code}`).join('\n');
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <div class="cat">Códigos de Acesso</div>
+      <h3>${gerados.length} código${gerados.length===1?'':'s'} gerado${gerados.length===1?'':'s'}</h3>
+      ${falhasNomes.length? `<p style="color:var(--danger);font-size:12.5px">Não foi possível gerar para: ${escapeHtml(falhasNomes.join(', '))}. Cole esses nomes de novo e tente mais uma vez.</p>` : ''}
+      <div class="ps-section" style="font-size:13px;line-height:1.8">
+        <pre style="white-space:pre-wrap;margin:0;font-family:inherit;word-break:break-word">${escapeHtml(resumo)}</pre>
+      </div>
+      <p class="section-sub" style="margin-top:4px">Copie e envie o código certo pra cada pessoa — ela usa esse código na aba "Criar conta".</p>
+      <div class="modal-actions">
+        <button class="btn-accent" id="codigos-lote-copiar">${icon('copy','tiny')} Copiar tudo</button>
+        <button class="btn-outline" id="codigos-lote-fechar">Fechar</button>
+      </div>
+    </div>`;
+  modalReturnTo = null; modalCloseGuard = null;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('codigos-lote-fechar').addEventListener('click', closeModal);
+  document.getElementById('codigos-lote-copiar').addEventListener('click', async ()=>{
+    const copyBtn = document.getElementById('codigos-lote-copiar');
+    try{
+      await navigator.clipboard.writeText(resumo);
+      copyBtn.innerHTML = `${icon('check','tiny')} Copiado`;
+      setTimeout(()=>{ copyBtn.innerHTML = `${icon('copy','tiny')} Copiar tudo`; }, 1500);
+    }catch(e){ /* clipboard indisponível — a pessoa copia manualmente pelo texto acima */ }
+  });
 }
 /* ---- Financeiro interno da NCC Plat (equipe interna) ---- */
 function mapFinLancamentoRow(r){
@@ -21024,6 +21055,15 @@ function renderVisaoGeral(){
       <div class="field full"><label>Identificação (opcional)</label><input class="ps-input" type="text" id="new-code-label" placeholder="Ex.: nome de quem vai usar, ou turma"></div>
       <div class="actions"><button class="btn-accent" id="gen-code-btn">${icon('idcard')} Gerar código</button></div>
     </div>
+
+    <div class="add-form" style="margin-top:10px">
+      <div class="field full">
+        <label>Gerar vários códigos de uma vez</label>
+        <textarea class="ps-input" id="new-code-lote" placeholder="Cole um nome por linha — ex.:&#10;Maria Silva&#10;João Pereira&#10;Ana Souza" style="min-height:90px"></textarea>
+      </div>
+      <p class="section-sub" style="margin:-8px 0 0;width:100%">Gera um código para cada linha, todos no "Tipo de acesso" escolhido acima. Depois é só copiar e mandar o código certo pra cada pessoa — ela usa na aba "Criar conta".</p>
+      <div class="actions"><button class="btn-accent" id="gen-code-lote-btn">${icon('idcard')} Gerar um código para cada nome</button></div>
+    </div>
     <div class="table-wrap">
       <table class="check-table">
         <thead><tr><th>Código</th><th>Tipo</th><th>Identificação</th><th>Situação</th><th></th></tr></thead>
@@ -21075,6 +21115,38 @@ function renderVisaoGeral(){
       ACCESS_CODES.unshift(mapAccessCodeRow(row));
       renderVisaoGeral();
     }catch(e){ console.error(e); btn.disabled = false; }
+  });
+  /* Geração em lote: um código de acesso por linha colada (ex.: vários alunos do Clube do Livro de uma
+     vez). Cada código continua sendo de uso único e não fica ligado a nenhum e-mail — quem gera aqui só
+     está economizando cliques em "Gerar código" um a um; depois ainda é preciso mandar o código certo
+     pra pessoa certa, igual já era feito antes. Gera em sequência (não em paralelo) pra evitar qualquer
+     disputa de geração simultânea; ao final mostra tudo num modal pra copiar de uma vez (ver
+     openCodigosLoteResultModal), já que renderVisaoGeral() logo em seguida substitui o HTML da página e
+     apagaria uma mensagem de status comum. */
+  const genCodeLoteBtn = document.getElementById('gen-code-lote-btn');
+  if(genCodeLoteBtn) genCodeLoteBtn.addEventListener('click', async ()=>{
+    const escolha = document.getElementById('new-code-tier').value;
+    const tier = (escolha==='curso' || escolha==='curso_bonus') ? 'curso' : escolha;
+    const bonus = escolha==='curso_bonus';
+    const ta = document.getElementById('new-code-lote');
+    const nomes = ta.value.split('\n').map(s=>s.trim()).filter(Boolean);
+    if(!nomes.length){ alert('Cole ao menos um nome, um por linha.'); return; }
+    const textoOriginal = genCodeLoteBtn.textContent;
+    genCodeLoteBtn.disabled = true;
+    const gerados = []; const falhasNomes = [];
+    for(let i=0;i<nomes.length;i++){
+      genCodeLoteBtn.textContent = `Gerando ${i+1} de ${nomes.length}...`;
+      try{
+        const row = await syncAccessCodeGenerate(tier, nomes[i], bonus);
+        const mapped = mapAccessCodeRow(row);
+        ACCESS_CODES.unshift(mapped);
+        gerados.push(mapped);
+      }catch(e){ console.error(e); falhasNomes.push(nomes[i]); }
+    }
+    genCodeLoteBtn.disabled = false; genCodeLoteBtn.textContent = textoOriginal;
+    renderVisaoGeral();
+    if(gerados.length) openCodigosLoteResultModal(gerados, falhasNomes);
+    else alert('Não foi possível gerar os códigos. Confira sua internet e tente de novo.');
   });
   document.querySelectorAll('[data-copy-code]').forEach(btn=>{
     btn.addEventListener('click', async ()=>{

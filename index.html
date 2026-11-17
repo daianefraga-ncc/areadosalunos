@@ -459,6 +459,10 @@
   .quick-access-grid .novidades-cta{max-width:none;margin-top:0;}
   .novidades-cta:hover{border-color:var(--accent);transform:translateY(-2px);}
   .novidades-cta .nc-icon{width:100%;max-width:180px;height:auto;display:block;margin-bottom:12px;}
+  /* "Estudos do Dia" usa um ícone comum (icon('book')) em vez de uma ilustração própria — essa variante
+     desenha uma caixinha quadrada com o ícone centralizado, do tamanho aproximado das outras ilustrações. */
+  .novidades-cta .nc-icon-svg{width:56px;height:56px;max-width:56px;border-radius:var(--radius-sm);background:var(--bg-elev);display:flex;align-items:center;justify-content:center;}
+  .novidades-cta .nc-icon-svg .icon{width:28px;height:28px;color:var(--accent);}
   .novidades-cta .nc-title{font-weight:700;font-size:15px;color:var(--text);}
   .novidades-cta .nc-desc{font-size:12.5px;color:var(--text-dim);margin-top:6px;line-height:1.4;}
   .novidades-list{display:flex;flex-direction:column;gap:0;}
@@ -7958,6 +7962,13 @@ const CLUBE_PONTOS_REGRAS = [
    openNovidadesMural). Populado em runtime a partir do Supabase (ver bootstrapData); gerenciado pela
    equipe interna em Conteúdo (ver renderConteudo). */
 let NOVIDADES = [];
+/* "Estudos do Dia" — 3 estudos científicos reais sobre infância/cérebro em desenvolvimento, buscados
+   automaticamente 1x/dia no PubMed (JAMA Pediatrics, Nature Reviews Neuroscience/Psychology, PNAS e,
+   quando não há nada recente o bastante nesses 4, periódicos parecidos) com resumo em PT-BR gerado por
+   IA a partir SÓ do abstract público (ver edge function gerar-noticias-estudos). Card de acesso rápido
+   na tela de Início (ver acessoRapidoHtml) + gerenciado pela equipe em Conteúdo (pode pausar/remover
+   um card, mas a publicação em si é automática, sem revisão prévia). */
+let ESTUDOS_CIENTIFICOS = [];
 /* Comentários de cada novidade, agrupados por novidade_id: { [novidadeId]: [{id, authorId, text, createdAt}] } */
 let NOVIDADE_COMMENTS = {};
 
@@ -8564,7 +8575,7 @@ async function bootstrapData(){
   PEOPLE = {};
   profiles.forEach(p=>{ PEOPLE[p.id] = {id:p.id, name:p.name, initials:p.initials, color:p.color, avatarUrl:p.avatar_url||null, role:p.role}; });
 
-  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:cursoModuloRows},{data:comunicadoRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows},{data:novidadeCommentRows},{data:estudoRows},{data:estudoMensagemRows},{data:palestraRows},{data:projetoAcademicoRows},{data:palestraModeloRows}] = await Promise.all([
+  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:cursoModuloRows},{data:comunicadoRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows},{data:novidadeCommentRows},{data:noticiasCientificasRows},{data:estudoRows},{data:estudoMensagemRows},{data:palestraRows},{data:projetoAcademicoRows},{data:palestraModeloRows}] = await Promise.all([
     sb.from('module_checklist_state').select('*'),
     sb.from('panel_data').select('*'),
     sb.from('panel_overrides').select('*'),
@@ -8585,6 +8596,8 @@ async function bootstrapData(){
     sb.from('novidades').select('*').order('created_at',{ascending:false}).limit(30),
     // Comentários dessas novidades — volume pequeno, carrega tudo de uma vez.
     sb.from('novidade_comments').select('*').order('created_at',{ascending:true}),
+    // "Estudos do Dia": RLS já garante que o aluno só vê os ativos (a equipe vê também os pausados).
+    sb.from('noticias_cientificas').select('*').order('publicado_em',{ascending:false}).limit(30),
     // Biblioteca Científica: RLS já garante que o aluno só vê os próprios estudos (e a equipe vê de todos).
     sb.from('estudos').select('id, aluno_id, titulo, nome_arquivo, arquivo_path, created_at').order('created_at',{ascending:false}),
     sb.from('estudo_mensagens').select('*').order('created_at',{ascending:true}),
@@ -8662,6 +8675,14 @@ async function bootstrapData(){
     if(!NOVIDADE_COMMENTS[c.novidade_id]) NOVIDADE_COMMENTS[c.novidade_id] = [];
     NOVIDADE_COMMENTS[c.novidade_id].push({id:c.id, authorId:c.author_id, text:c.text, createdAt:c.created_at});
   });
+
+  ESTUDOS_CIENTIFICOS.length = 0;
+  (noticiasCientificasRows||[]).forEach(n=>ESTUDOS_CIENTIFICOS.push({
+    id:n.id, pmid:n.pmid, tituloOriginal:n.titulo_original, tituloPt:n.titulo_pt, periodico:n.periodico,
+    tipo:n.tipo, autores:n.autores||'', dataPublicacao:n.data_publicacao, doi:n.doi||'', link:n.link,
+    abstractOriginal:n.abstract_original||'', resumoPratico:n.resumo_pratico, ativo:!!n.ativo,
+    publicadoEm:n.publicado_em, createdAt:n.created_at,
+  }));
 
   ESTUDOS.length = 0;
   (estudoRows||[]).forEach(e=>ESTUDOS.push({id:e.id, alunoId:e.aluno_id, titulo:e.titulo, nomeArquivo:e.nome_arquivo||'', arquivoPath:e.arquivo_path||null, createdAt:e.created_at}));
@@ -9226,6 +9247,14 @@ function syncNovidadeDelete(id){
 }
 function syncNovidadeUpdate(id, fields){
   syncNow(sb.from('novidades').update(fields).eq('id', id));
+}
+/* ---- "Estudos do Dia" (noticias_cientificas) — geração é automática (gerar-noticias-estudos); a
+   equipe só pode pausar ou remover um card depois de publicado, não criar um na mão. ---- */
+function syncEstudoDiaUpdate(id, fields){
+  syncNow(sb.from('noticias_cientificas').update(fields).eq('id', id));
+}
+function syncEstudoDiaDelete(id){
+  syncNow(sb.from('noticias_cientificas').delete().eq('id', id));
 }
 async function syncNovidadeCommentInsert(novidadeId, text){
   const { data, error } = await sb.from('novidade_comments').insert({novidade_id:novidadeId, author_id:currentUser.id, text}).select().single();
@@ -10643,9 +10672,27 @@ function bindEssenciaBannerCarrossel(){
    Notícias, Clínica, Escola e Gestão — cada um levando direto pro lugar certo (mural de notícias,
    ou um quadrante específico do Painel Profissional). O card Notícias some se não houver nenhuma
    novidade ativa publicada; os outros três são fixos. */
+/* Só os últimos 3 estudos ativos, mesmo que o histórico completo (todas as gerações diárias,
+   nunca repetidas) continue guardado na tabela — "Estudos do Dia" é pra mostrar a leva mais
+   recente, não virar uma biblioteca crescente sem fim. */
+function estudosDiaRecentes(){
+  return ESTUDOS_CIENTIFICOS.filter(n=>n.ativo)
+    .slice().sort((a,b)=> new Date(b.publicadoEm||0) - new Date(a.publicadoEm||0))
+    .slice(0,3);
+}
 function acessoRapidoHtml(){
   const ativas = NOVIDADES.filter(n=>n.ativo);
+  const estudosAtivos = estudosDiaRecentes();
   const cards = [];
+  if(estudosAtivos.length){
+    cards.push(`
+      <button type="button" class="novidades-cta" id="open-estudos-dia">
+        <div class="nc-icon nc-icon-svg">${icon('book')}</div>
+        <div class="nc-title">Estudos do Dia</div>
+        <div class="nc-desc">${estudosAtivos.length} estudo${estudosAtivos.length===1?'':'s'} científico${estudosAtivos.length===1?'':'s'} recente${estudosAtivos.length===1?'':'s'} sobre infância e cérebro em desenvolvimento, traduzido${estudosAtivos.length===1?'':'s'} e explicado${estudosAtivos.length===1?'':'s'} de forma simples.</div>
+      </button>
+    `);
+  }
   if(ativas.length){
     cards.push(`
       <button type="button" class="novidades-cta" id="open-novidades-mural">
@@ -10682,6 +10729,8 @@ function acessoRapidoHtml(){
    direto pro quadrante certo do Painel Profissional; Escola ainda não tem conteúdo pronto, abre
    um aviso "em construção" — ver openEscolaEmConstrucao(). */
 function bindAcessoRapido(){
+  const openEstudosBtn = document.getElementById('open-estudos-dia');
+  if(openEstudosBtn) openEstudosBtn.addEventListener('click', ()=>openEstudosDiaMural());
   const openNovidadesBtn = document.getElementById('open-novidades-mural');
   if(openNovidadesBtn) openNovidadesBtn.addEventListener('click', ()=>openNovidadesMural());
   const openClinicaBtn = document.getElementById('open-painel-clinica');
@@ -10868,6 +10917,95 @@ function openNovidadesMural(detailId){
       syncNovidadeCommentDelete(id);
       openNovidadesMural(n? n.id : null);
     });
+  });
+}
+
+/* ---- "Estudos do Dia" — mesmo visual do mural de novidades acima, mas sem comentários (não pedido) e
+   com um "Ver abstract original" pra quem quiser conferir a fonte em inglês por trás do resumo. ---- */
+function estudoDiaTipoLabel(n){ return n.tipo==='revisao' ? 'Artigo de revisão' : 'Estudo original'; }
+function estudoDiaMetaHtml(n){
+  const partes = [escapeHtml(n.periodico), estudoDiaTipoLabel(n)];
+  if(n.dataPublicacao) partes.push(new Date(n.dataPublicacao+'T00:00:00').toLocaleDateString('pt-BR'));
+  return partes.join(' · ');
+}
+function estudoDiaRowHtml(n){
+  return `
+    <button type="button" class="topic-row novidade-row" data-open-estudo-dia="${n.id}">
+      <span class="topic-status novidade-dot"></span>
+      <div class="ti">
+        <div class="novidade-data">${estudoDiaMetaHtml(n)}</div>
+        <div class="title">${escapeHtml(n.tituloPt)}</div>
+        ${n.autores? `<div class="desc">${escapeHtml(n.autores)}</div>` : ''}
+      </div>
+    </button>
+  `;
+}
+function estudoDiaDetailHtml(n){
+  return `
+    <div class="novidade-detail">
+      <div class="novidade-data">${estudoDiaMetaHtml(n)}</div>
+      <h3>${escapeHtml(n.tituloPt)}</h3>
+      <div class="novidade-fonte">Título original: ${escapeHtml(n.tituloOriginal)}${n.autores? ' — '+escapeHtml(n.autores) : ''}</div>
+      <div class="novidade-texto">${formatEstudoTexto(n.resumoPratico||'')}</div>
+      <p class="section-sub" style="margin:8px 0 0">Resumo gerado por IA com base no abstract público do estudo — não temos acesso ao texto completo, que é pago nesse periódico.</p>
+      <div class="novidade-actions">
+        <a class="btn-mini" href="${escapeAttr(n.link)}" target="_blank" rel="noopener noreferrer">${icon('externallink','tiny')} Abrir estudo original</a>
+        ${n.abstractOriginal? `<button type="button" class="btn-mini" data-toggle-abstract-original="${n.id}">${icon('book','tiny')} Ver abstract original (em inglês)</button>` : ''}
+        <button type="button" class="btn-mini" data-copy-estudo-dia="${n.id}">${icon('copy','tiny')} Copiar conteúdo</button>
+      </div>
+      ${n.abstractOriginal? `<div class="novidade-texto" id="abstract-original-${n.id}" style="display:none;margin-top:10px;color:var(--text-mute);font-size:12.5px">${escapeHtml(n.abstractOriginal)}</div>` : ''}
+    </div>
+  `;
+}
+/* Mural "Estudos do Dia": mesma mecânica do mural de novidades (lista → detalhe por data-open-estudo-dia). */
+function openEstudosDiaMural(detailId){
+  const ativos = ESTUDOS_CIENTIFICOS.filter(n=>n.ativo);
+  const recentes = estudosDiaRecentes();
+  const n = detailId? ativos.find(x=>x.id==detailId) : null;
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <button class="modal-close" id="modal-close" style="position:static;float:right">${icon('x')}</button>
+      ${n? `
+        <div class="back-row"><button type="button" class="back-btn" id="estudo-dia-back">${icon('back')} Voltar aos estudos</button></div>
+        ${estudoDiaDetailHtml(n)}
+      ` : `
+        <h3>Estudos do Dia</h3>
+        <p class="desc">Estudos científicos recentes sobre infância e cérebro em desenvolvimento — buscados automaticamente em periódicos como JAMA Pediatrics, Nature Reviews e PNAS, e explicados em linguagem simples. Clique em um estudo para ler o resumo completo e acessar o original.</p>
+        <div class="novidades-list">
+          ${recentes.map(estudoDiaRowHtml).join('') || `<p class="section-sub">Nenhum estudo publicado ainda — volte em breve.</p>`}
+        </div>
+        <div class="modal-actions"><button class="btn-outline" id="modal-close-2">Fechar</button></div>
+      `}
+    </div>
+  `;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('modal-close').addEventListener('click',closeModal);
+  const closeBtn2 = document.getElementById('modal-close-2');
+  if(closeBtn2) closeBtn2.addEventListener('click',closeModal);
+  const backBtn = document.getElementById('estudo-dia-back');
+  if(backBtn) backBtn.addEventListener('click',()=>openEstudosDiaMural());
+  document.querySelectorAll('[data-open-estudo-dia]').forEach(btn=>{
+    btn.addEventListener('click',()=>openEstudosDiaMural(btn.dataset.openEstudoDia));
+  });
+  const toggleAbsBtn = document.querySelector('[data-toggle-abstract-original]');
+  if(toggleAbsBtn) toggleAbsBtn.addEventListener('click', ()=>{
+    const el = document.getElementById('abstract-original-'+toggleAbsBtn.dataset.toggleAbstractOriginal);
+    if(el) el.style.display = (el.style.display==='none') ? 'block' : 'none';
+  });
+  const copyBtn = document.querySelector('[data-copy-estudo-dia]');
+  if(copyBtn) copyBtn.addEventListener('click', async ()=>{
+    const item = ativos.find(x=>x.id==copyBtn.dataset.copyEstudoDia);
+    if(!item) return;
+    const conteudo = `${item.tituloPt}\n\n${(item.resumoPratico||'').replace(/\*\*/g,'')}\n\nFonte: ${item.periodico}${item.autores? ' — '+item.autores:''}\n${item.link}`;
+    try{
+      await navigator.clipboard.writeText(conteudo);
+      const original = copyBtn.innerHTML;
+      copyBtn.innerHTML = `${icon('check','tiny')} Copiado!`;
+      setTimeout(()=>{ copyBtn.innerHTML = original; }, 1800);
+    }catch(e){
+      console.error('copiar estudo do dia', e);
+      alert('Não foi possível copiar automaticamente. Selecione o texto manualmente.');
+    }
   });
 }
 
@@ -19338,6 +19476,30 @@ function renderConteudo(){
       <div class="actions"><button class="btn-accent" id="add-novidade-btn">${icon('upload')} Publicar no mural</button></div>
     </div>` : ''}
 
+    ${conteudoSectionHeaderHtml('sec-estudos-dia', 'book', 'Estudos do Dia (gerados automaticamente)')}
+    ${conteudoAberto('sec-estudos-dia')? `
+    <p class="section-sub" style="margin-top:-6px">Todo dia, um robô busca até 3 estudos reais e recentes sobre infância/cérebro em desenvolvimento (JAMA Pediatrics, Nature Reviews, PNAS e periódicos parecidos) e já publica direto pros alunos, com resumo em português gerado por IA — sem passar por revisão antes. Use "Pausar" ou "Remover" aqui se algum card vier com algo errado ou fora do tema.</p>
+    <div class="table-wrap">
+      <table class="check-table">
+        <thead><tr><th>Título (PT)</th><th>Periódico</th><th>Tipo</th><th>Publicado em</th><th>Situação</th><th></th></tr></thead>
+        <tbody>
+          ${ESTUDOS_CIENTIFICOS.map(n=>`
+            <tr>
+              <td style="min-width:200px">${escapeHtml(n.tituloPt)}</td>
+              <td style="min-width:140px;color:var(--text-mute)">${escapeHtml(n.periodico)}</td>
+              <td><span class="resp-pill">${estudoDiaTipoLabel(n)}</span></td>
+              <td style="white-space:nowrap">${n.publicadoEm? new Date(n.publicadoEm).toLocaleDateString('pt-BR') : '—'}</td>
+              <td><span class="resp-pill">${n.ativo? 'No ar' : 'Pausado'}</span></td>
+              <td style="white-space:nowrap">
+                <button class="btn-mini" data-toggle-estudo-dia="${n.id}">${n.ativo? 'Pausar' : 'Reativar'}</button>
+                <button class="btn-mini danger" data-del-estudo-dia="${n.id}">${icon('trash')} Remover</button>
+              </td>
+            </tr>
+          `).join('') || `<tr><td colspan="6" style="color:var(--text-mute)">Nenhum estudo gerado ainda.</td></tr>`}
+        </tbody>
+      </table>
+    </div>` : ''}
+
     ${conteudoSectionHeaderHtml('sec-aulas', 'film', 'Aulas')}
     ${conteudoAberto('sec-aulas')? `
     <p class="section-sub" style="margin-top:-6px">Arraste pelo ícone ⠿ ou use as setas para reordenar as aulas dentro de cada módulo.</p>
@@ -19756,6 +19918,23 @@ function renderConteudo(){
       if(!confirmDelete('Remover esta novidade do mural? Essa ação não pode ser desfeita.')) return;
       const idx = NOVIDADES.findIndex(n=>n.id==btn.dataset.delNovidade);
       if(idx>-1){ syncNovidadeDelete(NOVIDADES[idx].id); NOVIDADES.splice(idx,1); }
+      renderConteudo();
+    });
+  });
+  document.querySelectorAll('[data-toggle-estudo-dia]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const n = ESTUDOS_CIENTIFICOS.find(x=>x.id==btn.dataset.toggleEstudoDia);
+      if(!n) return;
+      n.ativo = !n.ativo;
+      syncEstudoDiaUpdate(n.id, {ativo:n.ativo});
+      renderConteudo();
+    });
+  });
+  document.querySelectorAll('[data-del-estudo-dia]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(!confirmDelete('Remover este estudo do mural "Estudos do Dia"? Essa ação não pode ser desfeita.')) return;
+      const idx = ESTUDOS_CIENTIFICOS.findIndex(n=>n.id==btn.dataset.delEstudoDia);
+      if(idx>-1){ syncEstudoDiaDelete(ESTUDOS_CIENTIFICOS[idx].id); ESTUDOS_CIENTIFICOS.splice(idx,1); }
       renderConteudo();
     });
   });

@@ -475,8 +475,39 @@
   .publico-pill.pb-professoras{background:rgba(99,102,241,.14);color:#6366f1;}
   .publico-pill.pb-psicologas{background:rgba(236,72,153,.14);color:#ec4899;}
   .publico-pill.pb-familia{background:rgba(16,185,129,.14);color:#10b981;}
-  /* Caixa de destaque pro resumo prático do estudo — puxa o olho direto pra "o que fazer com isso". */
+  /* Caixa de destaque pro resumo prático do estudo (fichas antigas, geradas antes do NCC Science
+     Update ganhar as 5 seções separadas) — puxa o olho direto pra "o que fazer com isso". */
   .estudo-resumo-box{background:var(--bg-elev);border-left:3px solid var(--accent);border-radius:var(--radius-sm);padding:12px 14px;margin-top:4px;}
+  /* Logo do "NCC Science Update" — medalhão dourado com o ícone de cérebro/sinapses, no mesmo
+     formato dos outros 3 cards (ilustração acima do título), só que desenhado em CSS/SVG em vez de
+     imagem — pra trocar por uma arte própria depois, basta substituir esse bloco por um <img>. */
+  .novidades-cta .nc-icon-badge{width:64px;height:64px;max-width:64px;border-radius:50%;background:radial-gradient(circle at 32% 28%, #fce8b0, #d9a53c 55%, #a9741f 100%);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.35), 0 2px 5px rgba(0,0,0,.2);}
+  .novidades-cta .nc-icon-badge .icon{width:32px;height:32px;color:#4a2f08;}
+  /* Selinhos de área temática / faixa etária — a ficha de cada estudo do NCC Science Update. */
+  .meta-pills{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;}
+  .meta-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap;background:var(--bg-elev);color:var(--text-dim);border:1px solid var(--border);}
+  .meta-pill .icon{width:11px;height:11px;}
+  /* Cada uma das 5 seções da ficha completa (o que foi investigado, qual a novidade, o que acontece
+     no cérebro, o que muda na prática, limitações e cuidados) — um mini-cartão com ícone próprio. */
+  .ficha-secoes{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
+  .ficha-secao{background:var(--bg-elev);border-radius:var(--radius-sm);padding:12px 14px;display:flex;gap:10px;align-items:flex-start;}
+  .ficha-secao.destaque{border-left:3px solid var(--accent);}
+  .ficha-secao .fs-icon{width:26px;height:26px;border-radius:50%;background:var(--bg-card);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .ficha-secao .fs-icon .icon{width:14px;height:14px;color:var(--accent);}
+  .ficha-secao .fs-body h4{font-size:12.5px;font-weight:700;margin:0 0 3px;color:var(--text);}
+  .ficha-secao .fs-body p{font-size:13px;color:var(--text-dim);line-height:1.5;margin:0;}
+  /* Botão de favoritar — estrela/marcador que muda de cor quando ativo. */
+  .btn-favorito{display:inline-flex;align-items:center;gap:5px;}
+  .btn-favorito.ativo{background:rgba(217,165,60,.15);border-color:#d9a53c;color:#a9741f;}
+  .btn-favorito.ativo .icon{color:#a9741f;}
+  /* Barra de filtros da biblioteca completa (pesquisa + área temática + faixa etária + favoritos). */
+  .biblioteca-filtros{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px;}
+  .biblioteca-filtros input[type="text"]{flex:1 1 220px;}
+  .biblioteca-filtros select{flex:0 1 180px;}
+  .biblioteca-filtros .chk-favoritos{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-dim);flex:0 0 auto;padding:0 4px;}
+  /* Painel "Transforme ciência em conteúdo". */
+  .gerador-form{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
+  .gerador-resultado{white-space:pre-wrap;background:var(--bg-elev);border-radius:var(--radius-sm);padding:14px;font-size:13px;line-height:1.55;margin-top:10px;max-height:360px;overflow:auto;}
   .novidades-list{display:flex;flex-direction:column;gap:0;}
   .topic-row.novidade-row{align-items:flex-start;}
   .novidade-row .novidade-dot{background:var(--shared);margin-top:4px;}
@@ -6697,6 +6728,7 @@ const MURAL_PAGINA = 25;
 const MURAL_ESTADO = { mentorado:{fim:false, carregando:false}, curso:{fim:false, carregando:false} };
 const AULAS_COMENTADAS = new Set();  // ids de aula cujos comentários já foram baixados
 let MEUS_LIKES = new Set();          // ids de publicações que EU curti
+let MEUS_FAVORITOS_ESTUDOS = new Set(); // ids de estudos do NCC Science Update que EU favoritei
 let PENDENCIAS = [];                 // sininho — vem da função comunidade_pendencias() no banco
 let NOTIFICACOES = [];               // sininho — feed de notificações (tabela public.notificacoes: novidade/aula/evento/conclusão/lembrete)
 let EU_JA_APRESENTEI = false;        // se já publiquei minha apresentação (checado direto no banco)
@@ -8587,7 +8619,7 @@ async function bootstrapData(){
   PEOPLE = {};
   profiles.forEach(p=>{ PEOPLE[p.id] = {id:p.id, name:p.name, initials:p.initials, color:p.color, avatarUrl:p.avatar_url||null, role:p.role}; });
 
-  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:cursoModuloRows},{data:comunicadoRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows},{data:novidadeCommentRows},{data:noticiasCientificasRows},{data:estudoRows},{data:estudoMensagemRows},{data:palestraRows},{data:projetoAcademicoRows},{data:palestraModeloRows}] = await Promise.all([
+  const [{data:mcs},{data:pd},{data:po},{data:ida},{data:courseRows},{data:cursoModuloRows},{data:comunicadoRows},{data:materialRows},{data:liveRows},{data:watchedRows},{data:meusLikes},{data:apresentacaoRows},{data:novidadesRows},{data:novidadeCommentRows},{data:noticiasCientificasRows},{data:meusFavoritosRows},{data:estudoRows},{data:estudoMensagemRows},{data:palestraRows},{data:projetoAcademicoRows},{data:palestraModeloRows}] = await Promise.all([
     sb.from('module_checklist_state').select('*'),
     sb.from('panel_data').select('*'),
     sb.from('panel_overrides').select('*'),
@@ -8608,8 +8640,11 @@ async function bootstrapData(){
     sb.from('novidades').select('*').order('created_at',{ascending:false}).limit(30),
     // Comentários dessas novidades — volume pequeno, carrega tudo de uma vez.
     sb.from('novidade_comments').select('*').order('created_at',{ascending:true}),
-    // "Estudos do Dia": RLS já garante que o aluno só vê os ativos (a equipe vê também os pausados).
-    sb.from('noticias_cientificas').select('*').order('publicado_em',{ascending:false}).limit(30),
+    // "NCC Science Update": RLS já garante que o aluno só vê os ativos (a equipe vê também os pausados).
+    // Sem limite baixo de propósito — a biblioteca precisa do histórico completo pra pesquisa/filtros.
+    sb.from('noticias_cientificas').select('*').order('publicado_em',{ascending:false}).limit(500),
+    // Só os ids do que EU favoritei no NCC Science Update — em vez dos favoritos de todo mundo.
+    sb.from('noticias_favoritos').select('noticia_id').eq('student_id', currentUser.id),
     // Biblioteca Científica: RLS já garante que o aluno só vê os próprios estudos (e a equipe vê de todos).
     sb.from('estudos').select('id, aluno_id, titulo, nome_arquivo, arquivo_path, created_at').order('created_at',{ascending:false}),
     sb.from('estudo_mensagens').select('*').order('created_at',{ascending:true}),
@@ -8694,6 +8729,10 @@ async function bootstrapData(){
     tipo:n.tipo, autores:n.autores||'', dataPublicacao:n.data_publicacao, doi:n.doi||'', link:n.link,
     abstractOriginal:n.abstract_original||'', resumoPratico:n.resumo_pratico, ativo:!!n.ativo,
     publicoAlvo:n.publico_alvo||[], publicadoEm:n.publicado_em, createdAt:n.created_at,
+    areaTematica:n.area_tematica||'', faixaEtaria:n.faixa_etaria||'', tempoLeituraMin:n.tempo_leitura_min||null,
+    oQueFoiInvestigado:n.o_que_foi_investigado||'', qualNovidade:n.qual_novidade||'',
+    oQueAconteceCerebro:n.o_que_acontece_cerebro||'', oQueMudaPratica:n.o_que_muda_pratica||'',
+    limitacoesCuidados:n.limitacoes_cuidados||'',
   }));
 
   ESTUDOS.length = 0;
@@ -8726,6 +8765,7 @@ async function bootstrapData(){
   }));
 
   MEUS_LIKES = new Set((meusLikes||[]).map(l=>l.post_id));
+  MEUS_FAVORITOS_ESTUDOS = new Set((meusFavoritosRows||[]).map(f=>f.noticia_id));
   EU_JA_APRESENTEI = !!(apresentacaoRows && apresentacaoRows.length);
   COMMUNITY_POSTS.length = 0;
   AULAS_COMENTADAS.clear();
@@ -9267,6 +9307,11 @@ function syncEstudoDiaUpdate(id, fields){
 }
 function syncEstudoDiaDelete(id){
   syncNow(sb.from('noticias_cientificas').delete().eq('id', id));
+}
+// Favoritar/desfavoritar um estudo do NCC Science Update — upsert evita erro se clicar 2x rápido.
+function syncEstudoFavoritoToggle(noticiaId, favoritado){
+  if(favoritado) syncNow(sb.from('noticias_favoritos').upsert({student_id:currentUser.id, noticia_id:noticiaId}, {onConflict:'student_id,noticia_id'}));
+  else syncNow(sb.from('noticias_favoritos').delete().eq('student_id',currentUser.id).eq('noticia_id',noticiaId));
 }
 async function syncNovidadeCommentInsert(novidadeId, text){
   const { data, error } = await sb.from('novidade_comments').insert({novidade_id:novidadeId, author_id:currentUser.id, text}).select().single();
@@ -10699,9 +10744,9 @@ function acessoRapidoHtml(){
   if(estudosAtivos.length){
     cards.push(`
       <button type="button" class="novidades-cta" id="open-estudos-dia">
-        <div class="nc-icon nc-icon-svg">${icon('book')}</div>
-        <div class="nc-eyebrow">Notícias científicas</div>
-        <div class="nc-title">Estudos do Dia</div>
+        <div class="nc-icon nc-icon-badge">${icon('neuro')}</div>
+        <div class="nc-eyebrow">Ciência em Atualização</div>
+        <div class="nc-title">NCC Science Update</div>
         <div class="nc-desc">${estudosAtivos.length} estudo${estudosAtivos.length===1?'':'s'} recente${estudosAtivos.length===1?'':'s'}, selecionado${estudosAtivos.length===1?'':'s'} por relevância prática pra quem atua com crianças — traduzido${estudosAtivos.length===1?'':'s'} e explicado${estudosAtivos.length===1?'':'s'} de forma simples.</div>
       </button>
     `);
@@ -10939,6 +10984,7 @@ function estudoDiaTipoLabel(n){ return n.tipo==='revisao' ? 'Artigo de revisão'
 function estudoDiaMetaHtml(n){
   const partes = [escapeHtml(n.periodico), estudoDiaTipoLabel(n)];
   if(n.dataPublicacao) partes.push(new Date(n.dataPublicacao+'T00:00:00').toLocaleDateString('pt-BR'));
+  if(n.tempoLeituraMin) partes.push(`~${n.tempoLeituraMin} min de leitura`);
   return partes.join(' · ');
 }
 // Mapa fixo código -> (rótulo, classe de cor) pros selinhos de "pra quem serve". O código vem da IA
@@ -10948,73 +10994,142 @@ const PUBLICO_ALVO_LABELS = {
   psicologas: { label: 'Psicólogas(os)', cls: 'pb-psicologas' },
   orientacao_familiar: { label: 'Orientação familiar', cls: 'pb-familia' },
 };
+// As 10 áreas temáticas pedidas pela Daiane pro NCC Science Update — mesmos códigos escolhidos pela
+// IA em gerar-noticias-estudos (ver AREA_TEMATICA_CODIGOS_VALIDOS lá).
+const AREA_TEMATICA_LABELS = {
+  neurociencia_desenvolvimento: 'Neurociência do desenvolvimento',
+  neuroplasticidade_aprendizagem: 'Neuroplasticidade e aprendizagem',
+  transtornos_neurodesenvolvimento: 'Transtornos do neurodesenvolvimento',
+  funcoes_executivas_autorregulacao: 'Funções executivas e autorregulação',
+  saude_mental_infantojuvenil: 'Saúde mental infantojuvenil',
+  desenvolvimento_socioemocional: 'Desenvolvimento socioemocional',
+  comportamento_infantil: 'Comportamento infantil',
+  educacao_inclusao_escolar: 'Educação e inclusão escolar',
+  puberdade_adolescencia: 'Puberdade e adolescência',
+  intervencoes_evidencias: 'Intervenções baseadas em evidências',
+};
+const FAIXA_ETARIA_LABELS = {
+  primeira_infancia: 'Primeira infância (0–3 anos)',
+  infancia: 'Infância (4–11 anos)',
+  adolescencia: 'Adolescência (12–18 anos)',
+  todas_idades: 'Todas as idades',
+};
 function estudoDiaPublicoHtml(n){
   const codigos = Array.isArray(n.publicoAlvo) ? n.publicoAlvo : [];
   const pills = codigos.map(c=>PUBLICO_ALVO_LABELS[c]).filter(Boolean);
   if(!pills.length) return '';
   return `<div class="publico-pills">${pills.map(p=>`<span class="publico-pill ${p.cls}">${p.label}</span>`).join('')}</div>`;
 }
+function estudoDiaTematicaHtml(n){
+  const pills = [];
+  if(n.areaTematica && AREA_TEMATICA_LABELS[n.areaTematica]) pills.push(`<span class="meta-pill">${icon('target','tiny')} ${AREA_TEMATICA_LABELS[n.areaTematica]}</span>`);
+  if(n.faixaEtaria && FAIXA_ETARIA_LABELS[n.faixaEtaria]) pills.push(`<span class="meta-pill">${icon('child','tiny')} ${FAIXA_ETARIA_LABELS[n.faixaEtaria]}</span>`);
+  if(!pills.length) return '';
+  return `<div class="meta-pills">${pills.join('')}</div>`;
+}
+function estudoFavoritoBtnHtml(n){
+  const ativo = MEUS_FAVORITOS_ESTUDOS.has(n.id);
+  return `<button type="button" class="btn-mini btn-favorito${ativo?' ativo':''}" data-fav-estudo-dia="${n.id}">${icon('bookmark','tiny')} ${ativo?'Favoritado':'Favoritar'}</button>`;
+}
+// Texto completo pronto pra copiar/baixar — usa a ficha nova (5 seções) quando existe, senão cai pro
+// resumo antigo (fichas geradas antes do NCC Science Update ganhar essa estrutura).
+function montarTextoEstudoCompleto(n){
+  const ref = `Fonte: ${n.periodico}${n.autores? ' — '+n.autores:''}${n.dataPublicacao? ' ('+n.dataPublicacao.slice(0,4)+')':''}\n${n.link}`;
+  if(n.oQueFoiInvestigado){
+    return [
+      n.tituloPt, '',
+      'O que foi investigado', n.oQueFoiInvestigado, '',
+      'Qual a novidade', n.qualNovidade, '',
+      'O que acontece no cérebro', n.oQueAconteceCerebro || 'Não investigado diretamente neste estudo.', '',
+      'O que muda na prática', n.oQueMudaPratica, '',
+      'Limitações e cuidados', n.limitacoesCuidados || '—', '',
+      ref,
+    ].join('\n');
+  }
+  return `${n.tituloPt}\n\n${(n.resumoPratico||'').replace(/\*\*/g,'')}\n\n${ref}`;
+}
+function baixarEstudoTxt(n){
+  const blob = new Blob([montarTextoEstudoCompleto(n)], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ncc-science-update-${n.pmid||n.id}.txt`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+}
 function estudoDiaRowHtml(n){
+  const fav = MEUS_FAVORITOS_ESTUDOS.has(n.id);
   return `
     <button type="button" class="topic-row novidade-row" data-open-estudo-dia="${n.id}">
       <span class="topic-status novidade-dot"></span>
       <div class="ti">
-        <div class="novidade-data">${estudoDiaMetaHtml(n)}</div>
+        <div class="novidade-data">${estudoDiaMetaHtml(n)}${fav? ' · '+icon('bookmark','tiny'):''}</div>
         <div class="title">${escapeHtml(n.tituloPt)}</div>
+        ${estudoDiaTematicaHtml(n)}
         ${estudoDiaPublicoHtml(n)}
         ${n.autores? `<div class="desc">${escapeHtml(n.autores)}</div>` : ''}
       </div>
     </button>
   `;
 }
+// As 5 seções da ficha completa (quando o estudo já foi gerado com a estrutura nova do NCC Science
+// Update) — cada uma com ícone próprio. Fichas antigas (antes dessa estrutura) não têm esses campos
+// preenchidos e continuam caindo no bloco único de resumo (ver estudoDiaDetailHtml).
+function estudoDiaFichaSecoesHtml(n){
+  if(!n.oQueFoiInvestigado) return null;
+  const secoes = [
+    {icone:'compass', titulo:'O que foi investigado', texto:n.oQueFoiInvestigado},
+    {icone:'flag', titulo:'Qual a novidade', texto:n.qualNovidade, destaque:true},
+    {icone:'neuro', titulo:'O que acontece no cérebro', texto:n.oQueAconteceCerebro || 'Este estudo não investigou mecanismos cerebrais diretamente.'},
+    {icone:'target', titulo:'O que muda na prática', texto:n.oQueMudaPratica, destaque:true},
+    {icone:'alert', titulo:'Limitações e cuidados', texto:n.limitacoesCuidados || 'Sem limitações específicas informadas.'},
+  ];
+  return `<div class="ficha-secoes">${secoes.map(s=>`
+    <div class="ficha-secao${s.destaque?' destaque':''}">
+      <div class="fs-icon">${icon(s.icone,'tiny')}</div>
+      <div class="fs-body"><h4>${s.titulo}</h4><p>${escapeHtml(s.texto)}</p></div>
+    </div>
+  `).join('')}</div>`;
+}
 function estudoDiaDetailHtml(n){
+  const fichaNova = estudoDiaFichaSecoesHtml(n);
   return `
     <div class="novidade-detail">
       <div class="novidade-data">${estudoDiaMetaHtml(n)}</div>
       <h3>${escapeHtml(n.tituloPt)}</h3>
+      ${estudoDiaTematicaHtml(n)}
       ${estudoDiaPublicoHtml(n)}
       <div class="novidade-fonte">Título original: ${escapeHtml(n.tituloOriginal)}${n.autores? ' — '+escapeHtml(n.autores) : ''}</div>
-      <div class="estudo-resumo-box">${formatEstudoTexto(n.resumoPratico||'')}</div>
-      <p class="section-sub" style="margin:8px 0 0">Resumo gerado por IA com base no abstract público do estudo — não temos acesso ao texto completo, que é pago nesse periódico.</p>
+      ${fichaNova || `<div class="estudo-resumo-box">${formatEstudoTexto(n.resumoPratico||'')}</div>`}
+      <p class="section-sub" style="margin:8px 0 0">Ficha gerada por IA com base no abstract público do estudo — não temos acesso ao texto completo, que é pago nesse periódico.</p>
       <div class="novidade-actions">
         <a class="btn-mini" href="${escapeAttr(n.link)}" target="_blank" rel="noopener noreferrer">${icon('externallink','tiny')} Abrir estudo original</a>
         ${n.abstractOriginal? `<button type="button" class="btn-mini" data-toggle-abstract-original="${n.id}">${icon('book','tiny')} Ver abstract original (em inglês)</button>` : ''}
         <button type="button" class="btn-mini" data-copy-estudo-dia="${n.id}">${icon('copy','tiny')} Copiar conteúdo</button>
+        <button type="button" class="btn-mini" data-baixar-estudo-dia="${n.id}">${icon('download','tiny')} Baixar</button>
+        ${estudoFavoritoBtnHtml(n)}
+        <button type="button" class="btn-accent" data-gerar-conteudo="${n.id}">${icon('edit','tiny')} Transformar em conteúdo</button>
       </div>
       ${n.abstractOriginal? `<div class="novidade-texto" id="abstract-original-${n.id}" style="display:none;margin-top:10px;color:var(--text-mute);font-size:12.5px">${escapeHtml(n.abstractOriginal)}</div>` : ''}
     </div>
   `;
 }
-/* Mural "Estudos do Dia": mesma mecânica do mural de novidades (lista → detalhe por data-open-estudo-dia). */
-function openEstudosDiaMural(detailId){
-  const ativos = ESTUDOS_CIENTIFICOS.filter(n=>n.ativo);
-  const recentes = estudosDiaRecentes();
-  const n = detailId? ativos.find(x=>x.id==detailId) : null;
+/* Abre o detalhe de UM estudo dentro do modal, com um "voltar" configurável — usado tanto pelo
+   teaser da tela de Início (volta pros 3 mais recentes) quanto pela biblioteca completa (volta pra
+   lista filtrada). Também liga os botões de favoritar/baixar/copiar/abstract/gerar conteúdo. */
+function abrirEstudoDetalhe(estudoId, voltarLabel, voltarFn){
+  const n = ESTUDOS_CIENTIFICOS.find(x=>x.id==estudoId);
+  if(!n) return;
   document.getElementById('modal').innerHTML = `
     <div class="modal-body form-modal">
       <button class="modal-close" id="modal-close" style="position:static;float:right">${icon('x')}</button>
-      ${n? `
-        <div class="back-row"><button type="button" class="back-btn" id="estudo-dia-back">${icon('back')} Voltar aos estudos</button></div>
-        ${estudoDiaDetailHtml(n)}
-      ` : `
-        <h3>Estudos do Dia</h3>
-        <p class="desc">Estudos científicos recentes sobre infância e cérebro em desenvolvimento — buscados automaticamente em periódicos como JAMA Pediatrics, Nature Reviews e PNAS, e explicados em linguagem simples. Clique em um estudo para ler o resumo completo e acessar o original.</p>
-        <div class="novidades-list">
-          ${recentes.map(estudoDiaRowHtml).join('') || `<p class="section-sub">Nenhum estudo publicado ainda — volte em breve.</p>`}
-        </div>
-        <div class="modal-actions"><button class="btn-outline" id="modal-close-2">Fechar</button></div>
-      `}
+      <div class="back-row"><button type="button" class="back-btn" id="estudo-dia-back">${icon('back')} ${voltarLabel}</button></div>
+      ${estudoDiaDetailHtml(n)}
     </div>
   `;
   document.getElementById('modal-backdrop').classList.add('open');
   document.getElementById('modal-close').addEventListener('click',closeModal);
-  const closeBtn2 = document.getElementById('modal-close-2');
-  if(closeBtn2) closeBtn2.addEventListener('click',closeModal);
-  const backBtn = document.getElementById('estudo-dia-back');
-  if(backBtn) backBtn.addEventListener('click',()=>openEstudosDiaMural());
-  document.querySelectorAll('[data-open-estudo-dia]').forEach(btn=>{
-    btn.addEventListener('click',()=>openEstudosDiaMural(btn.dataset.openEstudoDia));
-  });
+  document.getElementById('estudo-dia-back').addEventListener('click',voltarFn);
   const toggleAbsBtn = document.querySelector('[data-toggle-abstract-original]');
   if(toggleAbsBtn) toggleAbsBtn.addEventListener('click', ()=>{
     const el = document.getElementById('abstract-original-'+toggleAbsBtn.dataset.toggleAbstractOriginal);
@@ -11022,17 +11137,178 @@ function openEstudosDiaMural(detailId){
   });
   const copyBtn = document.querySelector('[data-copy-estudo-dia]');
   if(copyBtn) copyBtn.addEventListener('click', async ()=>{
-    const item = ativos.find(x=>x.id==copyBtn.dataset.copyEstudoDia);
-    if(!item) return;
-    const conteudo = `${item.tituloPt}\n\n${(item.resumoPratico||'').replace(/\*\*/g,'')}\n\nFonte: ${item.periodico}${item.autores? ' — '+item.autores:''}\n${item.link}`;
     try{
-      await navigator.clipboard.writeText(conteudo);
+      await navigator.clipboard.writeText(montarTextoEstudoCompleto(n));
       const original = copyBtn.innerHTML;
       copyBtn.innerHTML = `${icon('check','tiny')} Copiado!`;
       setTimeout(()=>{ copyBtn.innerHTML = original; }, 1800);
     }catch(e){
-      console.error('copiar estudo do dia', e);
+      console.error('copiar estudo', e);
       alert('Não foi possível copiar automaticamente. Selecione o texto manualmente.');
+    }
+  });
+  const baixarBtn = document.querySelector('[data-baixar-estudo-dia]');
+  if(baixarBtn) baixarBtn.addEventListener('click', ()=>baixarEstudoTxt(n));
+  const favBtn = document.querySelector('[data-fav-estudo-dia]');
+  if(favBtn) favBtn.addEventListener('click', ()=>{
+    const ativo = MEUS_FAVORITOS_ESTUDOS.has(n.id);
+    if(ativo) MEUS_FAVORITOS_ESTUDOS.delete(n.id); else MEUS_FAVORITOS_ESTUDOS.add(n.id);
+    syncEstudoFavoritoToggle(n.id, !ativo);
+    abrirEstudoDetalhe(estudoId, voltarLabel, voltarFn);
+  });
+  const gerarBtn = document.querySelector('[data-gerar-conteudo]');
+  if(gerarBtn) gerarBtn.addEventListener('click', ()=>abrirGeradorConteudo(n, ()=>abrirEstudoDetalhe(estudoId, voltarLabel, voltarFn)));
+}
+/* Teaser do card de acesso rápido na tela de Início — só os 3 estudos mais recentes, com um atalho
+   pra abrir a biblioteca completa (com pesquisa, filtros e favoritos). */
+function openEstudosDiaMural(){
+  const recentes = estudosDiaRecentes();
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <button class="modal-close" id="modal-close" style="position:static;float:right">${icon('x')}</button>
+      <h3>NCC Science Update</h3>
+      <p class="desc">Atualização científica contínua pra profissionais da infância e adolescência — estudos reais e recentes, selecionados por terem aplicação prática, traduzidos e explicados em linguagem simples.</p>
+      <div class="novidades-list">
+        ${recentes.map(estudoDiaRowHtml).join('') || `<p class="section-sub">Nenhum estudo publicado ainda — volte em breve.</p>`}
+      </div>
+      <div class="modal-actions">
+        <button class="btn-accent" id="abrir-biblioteca-science">${icon('biblioteca','tiny')} Ver biblioteca completa</button>
+        <button class="btn-outline" id="modal-close-2">Fechar</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('modal-close').addEventListener('click',closeModal);
+  document.getElementById('modal-close-2').addEventListener('click',closeModal);
+  document.getElementById('abrir-biblioteca-science').addEventListener('click',()=>abrirBibliotecaScienceUpdate());
+  document.querySelectorAll('[data-open-estudo-dia]').forEach(btn=>{
+    btn.addEventListener('click',()=>abrirEstudoDetalhe(btn.dataset.openEstudoDia, 'Voltar aos estudos', openEstudosDiaMural));
+  });
+}
+/* Biblioteca completa do NCC Science Update: pesquisa por texto, filtro por área temática e faixa
+   etária, e um filtro "só favoritos" — histórico inteiro, não só os 3 mais recentes. A lista é
+   refiltrada só trocando o conteúdo de #biblioteca-science-lista (sem redesenhar os campos de
+   filtro), pra não perder o foco/cursor de quem está digitando na pesquisa. */
+function bibliotecaScienceFiltrar(){
+  const busca = (document.getElementById('biblioteca-science-busca')?.value || '').trim().toLowerCase();
+  const area = document.getElementById('biblioteca-science-area')?.value || '';
+  const faixa = document.getElementById('biblioteca-science-faixa')?.value || '';
+  const soFav = !!document.getElementById('biblioteca-science-fav')?.checked;
+  let lista = ESTUDOS_CIENTIFICOS.filter(n=>n.ativo);
+  if(area) lista = lista.filter(n=>n.areaTematica===area);
+  if(faixa) lista = lista.filter(n=>n.faixaEtaria===faixa);
+  if(soFav) lista = lista.filter(n=>MEUS_FAVORITOS_ESTUDOS.has(n.id));
+  if(busca) lista = lista.filter(n=>
+    (n.tituloPt||'').toLowerCase().includes(busca) ||
+    (n.autores||'').toLowerCase().includes(busca) ||
+    (n.periodico||'').toLowerCase().includes(busca)
+  );
+  lista = lista.slice().sort((a,b)=> new Date(b.publicadoEm||0) - new Date(a.publicadoEm||0));
+  const listaEl = document.getElementById('biblioteca-science-lista');
+  if(!listaEl) return;
+  listaEl.innerHTML = lista.map(estudoDiaRowHtml).join('') || `<p class="section-sub">Nenhum estudo encontrado com esses filtros.</p>`;
+  listaEl.querySelectorAll('[data-open-estudo-dia]').forEach(btn=>{
+    btn.addEventListener('click',()=>abrirEstudoDetalhe(btn.dataset.openEstudoDia, 'Voltar à biblioteca', abrirBibliotecaScienceUpdate));
+  });
+}
+function abrirBibliotecaScienceUpdate(){
+  const opcoesArea = Object.entries(AREA_TEMATICA_LABELS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+  const opcoesFaixa = Object.entries(FAIXA_ETARIA_LABELS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <button class="modal-close" id="modal-close" style="position:static;float:right">${icon('x')}</button>
+      <div class="back-row"><button type="button" class="back-btn" id="biblioteca-back">${icon('back')} Voltar</button></div>
+      <h3>Biblioteca — NCC Science Update</h3>
+      <p class="desc">Todo o histórico de estudos já publicados. Pesquise por tema, filtre por área ou faixa etária, ou veja só os que você favoritou.</p>
+      <div class="biblioteca-filtros">
+        <input type="text" class="ps-input" id="biblioteca-science-busca" placeholder="Pesquisar por título, autor ou periódico...">
+        <select class="ps-input" id="biblioteca-science-area"><option value="">Todas as áreas</option>${opcoesArea}</select>
+        <select class="ps-input" id="biblioteca-science-faixa"><option value="">Todas as faixas etárias</option>${opcoesFaixa}</select>
+        <label class="chk-favoritos"><input type="checkbox" id="biblioteca-science-fav"> ${icon('bookmark','tiny')} Só favoritos</label>
+      </div>
+      <div class="novidades-list" id="biblioteca-science-lista"></div>
+      <div class="modal-actions"><button class="btn-outline" id="modal-close-2">Fechar</button></div>
+    </div>
+  `;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('modal-close').addEventListener('click',closeModal);
+  document.getElementById('modal-close-2').addEventListener('click',closeModal);
+  document.getElementById('biblioteca-back').addEventListener('click',openEstudosDiaMural);
+  document.getElementById('biblioteca-science-busca').addEventListener('input',bibliotecaScienceFiltrar);
+  document.getElementById('biblioteca-science-area').addEventListener('change',bibliotecaScienceFiltrar);
+  document.getElementById('biblioteca-science-faixa').addEventListener('change',bibliotecaScienceFiltrar);
+  document.getElementById('biblioteca-science-fav').addEventListener('change',bibliotecaScienceFiltrar);
+  bibliotecaScienceFiltrar();
+}
+/* ---- "Transforme ciência em conteúdo" — gera, com IA, uma peça de divulgação a partir da ficha real
+   de um estudo já publicado (ver edge function gerar-conteudo-divulgacao). Nunca inventa dado: a
+   função no servidor usa só os campos reais já salvos no banco. ---- */
+const GERADOR_FORMATOS = {
+  carrossel_instagram: 'Carrossel para Instagram',
+  legenda_post: 'Legenda para publicação',
+  roteiro_reels: 'Roteiro para Reels',
+  conteudo_familias: 'Conteúdo educativo para famílias',
+  infografico: 'Infográfico científico (estrutura de texto)',
+  material_educadores: 'Material informativo para educadores',
+};
+const GERADOR_PUBLICOS = {
+  pais_familias: 'Pais e famílias',
+  professores: 'Professoras(es) e gestores escolares',
+  outros_profissionais: 'Outros profissionais da infância',
+  geral: 'Público geral',
+};
+function abrirGeradorConteudo(n, voltarFn){
+  const opcoesFormato = Object.entries(GERADOR_FORMATOS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+  const opcoesPublico = Object.entries(GERADOR_PUBLICOS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-body form-modal">
+      <button class="modal-close" id="modal-close" style="position:static;float:right">${icon('x')}</button>
+      <div class="back-row"><button type="button" class="back-btn" id="gerador-back">${icon('back')} Voltar ao estudo</button></div>
+      <h3>Transforme ciência em conteúdo</h3>
+      <p class="desc">A partir de "${escapeHtml(n.tituloPt)}", gere um texto pronto pra divulgação — sempre baseado só nos dados reais desse estudo, com a referência incluída.</p>
+      <div class="gerador-form">
+        <div class="field full"><label>Formato</label><select class="ps-input" id="gerador-formato">${opcoesFormato}</select></div>
+        <div class="field full"><label>Público-alvo do conteúdo</label><select class="ps-input" id="gerador-publico">${opcoesPublico}</select></div>
+        <div class="field full"><label>Tom</label><select class="ps-input" id="gerador-tom"><option value="acessivel">Bem acessível e simples</option><option value="tecnico">Mais técnico (outros profissionais)</option></select></div>
+        <div class="field full"><label>Assinatura profissional (opcional)</label><input class="ps-input" type="text" id="gerador-assinatura" placeholder="Ex.: Dra. Fulana de Tal — Psicóloga infantil, CRP 00/00000"></div>
+        <div class="actions"><button class="btn-accent" id="gerador-gerar-btn">${icon('edit','tiny')} Gerar conteúdo</button></div>
+      </div>
+      <div id="gerador-resultado-wrap"></div>
+    </div>
+  `;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.getElementById('modal-close').addEventListener('click',closeModal);
+  document.getElementById('gerador-back').addEventListener('click',voltarFn);
+  document.getElementById('gerador-gerar-btn').addEventListener('click', async ()=>{
+    const btn = document.getElementById('gerador-gerar-btn');
+    const formato = document.getElementById('gerador-formato').value;
+    const publico = document.getElementById('gerador-publico').value;
+    const tom = document.getElementById('gerador-tom').value;
+    const assinatura = document.getElementById('gerador-assinatura').value.trim();
+    const wrap = document.getElementById('gerador-resultado-wrap');
+    btn.disabled = true; btn.textContent = 'Gerando...';
+    wrap.innerHTML = '';
+    try{
+      const { data, error } = await sb.functions.invoke('gerar-conteudo-divulgacao', { body: { noticiaId:n.id, formato, publico, tom, assinatura } });
+      if(error || data?.error) throw (error || new Error(data.error));
+      wrap.innerHTML = `
+        <div class="gerador-resultado" id="gerador-resultado-texto">${escapeHtml(data.conteudo)}</div>
+        <div class="novidade-actions" style="margin-top:10px">
+          <button type="button" class="btn-mini" id="gerador-copiar-btn">${icon('copy','tiny')} Copiar conteúdo gerado</button>
+        </div>
+      `;
+      document.getElementById('gerador-copiar-btn').addEventListener('click', async ()=>{
+        try{ await navigator.clipboard.writeText(data.conteudo); }catch(e){ console.error(e); }
+        const cBtn = document.getElementById('gerador-copiar-btn');
+        const original = cBtn.innerHTML;
+        cBtn.innerHTML = `${icon('check','tiny')} Copiado!`;
+        setTimeout(()=>{ cBtn.innerHTML = original; }, 1800);
+      });
+    }catch(e){
+      console.error('gerar conteudo divulgacao', e);
+      wrap.innerHTML = `<p class="section-sub" style="color:#e05252">Não foi possível gerar o conteúdo agora. Tente novamente em instantes.</p>`;
+    }finally{
+      btn.disabled = false; btn.textContent = 'Gerar conteúdo';
     }
   });
 }
@@ -19504,16 +19780,17 @@ function renderConteudo(){
       <div class="actions"><button class="btn-accent" id="add-novidade-btn">${icon('upload')} Publicar no mural</button></div>
     </div>` : ''}
 
-    ${conteudoSectionHeaderHtml('sec-estudos-dia', 'book', 'Estudos do Dia — Notícias científicas (gerados automaticamente)')}
+    ${conteudoSectionHeaderHtml('sec-estudos-dia', 'neuro', 'NCC Science Update — Ciência em Atualização (gerado automaticamente)')}
     ${conteudoAberto('sec-estudos-dia')? `
-    <p class="section-sub" style="margin-top:-6px">Essa é a área de notícias do app (o antigo mural de notícias gerais saiu do Início e da área da equipe). Todo dia, um robô busca estudos reais e recentes sobre infância/cérebro em desenvolvimento, em JAMA Pediatrics, Nature Reviews, PNAS e um grupo amplo de periódicos de psicologia, educação e desenvolvimento infantil, filtra só os que têm aplicação prática pra professoras(es), psicólogas(os) ou orientação familiar, e já publica até 3 deles direto pros alunos, com resumo em português gerado por IA — sem passar por revisão antes. Use "Pausar" ou "Remover" aqui se algum card vier com algo errado ou fora do tema.</p>
+    <p class="section-sub" style="margin-top:-6px">Essa é a área de notícias/atualização científica do app (o antigo mural de notícias gerais saiu do Início e da área da equipe). Todo dia, um robô busca estudos reais e recentes nas 10 áreas pedidas (neurociência do desenvolvimento, neuroplasticidade, transtornos do neurodesenvolvimento, funções executivas, saúde mental infantojuvenil, socioemocional, comportamento, educação/inclusão, puberdade/adolescência e intervenções baseadas em evidências), em JAMA Pediatrics, Nature Reviews, PNAS e um grupo amplo de periódicos de psicologia, educação e saúde mental. Filtra só os que têm aplicação prática pra professoras(es), psicólogas(os) ou orientação familiar, e já publica até 3 deles direto pros alunos com a ficha completa gerada por IA — sem passar por revisão antes. Use "Pausar" ou "Remover" aqui se algum card vier com algo errado ou fora do tema.</p>
     <div class="table-wrap">
       <table class="check-table">
-        <thead><tr><th>Título (PT)</th><th>Pra quem</th><th>Periódico</th><th>Tipo</th><th>Publicado em</th><th>Situação</th><th></th></tr></thead>
+        <thead><tr><th>Título (PT)</th><th>Área temática</th><th>Pra quem</th><th>Periódico</th><th>Tipo</th><th>Publicado em</th><th>Situação</th><th></th></tr></thead>
         <tbody>
           ${ESTUDOS_CIENTIFICOS.map(n=>`
             <tr>
               <td style="min-width:200px">${escapeHtml(n.tituloPt)}</td>
+              <td style="min-width:150px;color:var(--text-mute)">${n.areaTematica? escapeHtml(AREA_TEMATICA_LABELS[n.areaTematica]||n.areaTematica) : '—'}</td>
               <td style="min-width:160px">${estudoDiaPublicoHtml(n) || '—'}</td>
               <td style="min-width:140px;color:var(--text-mute)">${escapeHtml(n.periodico)}</td>
               <td><span class="resp-pill">${estudoDiaTipoLabel(n)}</span></td>
@@ -19524,7 +19801,7 @@ function renderConteudo(){
                 <button class="btn-mini danger" data-del-estudo-dia="${n.id}">${icon('trash')} Remover</button>
               </td>
             </tr>
-          `).join('') || `<tr><td colspan="7" style="color:var(--text-mute)">Nenhum estudo gerado ainda.</td></tr>`}
+          `).join('') || `<tr><td colspan="8" style="color:var(--text-mute)">Nenhum estudo gerado ainda.</td></tr>`}
         </tbody>
       </table>
     </div>` : ''}

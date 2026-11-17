@@ -465,6 +465,18 @@
   .novidades-cta .nc-icon-svg .icon{width:28px;height:28px;color:var(--accent);}
   .novidades-cta .nc-title{font-weight:700;font-size:15px;color:var(--text);}
   .novidades-cta .nc-desc{font-size:12.5px;color:var(--text-dim);margin-top:6px;line-height:1.4;}
+  /* Rótulo pequeno acima do título do card "Estudos do Dia" — deixa claro que essa é a área de
+     notícias do app (o mural antigo de novidades saiu do Início e da área da equipe). */
+  .novidades-cta .nc-eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:2px;}
+  /* Selinhos de "pra quem serve" (professoras, psicólogas, orientação familiar) — uma cor por
+     público pra dar pra escanear a lista de estudos de uma olhada só. */
+  .publico-pills{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;}
+  .publico-pill{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap;}
+  .publico-pill.pb-professoras{background:rgba(99,102,241,.14);color:#6366f1;}
+  .publico-pill.pb-psicologas{background:rgba(236,72,153,.14);color:#ec4899;}
+  .publico-pill.pb-familia{background:rgba(16,185,129,.14);color:#10b981;}
+  /* Caixa de destaque pro resumo prático do estudo — puxa o olho direto pra "o que fazer com isso". */
+  .estudo-resumo-box{background:var(--bg-elev);border-left:3px solid var(--accent);border-radius:var(--radius-sm);padding:12px 14px;margin-top:4px;}
   .novidades-list{display:flex;flex-direction:column;gap:0;}
   .topic-row.novidade-row{align-items:flex-start;}
   .novidade-row .novidade-dot{background:var(--shared);margin-top:4px;}
@@ -8681,7 +8693,7 @@ async function bootstrapData(){
     id:n.id, pmid:n.pmid, tituloOriginal:n.titulo_original, tituloPt:n.titulo_pt, periodico:n.periodico,
     tipo:n.tipo, autores:n.autores||'', dataPublicacao:n.data_publicacao, doi:n.doi||'', link:n.link,
     abstractOriginal:n.abstract_original||'', resumoPratico:n.resumo_pratico, ativo:!!n.ativo,
-    publicadoEm:n.publicado_em, createdAt:n.created_at,
+    publicoAlvo:n.publico_alvo||[], publicadoEm:n.publicado_em, createdAt:n.created_at,
   }));
 
   ESTUDOS.length = 0;
@@ -10681,24 +10693,15 @@ function estudosDiaRecentes(){
     .slice(0,3);
 }
 function acessoRapidoHtml(){
-  const ativas = NOVIDADES.filter(n=>n.ativo);
   const estudosAtivos = estudosDiaRecentes();
   const cards = [];
   if(estudosAtivos.length){
     cards.push(`
       <button type="button" class="novidades-cta" id="open-estudos-dia">
         <div class="nc-icon nc-icon-svg">${icon('book')}</div>
+        <div class="nc-eyebrow">Notícias científicas</div>
         <div class="nc-title">Estudos do Dia</div>
-        <div class="nc-desc">${estudosAtivos.length} estudo${estudosAtivos.length===1?'':'s'} científico${estudosAtivos.length===1?'':'s'} recente${estudosAtivos.length===1?'':'s'} sobre infância e cérebro em desenvolvimento, traduzido${estudosAtivos.length===1?'':'s'} e explicado${estudosAtivos.length===1?'':'s'} de forma simples.</div>
-      </button>
-    `);
-  }
-  if(ativas.length){
-    cards.push(`
-      <button type="button" class="novidades-cta" id="open-novidades-mural">
-        <img class="nc-icon" src="${NOVIDADES_ICON_DATA_URI}" alt="">
-        <div class="nc-title">Notícias do mundo sobre a Infância</div>
-        <div class="nc-desc">Selecionadas pela equipe. Comente e copie para criar conteúdos para suas redes sociais com a Ferramenta NCC.</div>
+        <div class="nc-desc">${estudosAtivos.length} estudo${estudosAtivos.length===1?'':'s'} recente${estudosAtivos.length===1?'':'s'}, selecionado${estudosAtivos.length===1?'':'s'} por relevância prática pra quem atua com crianças — traduzido${estudosAtivos.length===1?'':'s'} e explicado${estudosAtivos.length===1?'':'s'} de forma simples.</div>
       </button>
     `);
   }
@@ -10731,8 +10734,6 @@ function acessoRapidoHtml(){
 function bindAcessoRapido(){
   const openEstudosBtn = document.getElementById('open-estudos-dia');
   if(openEstudosBtn) openEstudosBtn.addEventListener('click', ()=>openEstudosDiaMural());
-  const openNovidadesBtn = document.getElementById('open-novidades-mural');
-  if(openNovidadesBtn) openNovidadesBtn.addEventListener('click', ()=>openNovidadesMural());
   const openClinicaBtn = document.getElementById('open-painel-clinica');
   if(openClinicaBtn) openClinicaBtn.addEventListener('click', ()=>openPainelQuadrant('vendas'));
   const openEscolaBtn = document.getElementById('open-painel-escola');
@@ -10928,6 +10929,19 @@ function estudoDiaMetaHtml(n){
   if(n.dataPublicacao) partes.push(new Date(n.dataPublicacao+'T00:00:00').toLocaleDateString('pt-BR'));
   return partes.join(' · ');
 }
+// Mapa fixo código -> (rótulo, classe de cor) pros selinhos de "pra quem serve". O código vem da IA
+// (ver gerar-noticias-estudos), que só escolhe entre esses 3 — um código desconhecido é ignorado.
+const PUBLICO_ALVO_LABELS = {
+  professoras: { label: 'Professoras(es)', cls: 'pb-professoras' },
+  psicologas: { label: 'Psicólogas(os)', cls: 'pb-psicologas' },
+  orientacao_familiar: { label: 'Orientação familiar', cls: 'pb-familia' },
+};
+function estudoDiaPublicoHtml(n){
+  const codigos = Array.isArray(n.publicoAlvo) ? n.publicoAlvo : [];
+  const pills = codigos.map(c=>PUBLICO_ALVO_LABELS[c]).filter(Boolean);
+  if(!pills.length) return '';
+  return `<div class="publico-pills">${pills.map(p=>`<span class="publico-pill ${p.cls}">${p.label}</span>`).join('')}</div>`;
+}
 function estudoDiaRowHtml(n){
   return `
     <button type="button" class="topic-row novidade-row" data-open-estudo-dia="${n.id}">
@@ -10935,6 +10949,7 @@ function estudoDiaRowHtml(n){
       <div class="ti">
         <div class="novidade-data">${estudoDiaMetaHtml(n)}</div>
         <div class="title">${escapeHtml(n.tituloPt)}</div>
+        ${estudoDiaPublicoHtml(n)}
         ${n.autores? `<div class="desc">${escapeHtml(n.autores)}</div>` : ''}
       </div>
     </button>
@@ -10945,8 +10960,9 @@ function estudoDiaDetailHtml(n){
     <div class="novidade-detail">
       <div class="novidade-data">${estudoDiaMetaHtml(n)}</div>
       <h3>${escapeHtml(n.tituloPt)}</h3>
+      ${estudoDiaPublicoHtml(n)}
       <div class="novidade-fonte">Título original: ${escapeHtml(n.tituloOriginal)}${n.autores? ' — '+escapeHtml(n.autores) : ''}</div>
-      <div class="novidade-texto">${formatEstudoTexto(n.resumoPratico||'')}</div>
+      <div class="estudo-resumo-box">${formatEstudoTexto(n.resumoPratico||'')}</div>
       <p class="section-sub" style="margin:8px 0 0">Resumo gerado por IA com base no abstract público do estudo — não temos acesso ao texto completo, que é pago nesse periódico.</p>
       <div class="novidade-actions">
         <a class="btn-mini" href="${escapeAttr(n.link)}" target="_blank" rel="noopener noreferrer">${icon('externallink','tiny')} Abrir estudo original</a>
@@ -19444,48 +19460,17 @@ function renderConteudo(){
       </div>
     </div>` : ''}
 
-    ${conteudoSectionHeaderHtml('sec-mural', 'newspaper', 'Mural — O que está acontecendo no mundo sobre a Infância')}
-    ${conteudoAberto('sec-mural')? `
-    <p class="section-sub" style="margin-top:-6px">Publique aqui notícias, artigos ou conteúdos curtos sobre infância — aparece na tela de Início de todos os alunos, na ordem do mais novo pro mais antigo. Use "Pausar" para tirar algo do ar sem apagar.</p>
-    <div class="table-wrap">
-      <table class="check-table">
-        <thead><tr><th>Título</th><th>Texto</th><th>Fonte</th><th>Link</th><th>Publicado em</th><th>Situação</th><th></th></tr></thead>
-        <tbody>
-          ${NOVIDADES.map(n=>`
-            <tr>
-              <td style="min-width:160px">${escapeHtml(n.titulo)}</td>
-              <td style="min-width:220px;color:var(--text-mute)">${escapeHtml((n.texto||'').slice(0,120))}${(n.texto||'').length>120?'…':''}</td>
-              <td style="min-width:120px;color:var(--text-mute)">${escapeHtml(n.fonte||'')||'—'}</td>
-              <td>${n.link? `<a class="btn-mini" href="${escapeAttr(n.link)}" target="_blank" rel="noopener">${icon('externallink','tiny')} Abrir</a>` : '—'}</td>
-              <td style="white-space:nowrap">${n.createdAt? new Date(n.createdAt).toLocaleDateString('pt-BR') : '—'}</td>
-              <td><span class="resp-pill">${n.ativo? 'No ar' : 'Pausada'}</span></td>
-              <td style="white-space:nowrap">
-                <button class="btn-mini" data-toggle-novidade="${n.id}">${n.ativo? 'Pausar' : 'Reativar'}</button>
-                <button class="btn-mini danger" data-del-novidade="${n.id}">${icon('trash')} Remover</button>
-              </td>
-            </tr>
-          `).join('') || `<tr><td colspan="7" style="color:var(--text-mute)">Nenhuma novidade publicada ainda.</td></tr>`}
-        </tbody>
-      </table>
-    </div>
-    <div class="add-form">
-      <div class="field full"><label>Título</label><input class="ps-input" type="text" id="new-novidade-titulo" placeholder="Ex.: Nova pesquisa sobre sono e desenvolvimento infantil"></div>
-      <div class="field full"><label>Descrição curta (opcional)</label><textarea class="ps-input" id="new-novidade-texto" placeholder="Um resumo curto do que se trata..."></textarea></div>
-      <div class="field"><label>Fonte da notícia (opcional)</label><input class="ps-input" type="text" id="new-novidade-fonte" placeholder="Ex.: Revista Pediatria, G1, UOL..."></div>
-      <div class="field"><label>Link (opcional)</label><input class="ps-input" type="text" id="new-novidade-link" placeholder="https://..."></div>
-      <div class="actions"><button class="btn-accent" id="add-novidade-btn">${icon('upload')} Publicar no mural</button></div>
-    </div>` : ''}
-
-    ${conteudoSectionHeaderHtml('sec-estudos-dia', 'book', 'Estudos do Dia (gerados automaticamente)')}
+    ${conteudoSectionHeaderHtml('sec-estudos-dia', 'book', 'Estudos do Dia — Notícias científicas (gerados automaticamente)')}
     ${conteudoAberto('sec-estudos-dia')? `
-    <p class="section-sub" style="margin-top:-6px">Todo dia, um robô busca até 3 estudos reais e recentes sobre infância/cérebro em desenvolvimento (JAMA Pediatrics, Nature Reviews, PNAS e periódicos parecidos) e já publica direto pros alunos, com resumo em português gerado por IA — sem passar por revisão antes. Use "Pausar" ou "Remover" aqui se algum card vier com algo errado ou fora do tema.</p>
+    <p class="section-sub" style="margin-top:-6px">Essa é a área de notícias do app (o antigo mural de notícias gerais saiu do Início e da área da equipe). Todo dia, um robô busca estudos reais e recentes sobre infância/cérebro em desenvolvimento, em JAMA Pediatrics, Nature Reviews, PNAS e um grupo amplo de periódicos de psicologia, educação e desenvolvimento infantil, filtra só os que têm aplicação prática pra professoras(es), psicólogas(os) ou orientação familiar, e já publica até 3 deles direto pros alunos, com resumo em português gerado por IA — sem passar por revisão antes. Use "Pausar" ou "Remover" aqui se algum card vier com algo errado ou fora do tema.</p>
     <div class="table-wrap">
       <table class="check-table">
-        <thead><tr><th>Título (PT)</th><th>Periódico</th><th>Tipo</th><th>Publicado em</th><th>Situação</th><th></th></tr></thead>
+        <thead><tr><th>Título (PT)</th><th>Pra quem</th><th>Periódico</th><th>Tipo</th><th>Publicado em</th><th>Situação</th><th></th></tr></thead>
         <tbody>
           ${ESTUDOS_CIENTIFICOS.map(n=>`
             <tr>
               <td style="min-width:200px">${escapeHtml(n.tituloPt)}</td>
+              <td style="min-width:160px">${estudoDiaPublicoHtml(n) || '—'}</td>
               <td style="min-width:140px;color:var(--text-mute)">${escapeHtml(n.periodico)}</td>
               <td><span class="resp-pill">${estudoDiaTipoLabel(n)}</span></td>
               <td style="white-space:nowrap">${n.publicadoEm? new Date(n.publicadoEm).toLocaleDateString('pt-BR') : '—'}</td>
@@ -19495,7 +19480,7 @@ function renderConteudo(){
                 <button class="btn-mini danger" data-del-estudo-dia="${n.id}">${icon('trash')} Remover</button>
               </td>
             </tr>
-          `).join('') || `<tr><td colspan="6" style="color:var(--text-mute)">Nenhum estudo gerado ainda.</td></tr>`}
+          `).join('') || `<tr><td colspan="7" style="color:var(--text-mute)">Nenhum estudo gerado ainda.</td></tr>`}
         </tbody>
       </table>
     </div>` : ''}
@@ -19888,38 +19873,6 @@ function renderConteudo(){
       COMUNICADO_ALUNO.updatedAt = row.updated_at;
       renderConteudo();
     }catch(e){ console.error(e); alert('Não foi possível salvar o comunicado. Tente de novo.'); btn.disabled = false; }
-  });
-  const addNovidadeBtn = document.getElementById('add-novidade-btn');
-  if(addNovidadeBtn) addNovidadeBtn.addEventListener('click', async ()=>{
-    const titulo = document.getElementById('new-novidade-titulo').value.trim();
-    const texto = document.getElementById('new-novidade-texto').value.trim();
-    const fonte = document.getElementById('new-novidade-fonte').value.trim();
-    const link = document.getElementById('new-novidade-link').value.trim();
-    if(!titulo) return;
-    const btn = document.getElementById('add-novidade-btn');
-    btn.disabled = true;
-    try{
-      const row = await syncNovidadeInsert({titulo, texto, fonte, link});
-      NOVIDADES.unshift({id:row.id, titulo:row.titulo, texto:row.texto||'', link:row.link||'', fonte:row.fonte||'', ativo:!!row.ativo, createdAt:row.created_at});
-      renderConteudo();
-    }catch(e){ console.error(e); btn.disabled = false; }
-  });
-  document.querySelectorAll('[data-toggle-novidade]').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      const n = NOVIDADES.find(x=>x.id==btn.dataset.toggleNovidade);
-      if(!n) return;
-      n.ativo = !n.ativo;
-      syncNovidadeUpdate(n.id, {ativo:n.ativo});
-      renderConteudo();
-    });
-  });
-  document.querySelectorAll('[data-del-novidade]').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      if(!confirmDelete('Remover esta novidade do mural? Essa ação não pode ser desfeita.')) return;
-      const idx = NOVIDADES.findIndex(n=>n.id==btn.dataset.delNovidade);
-      if(idx>-1){ syncNovidadeDelete(NOVIDADES[idx].id); NOVIDADES.splice(idx,1); }
-      renderConteudo();
-    });
   });
   document.querySelectorAll('[data-toggle-estudo-dia]').forEach(btn=>{
     btn.addEventListener('click',()=>{

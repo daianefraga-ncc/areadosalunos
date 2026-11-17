@@ -10693,6 +10693,7 @@ function estudosDiaRecentes(){
     .slice(0,3);
 }
 function acessoRapidoHtml(){
+  const ativas = NOVIDADES.filter(n=>n.ativo);
   const estudosAtivos = estudosDiaRecentes();
   const cards = [];
   if(estudosAtivos.length){
@@ -10702,6 +10703,15 @@ function acessoRapidoHtml(){
         <div class="nc-eyebrow">Notícias científicas</div>
         <div class="nc-title">Estudos do Dia</div>
         <div class="nc-desc">${estudosAtivos.length} estudo${estudosAtivos.length===1?'':'s'} recente${estudosAtivos.length===1?'':'s'}, selecionado${estudosAtivos.length===1?'':'s'} por relevância prática pra quem atua com crianças — traduzido${estudosAtivos.length===1?'':'s'} e explicado${estudosAtivos.length===1?'':'s'} de forma simples.</div>
+      </button>
+    `);
+  }
+  if(ativas.length){
+    cards.push(`
+      <button type="button" class="novidades-cta" id="open-novidades-mural">
+        <img class="nc-icon" src="${NOVIDADES_ICON_DATA_URI}" alt="">
+        <div class="nc-title">Notícias do mundo sobre a Infância</div>
+        <div class="nc-desc">Selecionadas pela equipe. Comente e copie para criar conteúdos para suas redes sociais com a Ferramenta NCC.</div>
       </button>
     `);
   }
@@ -10734,6 +10744,8 @@ function acessoRapidoHtml(){
 function bindAcessoRapido(){
   const openEstudosBtn = document.getElementById('open-estudos-dia');
   if(openEstudosBtn) openEstudosBtn.addEventListener('click', ()=>openEstudosDiaMural());
+  const openNovidadesBtn = document.getElementById('open-novidades-mural');
+  if(openNovidadesBtn) openNovidadesBtn.addEventListener('click', ()=>openNovidadesMural());
   const openClinicaBtn = document.getElementById('open-painel-clinica');
   if(openClinicaBtn) openClinicaBtn.addEventListener('click', ()=>openPainelQuadrant('vendas'));
   const openEscolaBtn = document.getElementById('open-painel-escola');
@@ -19460,6 +19472,38 @@ function renderConteudo(){
       </div>
     </div>` : ''}
 
+    ${conteudoSectionHeaderHtml('sec-mural', 'newspaper', 'Mural — O que está acontecendo no mundo sobre a Infância')}
+    ${conteudoAberto('sec-mural')? `
+    <p class="section-sub" style="margin-top:-6px">Publique aqui notícias, artigos ou conteúdos curtos sobre infância — aparece na tela de Início de todos os alunos, na ordem do mais novo pro mais antigo. Use "Pausar" para tirar algo do ar sem apagar.</p>
+    <div class="table-wrap">
+      <table class="check-table">
+        <thead><tr><th>Título</th><th>Texto</th><th>Fonte</th><th>Link</th><th>Publicado em</th><th>Situação</th><th></th></tr></thead>
+        <tbody>
+          ${NOVIDADES.map(n=>`
+            <tr>
+              <td style="min-width:160px">${escapeHtml(n.titulo)}</td>
+              <td style="min-width:220px;color:var(--text-mute)">${escapeHtml((n.texto||'').slice(0,120))}${(n.texto||'').length>120?'…':''}</td>
+              <td style="min-width:120px;color:var(--text-mute)">${escapeHtml(n.fonte||'')||'—'}</td>
+              <td>${n.link? `<a class="btn-mini" href="${escapeAttr(n.link)}" target="_blank" rel="noopener">${icon('externallink','tiny')} Abrir</a>` : '—'}</td>
+              <td style="white-space:nowrap">${n.createdAt? new Date(n.createdAt).toLocaleDateString('pt-BR') : '—'}</td>
+              <td><span class="resp-pill">${n.ativo? 'No ar' : 'Pausada'}</span></td>
+              <td style="white-space:nowrap">
+                <button class="btn-mini" data-toggle-novidade="${n.id}">${n.ativo? 'Pausar' : 'Reativar'}</button>
+                <button class="btn-mini danger" data-del-novidade="${n.id}">${icon('trash')} Remover</button>
+              </td>
+            </tr>
+          `).join('') || `<tr><td colspan="7" style="color:var(--text-mute)">Nenhuma novidade publicada ainda.</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+    <div class="add-form">
+      <div class="field full"><label>Título</label><input class="ps-input" type="text" id="new-novidade-titulo" placeholder="Ex.: Nova pesquisa sobre sono e desenvolvimento infantil"></div>
+      <div class="field full"><label>Descrição curta (opcional)</label><textarea class="ps-input" id="new-novidade-texto" placeholder="Um resumo curto do que se trata..."></textarea></div>
+      <div class="field"><label>Fonte da notícia (opcional)</label><input class="ps-input" type="text" id="new-novidade-fonte" placeholder="Ex.: Revista Pediatria, G1, UOL..."></div>
+      <div class="field"><label>Link (opcional)</label><input class="ps-input" type="text" id="new-novidade-link" placeholder="https://..."></div>
+      <div class="actions"><button class="btn-accent" id="add-novidade-btn">${icon('upload')} Publicar no mural</button></div>
+    </div>` : ''}
+
     ${conteudoSectionHeaderHtml('sec-estudos-dia', 'book', 'Estudos do Dia — Notícias científicas (gerados automaticamente)')}
     ${conteudoAberto('sec-estudos-dia')? `
     <p class="section-sub" style="margin-top:-6px">Essa é a área de notícias do app (o antigo mural de notícias gerais saiu do Início e da área da equipe). Todo dia, um robô busca estudos reais e recentes sobre infância/cérebro em desenvolvimento, em JAMA Pediatrics, Nature Reviews, PNAS e um grupo amplo de periódicos de psicologia, educação e desenvolvimento infantil, filtra só os que têm aplicação prática pra professoras(es), psicólogas(os) ou orientação familiar, e já publica até 3 deles direto pros alunos, com resumo em português gerado por IA — sem passar por revisão antes. Use "Pausar" ou "Remover" aqui se algum card vier com algo errado ou fora do tema.</p>
@@ -19873,6 +19917,38 @@ function renderConteudo(){
       COMUNICADO_ALUNO.updatedAt = row.updated_at;
       renderConteudo();
     }catch(e){ console.error(e); alert('Não foi possível salvar o comunicado. Tente de novo.'); btn.disabled = false; }
+  });
+  const addNovidadeBtn = document.getElementById('add-novidade-btn');
+  if(addNovidadeBtn) addNovidadeBtn.addEventListener('click', async ()=>{
+    const titulo = document.getElementById('new-novidade-titulo').value.trim();
+    const texto = document.getElementById('new-novidade-texto').value.trim();
+    const fonte = document.getElementById('new-novidade-fonte').value.trim();
+    const link = document.getElementById('new-novidade-link').value.trim();
+    if(!titulo) return;
+    const btn = document.getElementById('add-novidade-btn');
+    btn.disabled = true;
+    try{
+      const row = await syncNovidadeInsert({titulo, texto, fonte, link});
+      NOVIDADES.unshift({id:row.id, titulo:row.titulo, texto:row.texto||'', link:row.link||'', fonte:row.fonte||'', ativo:!!row.ativo, createdAt:row.created_at});
+      renderConteudo();
+    }catch(e){ console.error(e); btn.disabled = false; }
+  });
+  document.querySelectorAll('[data-toggle-novidade]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const n = NOVIDADES.find(x=>x.id==btn.dataset.toggleNovidade);
+      if(!n) return;
+      n.ativo = !n.ativo;
+      syncNovidadeUpdate(n.id, {ativo:n.ativo});
+      renderConteudo();
+    });
+  });
+  document.querySelectorAll('[data-del-novidade]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(!confirmDelete('Remover esta novidade do mural? Essa ação não pode ser desfeita.')) return;
+      const idx = NOVIDADES.findIndex(n=>n.id==btn.dataset.delNovidade);
+      if(idx>-1){ syncNovidadeDelete(NOVIDADES[idx].id); NOVIDADES.splice(idx,1); }
+      renderConteudo();
+    });
   });
   document.querySelectorAll('[data-toggle-estudo-dia]').forEach(btn=>{
     btn.addEventListener('click',()=>{

@@ -10748,7 +10748,7 @@ function acessoRapidoHtml(){
         <img class="nc-icon" src="${ICON_SCIENCE_UPDATE_DATA_URI}" alt="">
         <div class="nc-eyebrow">Ciência em Atualização</div>
         <div class="nc-title">NCC Science Update</div>
-        <div class="nc-desc">${estudosAtivos.length} estudo${estudosAtivos.length===1?'':'s'} recente${estudosAtivos.length===1?'':'s'}, selecionado${estudosAtivos.length===1?'':'s'} por relevância prática pra quem atua com crianças — traduzido${estudosAtivos.length===1?'':'s'} e explicado${estudosAtivos.length===1?'':'s'} de forma simples.</div>
+        <div class="nc-desc">Atualização científica contínua pra profissionais da infância e adolescência — estudos recentes, selecionados pela qualidade da revista científica publicada.</div>
       </button>
     `);
   }
@@ -11067,7 +11067,6 @@ function estudoDiaRowHtml(n){
         <div class="novidade-data">${estudoDiaMetaHtml(n)}${fav? ' · '+icon('bookmark','tiny'):''}</div>
         <div class="title">${escapeHtml(n.tituloPt)}</div>
         ${estudoDiaTematicaHtml(n)}
-        ${estudoDiaPublicoHtml(n)}
         ${n.autores? `<div class="desc">${escapeHtml(n.autores)}</div>` : ''}
       </div>
     </button>
@@ -11099,7 +11098,6 @@ function estudoDiaDetailHtml(n){
       <div class="novidade-data">${estudoDiaMetaHtml(n)}</div>
       <h3>${escapeHtml(n.tituloPt)}</h3>
       ${estudoDiaTematicaHtml(n)}
-      ${estudoDiaPublicoHtml(n)}
       <div class="novidade-fonte">Título original: ${escapeHtml(n.tituloOriginal)}${n.autores? ' — '+escapeHtml(n.autores) : ''}</div>
       ${fichaNova || `<div class="estudo-resumo-box">${formatEstudoTexto(n.resumoPratico||'')}</div>`}
       <p class="section-sub" style="margin:8px 0 0">Ficha gerada por IA com base no abstract público do estudo — não temos acesso ao texto completo, que é pago nesse periódico.</p>
@@ -11168,7 +11166,7 @@ function openEstudosDiaMural(){
     <div class="modal-body form-modal">
       <button class="modal-close" id="modal-close" style="position:static;float:right">${icon('x')}</button>
       <h3>NCC Science Update</h3>
-      <p class="desc">Atualização científica contínua pra profissionais da infância e adolescência — estudos reais e recentes, selecionados por terem aplicação prática, traduzidos e explicados em linguagem simples.</p>
+      <p class="desc">Atualização científica contínua pra profissionais da infância e adolescência — estudos recentes, selecionados pela qualidade da revista científica publicada.</p>
       <div class="novidades-list">
         ${recentes.map(estudoDiaRowHtml).join('') || `<p class="section-sub">Nenhum estudo publicado ainda — volte em breve.</p>`}
       </div>
@@ -19786,13 +19784,12 @@ function renderConteudo(){
     <p class="section-sub" style="margin-top:-6px">Essa é a área de notícias/atualização científica do app (o antigo mural de notícias gerais saiu do Início e da área da equipe). Todo dia, um robô busca estudos reais e recentes nas 10 áreas pedidas (neurociência do desenvolvimento, neuroplasticidade, transtornos do neurodesenvolvimento, funções executivas, saúde mental infantojuvenil, socioemocional, comportamento, educação/inclusão, puberdade/adolescência e intervenções baseadas em evidências), em JAMA Pediatrics, Nature Reviews, PNAS e um grupo amplo de periódicos de psicologia, educação e saúde mental. Filtra só os que têm aplicação prática pra professoras(es), psicólogas(os) ou orientação familiar, e já publica até 3 deles direto pros alunos com a ficha completa gerada por IA — sem passar por revisão antes. Use "Pausar" ou "Remover" aqui se algum card vier com algo errado ou fora do tema.</p>
     <div class="table-wrap">
       <table class="check-table">
-        <thead><tr><th>Título (PT)</th><th>Área temática</th><th>Pra quem</th><th>Periódico</th><th>Tipo</th><th>Publicado em</th><th>Situação</th><th></th></tr></thead>
+        <thead><tr><th>Título (PT)</th><th>Área temática</th><th>Periódico</th><th>Tipo</th><th>Publicado em</th><th>Situação</th><th></th></tr></thead>
         <tbody>
           ${ESTUDOS_CIENTIFICOS.map(n=>`
             <tr>
               <td style="min-width:200px">${escapeHtml(n.tituloPt)}</td>
               <td style="min-width:150px;color:var(--text-mute)">${n.areaTematica? escapeHtml(AREA_TEMATICA_LABELS[n.areaTematica]||n.areaTematica) : '—'}</td>
-              <td style="min-width:160px">${estudoDiaPublicoHtml(n) || '—'}</td>
               <td style="min-width:140px;color:var(--text-mute)">${escapeHtml(n.periodico)}</td>
               <td><span class="resp-pill">${estudoDiaTipoLabel(n)}</span></td>
               <td style="white-space:nowrap">${n.publicadoEm? new Date(n.publicadoEm).toLocaleDateString('pt-BR') : '—'}</td>
@@ -19802,7 +19799,7 @@ function renderConteudo(){
                 <button class="btn-mini danger" data-del-estudo-dia="${n.id}">${icon('trash')} Remover</button>
               </td>
             </tr>
-          `).join('') || `<tr><td colspan="8" style="color:var(--text-mute)">Nenhum estudo gerado ainda.</td></tr>`}
+          `).join('') || `<tr><td colspan="7" style="color:var(--text-mute)">Nenhum estudo gerado ainda.</td></tr>`}
         </tbody>
       </table>
     </div>` : ''}
